@@ -1,0 +1,17 @@
+# Directories
+.gradle/
+.idea/
+build/
+
+# Snapshot Testing
+app/screenshots/dev/debug/screenshots-compose-default/
+app/screenshots/dev/debug/screenshots-default/
+
+# File Endings
+*.iml
+
+# Files
+.DS_Store
+nsf.properties
+nextuple-keystore.jks
+local.properties

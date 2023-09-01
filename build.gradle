@@ -1,0 +1,57 @@
+import com.nextuple.nsf.UtilKt
+
+buildscript {
+    dependencies {
+        classpath 'com.karumi:shot:5.14.1'
+    }
+}
+
+plugins {
+    id 'com.android.application' version '7.4.2' apply false
+    id 'com.android.library' version '7.4.2' apply false
+    id 'com.google.dagger.hilt.android' version '2.45' apply false
+    id 'org.jetbrains.kotlin.android' version '1.8.10' apply false
+    id "com.diffplug.spotless" version "6.17.0" apply false
+}
+
+subprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    afterEvaluate { project ->
+        project.apply from: '../jacoco.gradle'
+    }
+
+    apply plugin: "com.diffplug.spotless"
+
+    spotless {
+        format 'misc', {
+            // define the files to apply `misc` to
+            target '*.gradle', '*.md', '.gitignore'
+
+            // define the steps to apply to those files
+            trimTrailingWhitespace()
+            indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+        }
+
+        kotlin {
+            // define the files to apply to
+            target fileTree('.') {
+                include '**/src/**/*.kt'
+                exclude '**/build/**'
+            }
+
+            // define the steps to apply to those files
+            ktlint()
+                    .editorConfigOverride([
+                            'ij_kotlin_allow_trailing_comma'             : 'false',
+                            'ij_kotlin_allow_trailing_comma_on_call_site': 'false',
+                            'ij_kotlin_packages_to_use_import_on_demand' : 'unset'
+                    ])
+            trimTrailingWhitespace()
+            indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
+        }
+    }
+}

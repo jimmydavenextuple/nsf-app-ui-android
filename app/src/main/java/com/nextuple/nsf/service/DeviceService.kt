@@ -11,8 +11,8 @@ class DeviceService(
 	private val getMacAddress: () -> String
 ) {
 	fun getStore(): Store {
-		val store = 1
-		val brand = Brand.toBrand("NEXTUPLE")
+		val store = 1234
+		val brand = Brand.toBrand("DSG")
 		return Store(
 			id = store.toString(),
 			brand = brand

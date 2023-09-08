@@ -7,7 +7,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nextuple.nsf.service.UserService
+import com.nextuple.nsf.service.dto.Brand
 import com.nextuple.nsf.service.dto.Result
+import com.nextuple.nsf.service.dto.Store
 import com.nextuple.nsf.service.dto.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -59,7 +61,20 @@ class UserViewModel @Inject constructor(
 		}
 
 		viewState = ViewState.LoggingIn
-		user = when (val res = userService.login(dks)) {
+
+		errMsg = null
+		viewState = ViewState.LoggedIn
+		user =
+		User(
+			firstName = "FN",
+			lastName = "LN",
+			dks = "ID000001",
+			store = Store(id = "1234", brand = Brand.DSG)
+		)
+
+
+
+		/*user = when (val res = userService.login(dks)) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = ViewState.LoggedIn
@@ -71,7 +86,7 @@ class UserViewModel @Inject constructor(
 				viewState = ViewState.LoginError
 				null
 			}
-		}
+		}*/
 	}
 
 	fun resetFromError() = logout()

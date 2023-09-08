@@ -1,6 +1,6 @@
-# FIT - Omni Experience - New PDT App
+# Nextuple Store Fulfillment
 
-Currently, we refer to this new app as "GOAT" until the official name is determined.
+Currently, we refer to this new app as "NSF" until the official name is determined.
 
 ## Development Environment Setup
 

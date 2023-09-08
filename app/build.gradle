@@ -63,7 +63,7 @@ android {
 
 	buildTypes {
 		debug {
-			signingConfig signingConfigs.nsf
+//			signingConfig signingConfigs.nsf
 			testCoverageEnabled true
 		}
 		release {

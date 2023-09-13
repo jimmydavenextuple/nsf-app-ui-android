@@ -85,7 +85,7 @@ fun AppTopBar(
 			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
-			fontSize = 24.sp
+			fontSize = 20.sp
 		)
 
 		Row(
@@ -185,7 +185,7 @@ fun PreviewAppTopBar() {
 	AppTopBar(
 		modifier = Modifier.fillMaxWidth(),
 		backgroundColor = BrandColor.BLUE_800_NT,
-		title = "NSF",
+		title = "ORDER DETAILS",
 		userLastName = "Heisey",
 		dks = "dks0564797",
 		items = listOf(

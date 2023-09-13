@@ -115,8 +115,8 @@ fun InfoModal(
 					}
 				}
 
-				Spacer(modifier = Modifier.height(16.dp))
-				visualContent.invoke()
+//				Spacer(modifier = Modifier.height(16.dp))
+//				visualContent.invoke()
 				Spacer(modifier = Modifier.height(16.dp))
 
 				PrimaryButton(

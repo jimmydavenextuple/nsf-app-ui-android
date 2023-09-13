@@ -126,7 +126,7 @@ fun PickDetailsScreen(
 								text = currentPickTaskItem?.productBrand?.uppercase().orEmpty(),
 								maxLines = 1,
 								overflow = TextOverflow.Ellipsis,
-								color = BrandColor.GREEN_700,
+								color = BrandColor.PINK_NT,
 								fontFamily = FontFamily.ARCHIVO,
 								fontSize = 15.sp,
 								fontWeight = FontWeight.Bold,
@@ -302,7 +302,7 @@ private fun ProductAttributes(currentItem: PickTaskItem?) {
 fun PickDetailsScreenPreview() {
 	PickDetailsScreen(
 		scanManager = NoOpScanManager(),
-		progressBarBackgroundColor = BrandColor.GREEN_900,
+		progressBarBackgroundColor = BrandColor.BLUE_800_NT,
 		pickDeclineState = GenericViewState.Loading,
 		currentPickTaskItem = PickTaskItem(
 			sku = "2345",

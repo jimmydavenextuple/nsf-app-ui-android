@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">NSF</string>
-    <string name="athlete">ATHLETE</string>
-    <string name="athlete_info">Athlete Info</string>
+    <string name="athlete">CUSTOMER</string>
+    <string name="athlete_info">Customer Info</string>
     <string name="athlete_name">ATHLETE NAME</string>
+    <string name="customer_name">CUSTOMER NAME</string>
     <string name="back">BACK</string>
-    <string name="bring_to_athlete_description">Bring this order to the athlete</string>
+    <string name="bring_to_athlete_description">Bring this order to the Customer</string>
     <string name="bring_to_athlete_title">Bring to Athlete</string>
+    <string name="bring_to_customer_title">Bring to Customer</string>
     <string name="cant_find_the_ip">CAN\'T FIND THE IP?</string>
     <string name="clear">Clear</string>
     <string name="color">Color</string>
@@ -19,7 +21,7 @@
     <string name="decline">DECLINE</string>
     <string name="decline_reason">Decline Reason</string>
     <string name="decline_reason_subtitle">Please select a reason for why you need to decline this unit.</string>
-    <string name="dks_number_label">DKS Number</string>
+    <string name="login_id_label">Login ID</string>
     <string name="dropdown_menu_feedback">Feedback</string>
     <string name="dropdown_menu_logout">Logout</string>
     <string name="dropdown_menu_settings">Settings</string>
@@ -30,7 +32,7 @@
     <string name="holding_area">HOLDING AREA</string>
     <string name="info_modal_order_extend_pickup_message">Are you sure you’d like to extend the pickup window for this order?</string>
     <string name="info_modal_order_extend_pickup_title">Extend Pickup</string>
-    <string name="info_modal_order_picked_up_message">This order has been picked up and the athlete has been charged.</string>
+    <string name="info_modal_order_picked_up_message">This order has been picked up and the customer has been charged.</string>
     <string name="info_modal_order_picked_up_title">Order Picked Up</string>
     <string name="info_modal_order_remove_check_in_message">Are you sure you’d like to remove the check-in for this order?</string>
     <string name="info_modal_order_remove_check_in_title">Remove Check-In</string>
@@ -54,6 +56,7 @@
     <string name="order_number_or_last_name">Order #, Phone # or Last Name</string>
     <string name="order_number_text">Order Number</string>
     <string name="order_search_label">Order Search</string>
+    <string name="nsf_label">NSF</string>
     <string name="pack">Pack</string>
     <string name="pack_these_units">Pack These Units</string>
     <string name="packed_by">PACKED BY</string>
@@ -61,7 +64,7 @@
     <string name="phone_number">PHONE NUMBER</string>
     <string name="pickup_actions">Pickup Actions</string>
     <string name="pickup_location">PICKUP LOCATION</string>
-    <string name="prep_empty_orders_description">There are no more orders to \nprep for athletes right now.</string>
+    <string name="prep_empty_orders_description">There are no more orders to \nprep for customers right now.</string>
     <string name="prep_empty_orders_title">Oh, there’s nothing here.</string>
     <string name="print_hold_slip">PRINT HOLD SLIP</string>
     <string name="printer_connected">Connected</string>

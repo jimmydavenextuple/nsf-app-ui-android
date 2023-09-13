@@ -62,7 +62,7 @@ fun TopLabeledTextField(
 			textAlign = TextAlign.Start,
 			color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY_900,
 			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight.Normal,
+			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
 			fontSize = 12.sp
 		)

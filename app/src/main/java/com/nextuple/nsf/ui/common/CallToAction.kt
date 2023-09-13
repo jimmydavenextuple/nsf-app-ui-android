@@ -32,7 +32,7 @@ fun CallToAction(
 	FloatingActionButton(
 		modifier = modifier.testTag("callToAction"),
 		shape = CircleShape,
-		containerColor = callToActionMode.color,
+		containerColor = BrandColor.PINK_NT,
 		onClick = onClick
 	) {
 		if (callToActionMode is CallToActionMode.Loading) {

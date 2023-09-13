@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -84,8 +85,9 @@ fun HorizontalProgressBar(
 					.fillMaxWidth(progress)
 					.fillMaxHeight()
 					.clip(RoundedCornerShape(9.dp))
-					.background(BrandColor.GREEN_500)
+					.background(BrandColor.BLUE_250_NT)
 					.animateContentSize()
+					.alpha(0.2f)
 			)
 		}
 	}

@@ -109,7 +109,7 @@ fun PickOrderScreen(
 			)
 			OrderPickupCardItem(
 				stepNumber = "2",
-				title = stringResource(id = R.string.bring_to_athlete_title),
+				title = stringResource(id = R.string.bring_to_customer_title),
 				subTitle = stringResource(id = R.string.bring_to_athlete_description),
 				isActive = isAthleteActive(),
 				extraContent = { BringToAthleteContent(orderDetails, onOrderPickupClicked) }
@@ -204,7 +204,7 @@ private fun GetOrdersContent(orderDetails: OrderDetailsResponse? = null, onScanC
 	Row {
 		TextInfo(
 			modifier = Modifier.weight(0.5f),
-			label = stringResource(id = R.string.athlete_name),
+			label = stringResource(id = R.string.customer_name),
 			value = orderDetails?.athleteDetail?.athleteFullName()
 		)
 		TextInfo(
@@ -355,10 +355,10 @@ private fun StepNumberWithCircle(text: String?, circleColor: Color, textColor: C
 }
 
 private fun cardTitleTextColor(isActive: Boolean) =
-	if (isActive) BrandColor.BLACK else BrandColor.GRAY_500
+	if (isActive) BrandColor.BLUE_800_NT else BrandColor.GRAY_500
 
 private fun stepCountCircleColor(isActive: Boolean) =
-	if (isActive) BrandColor.BLACK else BrandColor.GRAY_500
+	if (isActive) BrandColor.BLUE_800_NT else BrandColor.GRAY_500
 
 @PreviewPdt
 @Composable

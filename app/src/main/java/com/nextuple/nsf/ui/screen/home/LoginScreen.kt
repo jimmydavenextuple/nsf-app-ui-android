@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Text
@@ -19,14 +20,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -78,8 +83,23 @@ fun LoginScreen(
 				Column(
 					horizontalAlignment = Alignment.CenterHorizontally
 				) {
+
+					val annotatedText = buildAnnotatedString {
+						withStyle(style = SpanStyle(color = BrandColor.PINK_NT)) {
+							append("Nextuple")
+						}
+						append("\n")
+						withStyle(style = SpanStyle(color = BrandColor.YELLOW_NT)) {
+							append("Store")
+						}
+						append("\n")
+						withStyle(style = SpanStyle(color = BrandColor.BLUE_300_NT)) {
+							append("Fulfillment")
+						}
+					}
+
 					Text(
-						text = "GOAT",
+						text = annotatedText,
 						modifier = Modifier
 							.align(Alignment.Start)
 							.clickable {
@@ -93,8 +113,8 @@ fun LoginScreen(
 							fontWeight = FontWeight.Bold,
 							fontStyle = FontStyle.Normal,
 							letterSpacing = 1.5.sp,
-							fontSize = 100.sp,
-							color = BrandColor.BLACK
+							fontSize = 50.sp,
+							color = BrandColor.BLUE_800_NT
 						)
 					)
 					TopLabeledTextField(
@@ -102,7 +122,7 @@ fun LoginScreen(
 							.fillMaxWidth(0.45f)
 							.padding(top = 12.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
 							.align(Alignment.Start),
-						labelText = stringResource(id = R.string.dks_number_label),
+						labelText = stringResource(id = R.string.login_id_label),
 						fieldValue = dks,
 						isInvalid = isInvalid,
 						onValueChange = {
@@ -141,8 +161,8 @@ fun LoginScreen(
 				contentAlignment = Alignment.TopEnd
 			) {
 				Image(
-					modifier = Modifier.fillMaxHeight(),
-					painter = painterResource(R.drawable.phil_login),
+					modifier = Modifier.padding( top = 12.dp, end= 12.dp).height(40.dp),
+					painter = painterResource(R.drawable.nextuple_fulllogo),
 					contentDescription = null,
 					contentScale = ContentScale.FillHeight
 				)

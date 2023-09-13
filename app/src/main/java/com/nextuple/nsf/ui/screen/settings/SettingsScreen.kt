@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColor
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.BackButton
 import com.nextuple.nsf.ui.common.ButtonState
@@ -62,13 +64,27 @@ fun SettingsScreen(
 			.padding()
 			.background(BrandColor.GRAY_100)
 	) {
-		BackButton(
-			modifier = Modifier.padding(top = 22.dp, bottom = 10.dp),
-			onBackButtonClick = onBackButtonClick
-		)
+		//Header
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.background(color = BrandColor.GRAY_200)
+				.padding(start = 20.dp)
+				.height(40.dp)
+		) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				BackButton(
+					modifier = Modifier.fillMaxHeight().padding(top = 10.dp, bottom = 10.dp),
+					onBackButtonClick = onBackButtonClick
+				)
+
+			}
+		}
 		Card(
 			modifier = Modifier
-				.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
+				.padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 8.dp)
 				.fillMaxWidth()
 				.wrapContentHeight(),
 			shape = RoundedCornerShape(12.dp),
@@ -82,7 +98,7 @@ fun SettingsScreen(
 						fontWeight = FontWeight.Bold,
 						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 24.sp,
-						color = BrandColor.GRAY_900
+						color = BrandColor.BLUE_800_NT
 					)
 				)
 				printersList?.forEach { printer ->
@@ -128,7 +144,7 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 				.fillMaxWidth()
 				.wrapContentHeight(),
 			shape = RoundedCornerShape(12.dp),
-			colors = CardDefaults.cardColors(containerColor = if (printer.connectionStatus) BrandColor.GREEN_50 else BrandColor.GRAY_100)
+			colors = CardDefaults.cardColors(containerColor = if (printer.connectionStatus) BrandColor.BLUE_100_NT else BrandColor.GRAY_100)
 		) {
 			Row(
 				modifier = Modifier
@@ -321,7 +337,8 @@ private fun PrinterProblem(
 				.padding()
 				.clickable { onButtonClick() },
 			painter = painterResource(id = R.drawable.ic_info),
-			contentDescription = "back button"
+			contentDescription = "back button",
+			tint = BrandColor.BLUE_300_NT
 		)
 
 		TertiaryButton(text = stringResource(id = R.string.printer_problems)) {

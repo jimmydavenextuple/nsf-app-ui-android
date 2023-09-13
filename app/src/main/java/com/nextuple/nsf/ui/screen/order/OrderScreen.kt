@@ -176,9 +176,9 @@ private fun RowScope.CustomTab(
 			.clickable { onClick() }
 			.background(
 				if (selectedTab == tab) {
-					BrandColor.GRAY_50
+					BrandColor.BLUE_100_NT
 				} else {
-					BrandColor.GRAY_700
+					BrandColor.GRAY_200
 				}
 			)
 	) {
@@ -189,7 +189,11 @@ private fun RowScope.CustomTab(
 			fontSize = 14.sp,
 			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight(700),
-			color = BrandColor.GRAY,
+			color = if (selectedTab == tab) {
+				BrandColor.BLUE_800_NT
+			} else {
+				BrandColor.GRAY
+			},
 			textAlign = TextAlign.Center,
 			letterSpacing = 1.5.sp
 		)
@@ -285,7 +289,7 @@ private fun AllTabContainer(
 				modifier = Modifier
 					.height(40.dp)
 					.align(Alignment.CenterEnd)
-					.background(color = searchBackgroundColor)
+					.background(color = BrandColor.BLUE_100_NT)
 					.clickable(enabled = searchInput.value.isNotBlank()) {
 						if (isClearState.value) {
 							resetSearchState()
@@ -307,7 +311,7 @@ private fun AllTabContainer(
 							R.drawable.ic_order_search
 						)
 					},
-					tint = searchTintColor,
+					tint = BrandColor.BLUE_800_NT,
 					contentDescription = ""
 				)
 				Text(
@@ -326,7 +330,7 @@ private fun AllTabContainer(
 						fontSize = 10.sp
 					),
 					modifier = Modifier.align(Alignment.CenterHorizontally),
-					color = searchTextColor
+					color = BrandColor.BLUE_800_NT
 				)
 			}
 		}

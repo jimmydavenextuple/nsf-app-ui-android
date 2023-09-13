@@ -17,7 +17,7 @@ import com.nextuple.nsf.ui.theme.FontFamily
 fun TertiaryButton(
 	modifier: Modifier = Modifier,
 	text: String,
-	textColor: Color = BrandColor.GRAY_900,
+	textColor: Color = BrandColor.BLUE_300_NT,
 	tag: String = "TertiaryButton",
 	onButtonClick: () -> Unit
 ) {
@@ -25,7 +25,6 @@ fun TertiaryButton(
 		modifier = modifier.clickable { onButtonClick() }.testTag(tag),
 		text = text,
 		color = textColor,
-		textDecoration = TextDecoration.Underline,
 		fontFamily = FontFamily.ARCHIVO,
 		letterSpacing = 1.5.sp,
 		fontWeight = FontWeight.Bold

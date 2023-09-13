@@ -93,7 +93,7 @@ fun RowScope.AddItem(
 			}.let { modifier ->
 				if (isRouteSelected) {
 					modifier
-						.background(color = BrandColor.GRAY_50)
+						.background(color = BrandColor.BLUE_100_NT)
 				} else {
 					modifier
 				}
@@ -107,7 +107,7 @@ fun RowScope.AddItem(
 					.padding(start = 16.dp, top = 9.dp, end = 16.dp)
 					.size(21.dp),
 				imageVector = ImageVector.vectorResource(id = item.iconResId),
-				tint = if (isRouteSelected) BrandColor.GREEN_500 else BrandColor.GRAY_900,
+				tint = if (isRouteSelected) BrandColor.BLUE_300_NT else BrandColor.BLUE_800_NT,
 				contentDescription = "Navigate to ${item.label}"
 			)
 
@@ -136,7 +136,7 @@ fun RowScope.AddItem(
 				.testTag("navigationBarItemLabel_${item.label}")
 				.align(Alignment.CenterHorizontally),
 			text = item.label.uppercase(),
-			color = if (isRouteSelected) BrandColor.GREEN_500 else BrandColor.GRAY_900,
+			color = if (isRouteSelected) BrandColor.BLUE_300_NT else BrandColor.BLUE_800_NT,
 			fontSize = if (isRouteSelected) 12.sp else 10.sp,
 			fontWeight = FontWeight(700),
 			letterSpacing = 1.5.sp

@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -116,22 +117,35 @@ fun HomeScreen(
 				Row(
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					Image(
-						modifier = Modifier.fillMaxHeight().padding(top = 10.dp, bottom = 10.dp),
-						painter = painterResource(R.drawable.nextuple_logo),
-						contentDescription = "nextuple logo"
-					)
-					Text(
-						text = stringResource(id = R.string.nsf_label),
-						fontFamily = FontFamily.ARCHIVO,
-						fontWeight = FontWeight.Bold,
-						fontStyle = FontStyle.Normal,
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 8.dp),
-						fontSize = 16.sp,
-						color = BrandColor.BLACK
-					)
+					Box(
+						modifier = Modifier.fillMaxSize(),
+						contentAlignment = Alignment.TopStart
+					) {
+						Image(
+							modifier = Modifier.fillMaxHeight().padding(top = 10.dp, bottom = 10.dp),
+							painter = painterResource(R.drawable.nextuple_fulllogo),
+							contentDescription = null,
+							contentScale = ContentScale.FillHeight
+						)
+					}
+
+//					Image(
+//						modifier = Modifier.fillMaxHeight().padding(top = 10.dp, bottom = 10.dp),
+//						painter = painterResource(R.drawable.nextuple_logo),
+//						contentDescription = "nextuple logo"
+//					)
+//					Text(
+//						text = stringResource(id = R.string.nsf_label),
+//						fontFamily = FontFamily.ARCHIVO,
+//						fontWeight = FontWeight.Bold,
+//						fontStyle = FontStyle.Normal,
+//						modifier = Modifier
+//							.fillMaxWidth()
+//							.padding(start = 8.dp),
+//						fontSize = 16.sp,
+//						color = BrandColor.BLACK
+//					)
+
 				}
 			}
 		}
@@ -208,7 +222,7 @@ fun HomeScreen(
 							modifier = Modifier
 								.height(40.dp)
 								.align(Alignment.CenterEnd)
-								.background(color = searchBackgroundColor)
+								.background(color = BrandColor.BLUE_100_NT)
 								.clickable(enabled = searchInput.isNotBlank()) {
 									onSearchClick(searchInput)
 								},
@@ -220,7 +234,7 @@ fun HomeScreen(
 									.align(Alignment.CenterHorizontally)
 									.size(18.dp),
 								imageVector = ImageVector.vectorResource(R.drawable.ic_order_search),
-								tint = searchTintColor,
+								tint = BrandColor.BLUE_800_NT,
 								contentDescription = ""
 							)
 							Text(
@@ -233,7 +247,7 @@ fun HomeScreen(
 									fontSize = 10.sp
 								),
 								modifier = Modifier.align(Alignment.CenterHorizontally),
-								color = searchTextColor
+								color = BrandColor.BLUE_800_NT
 							)
 						}
 					}

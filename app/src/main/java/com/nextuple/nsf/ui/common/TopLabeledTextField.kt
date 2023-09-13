@@ -60,7 +60,7 @@ fun TopLabeledTextField(
 				.testTag("TopLabeledTextFieldLabelText"),
 			text = labelText,
 			textAlign = TextAlign.Start,
-			color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY_900,
+			color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY_600,
 			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,

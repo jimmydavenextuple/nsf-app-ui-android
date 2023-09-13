@@ -137,7 +137,7 @@ fun StageDetailsScreen(
 							modifier = Modifier
 								.height(100.dp)
 								.weight(0.42f)
-								.background(BrandColor.GREEN_500),
+								.background(BrandColor.BLUE_300_NT),
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
 							Image(
@@ -174,7 +174,7 @@ fun StageDetailsScreen(
 							modifier = Modifier
 								.height(100.dp)
 								.weight(0.42f)
-								.background(BrandColor.ORANGE_600)
+								.background(BrandColor.PINK_NT)
 								.clickable {
 									if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
 										onRecordHoldingLocation(
@@ -289,7 +289,8 @@ private fun Title() {
 		fontFamily = FontFamily.ARCHIVO,
 		fontWeight = FontWeight.Bold,
 		fontSize = 20.sp,
-		letterSpacing = 0.5.sp
+		letterSpacing = 0.5.sp,
+		color = BrandColor.BLUE_800_NT
 	)
 }
 
@@ -338,7 +339,7 @@ private fun RowScope.ItemDetails(
 @Composable
 fun StageOrderPreview() {
 	StageDetailsScreen(
-		progressBarBackgroundColor = BrandColor.GREEN_900,
+		progressBarBackgroundColor = BrandColor.BLUE_800_NT,
 		athlete = "Heisey, A.",
 		orderNum = "000000000001",
 		scanManager = NoOpScanManager(),

@@ -60,7 +60,7 @@ fun Carousel(modifier: Modifier = Modifier, images: List<String>) {
 					val color = if (pagerState.currentPage == iteration) {
 						BrandColor.PINK_NT
 					} else {
-						BrandColor.GRAY_300
+						BrandColor.PINK_100_NT
 					}
 					Box(
 						modifier = Modifier

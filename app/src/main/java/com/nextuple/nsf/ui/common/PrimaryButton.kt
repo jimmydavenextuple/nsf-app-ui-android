@@ -29,7 +29,7 @@ import com.nextuple.nsf.ui.theme.FontFamily
 fun PrimaryButton(
 	modifier: Modifier = Modifier,
 	text: String,
-	buttonColor: Color = BrandColor.RED,
+	buttonColor: Color = BrandColor.PINK_NT,
 	contentColor: Color = BrandColor.GRAY_50,
 	buttonShape: Shape = RoundedCornerShape(12.dp),
 	enabled: Boolean = true,
@@ -45,13 +45,13 @@ fun PrimaryButton(
 		shape = buttonShape,
 		colors = ButtonDefaults.buttonColors(
 			containerColor = if (buttonState == ButtonState.DONE) {
-				BrandColor.GREEN_500
+				BrandColor.BLUE_300_NT
 			} else {
 				buttonColor
 			},
-			disabledContainerColor = BrandColor.GRAY_700,
+			disabledContainerColor = BrandColor.PINK_100_NT,
 			contentColor = contentColor,
-			disabledContentColor = BrandColor.GRAY
+			disabledContentColor = BrandColor.PINK_NT
 		),
 		enabled = enabled
 	) {

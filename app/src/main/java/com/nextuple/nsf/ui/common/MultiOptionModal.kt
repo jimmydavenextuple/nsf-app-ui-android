@@ -105,7 +105,7 @@ fun MultiOptionModal(
 					PrimaryButton(
 						modifier = Modifier.fillMaxWidth(0.8f),
 						text = buttons[0],
-						buttonColor = BrandColor.ORANGE_600,
+						buttonColor = BrandColor.PINK_NT,
 						onButtonClick = { buttonClick(buttons[0]) },
 						contentColor = BrandColor.GRAY_100
 					)

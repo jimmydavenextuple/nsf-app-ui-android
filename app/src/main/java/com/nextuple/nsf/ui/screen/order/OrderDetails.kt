@@ -1,11 +1,13 @@
 package com.nextuple.nsf.ui.screen.order
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -112,6 +115,8 @@ fun OrderDetails(
 		}
 	}
 
+
+
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
@@ -119,10 +124,26 @@ fun OrderDetails(
 			.background(BrandColor.GRAY_100)
 			.verticalScroll(rememberScrollState())
 	) {
-		BackButton(
-			modifier = Modifier.padding(top = 22.dp, bottom = 10.dp),
-			onBackButtonClick = onBackButtonClick
-		)
+
+		//Header
+		Column(
+			modifier = Modifier
+				.fillMaxWidth()
+				.background(color = BrandColor.GRAY_200)
+				.padding(start = 20.dp)
+				.height(40.dp)
+		) {
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				BackButton(
+					modifier = Modifier.fillMaxHeight().padding(top = 10.dp, bottom = 10.dp),
+					onBackButtonClick = onBackButtonClick
+				)
+
+			}
+		}
+
 		InfoCard( // Athlete Info
 			modifier = Modifier
 				.padding(horizontal = 24.dp, vertical = 4.dp),
@@ -259,7 +280,9 @@ private fun InfoCard(
 				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 20.sp,
 				fontWeight = FontWeight.Bold,
-				letterSpacing = 0.5.sp
+				letterSpacing = 0.5.sp,
+				color = BrandColor.PINK_NT
+
 			)
 
 			Spacer(modifier = Modifier.height(8.dp))
@@ -320,7 +343,8 @@ private fun ContentDropDown(
 					fontFamily = FontFamily.ARCHIVO,
 					fontSize = 20.sp,
 					fontWeight = FontWeight.Bold,
-					letterSpacing = 0.5.sp
+					letterSpacing = 0.5.sp,
+					color = BrandColor.PINK_NT
 				)
 				Spacer(
 					modifier = Modifier
@@ -341,6 +365,7 @@ private fun ContentDropDown(
 					modifier = Modifier
 						.padding(start = 5.dp)
 						.clickable { isExpanded = !isExpanded },
+					tint = BrandColor.BLUE_300_NT,
 					painter = if (isExpanded) {
 						painterResource(id = R.drawable.ic_arrow_up)
 					} else {
@@ -452,7 +477,8 @@ private fun PickupActionsCard(
 				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 20.sp,
 				fontWeight = FontWeight.Bold,
-				letterSpacing = 0.5.sp
+				letterSpacing = 0.5.sp,
+				color = BrandColor.PINK_NT
 			)
 			Spacer(modifier = Modifier.height(8.dp))
 			PrimaryButton(
@@ -509,7 +535,8 @@ private fun OrderManagementCard(modifier: Modifier = Modifier) {
 				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 20.sp,
 				fontWeight = FontWeight.Bold,
-				letterSpacing = 0.5.sp
+				letterSpacing = 0.5.sp,
+				color = BrandColor.PINK_NT
 			)
 			Spacer(modifier = Modifier.height(8.dp))
 			SecondaryButton(

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -91,10 +92,26 @@ fun PickOrderScreen(
 				.background(BrandColor.GRAY_100)
 				.verticalScroll(rememberScrollState())
 		) {
-			BackButton(
-				modifier = Modifier.padding(top = 22.dp, bottom = 10.dp),
-				onBackButtonClick = onBackButtonClick
-			)
+
+
+			//Header
+			Column(
+				modifier = Modifier
+					.fillMaxWidth()
+					.background(color = BrandColor.GRAY_200)
+					.padding(start = 20.dp)
+					.height(40.dp)
+			) {
+				Row(
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					BackButton(
+						modifier = Modifier.fillMaxHeight().padding(top = 10.dp, bottom = 10.dp),
+						onBackButtonClick = onBackButtonClick
+					)
+
+				}
+			}
 
 			OrderPickupCardItem(
 				stepNumber = if (isOrderActive()) "1" else null,
@@ -190,7 +207,7 @@ private fun OrderPickupCardItem(
 					fontSize = 16.sp,
 					fontWeight = FontWeight.Normal,
 					letterSpacing = 0.5.sp,
-					color = BrandColor.BLACK
+					color = BrandColor.BLUE_800_NT
 				)
 				Spacer(modifier = Modifier.height(8.dp))
 				extraContent()
@@ -355,10 +372,10 @@ private fun StepNumberWithCircle(text: String?, circleColor: Color, textColor: C
 }
 
 private fun cardTitleTextColor(isActive: Boolean) =
-	if (isActive) BrandColor.BLUE_800_NT else BrandColor.GRAY_500
+	if (isActive) BrandColor.BLUE_800_NT else BrandColor.BLUE_250_NT
 
 private fun stepCountCircleColor(isActive: Boolean) =
-	if (isActive) BrandColor.BLUE_800_NT else BrandColor.GRAY_500
+	if (isActive) BrandColor.BLUE_800_NT else BrandColor.BLUE_250_NT
 
 @PreviewPdt
 @Composable

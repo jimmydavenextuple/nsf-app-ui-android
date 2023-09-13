@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nextuple.nsf.R
+import com.nextuple.nsf.ui.theme.BrandColor
 
 @Composable
 fun BackButton(
@@ -23,10 +24,11 @@ fun BackButton(
 	) {
 		Icon(
 			modifier = Modifier
-				.padding(start = 24.dp, end = 8.dp)
+				.padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
 				.clickable { onBackButtonClick() },
 			painter = painterResource(id = R.drawable.ic_back_arrow),
-			contentDescription = "back button"
+			contentDescription = "back button",
+			tint = BrandColor.BLUE_300_NT
 		)
 
 		TertiaryButton(text = stringResource(id = R.string.back)) {

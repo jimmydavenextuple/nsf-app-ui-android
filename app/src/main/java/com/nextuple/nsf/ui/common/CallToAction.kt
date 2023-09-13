@@ -40,7 +40,7 @@ fun CallToAction(
 				modifier = Modifier
 					.wrapContentSize()
 					.padding(16.dp),
-				color = BrandColor.GRAY_50,
+				color = BrandColor.PINK_100_NT,
 				strokeWidth = 6.dp
 			)
 		} else {
@@ -70,19 +70,19 @@ sealed class CallToActionMode(val color: Color) {
 	 * Initial state and Displays scan image
 	 */
 	class Scan(
-		color: Color = BrandColor.ORANGE_600
+		color: Color = BrandColor.PINK_NT
 	) : CallToActionMode(color)
 
 	/**
 	 * Once clicking on scan option changes to Loading state
 	 */
-	class Loading(color: Color = BrandColor.ORANGE_600) : CallToActionMode(color)
+	class Loading(color: Color = BrandColor.PINK_NT) : CallToActionMode(color)
 
 	/**
 	 * Once scanning is completed changes from Loading -> Done
 	 */
 	class Done(
-		color: Color = BrandColor.GREEN_500
+		color: Color = BrandColor.BLUE_300_NT
 	) : CallToActionMode(color)
 }
 

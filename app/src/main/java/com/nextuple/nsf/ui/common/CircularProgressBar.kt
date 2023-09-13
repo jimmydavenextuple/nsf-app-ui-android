@@ -58,9 +58,9 @@ fun CircularProgressBar(
 	indicatorThickness: Dp = 20.dp,
 	animationDuration: Int = 1000,
 	animationDelay: Int = 0,
-	backgroundIndicatorColor: Color = BrandColor.GRAY_300,
-	completedIndicatorColor: Color = BrandColor.GREEN_500,
-	inProgressIndicatorColor: Color = BrandColor.YELLOW_400,
+	backgroundIndicatorColor: Color = BrandColor.BLUE_100_NT,
+	completedIndicatorColor: Color = BrandColor.BLUE_300_NT,
+	inProgressIndicatorColor: Color = BrandColor.YELLOW_NT,
 	showLegends: Boolean = false,
 	backgroundLegendText: String = "Unworked",
 	completedLegendText: String = "Progress",
@@ -214,7 +214,8 @@ private fun DisplayText(
 			text = "$completedUnits/$totalUnits",
 			style = centerProgressTextStyle,
 // 			fontFamily = FontFamily.SANS
-			fontFamily = FontFamily.ARCHIVO
+			fontFamily = FontFamily.ARCHIVO,
+			color = BrandColor.BLUE_800_NT
 		)
 		centerText?.let {
 			Text(

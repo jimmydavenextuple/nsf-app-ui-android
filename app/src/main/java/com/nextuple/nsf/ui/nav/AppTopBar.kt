@@ -4,11 +4,13 @@ import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -32,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -72,18 +75,23 @@ fun AppTopBar(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.SpaceBetween
 	) {
-		Text(
-			modifier = Modifier.clickable {
-				Toast.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG).show()
-			},
-			text = title,
-			color = BrandColor.GRAY_50,
-// 			fontFamily = FontFamily.SANS,
-			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight.Bold,
-			fontStyle = FontStyle.Normal,
-			fontSize = 32.sp
-		)
+		Image(
+			modifier = Modifier.clickable { Toast.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG).show() },
+			painter = painterResource(R.drawable.nextuple_fulllogo),
+			contentDescription = "nextuple logo",
+			)
+//		Text(
+//			modifier = Modifier.clickable {
+//				Toast.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG).show()
+//			},
+//			text = title,
+//			color = BrandColor.GRAY_50,
+//// 			fontFamily = FontFamily.SANS,
+//			fontFamily = FontFamily.ARCHIVO,
+//			fontWeight = FontWeight.Bold,
+//			fontStyle = FontStyle.Normal,
+//			fontSize = 32.sp
+
 
 		Row(
 			verticalAlignment = Alignment.CenterVertically
@@ -94,7 +102,7 @@ fun AppTopBar(
 			) {
 				Text(
 					text = userLastName.uppercase(),
-					color = BrandColor.GRAY_50,
+					color = BrandColor.BLUE_800_NT,
 // 					fontFamily = FontFamily.SANS,
 					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
@@ -105,7 +113,7 @@ fun AppTopBar(
 				)
 				Text(
 					text = dks.replace("dks", "").uppercase(),
-					color = BrandColor.GRAY_50,
+					color = BrandColor.BLUE_800_NT,
 					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Light,
 					fontStyle = FontStyle.Normal,
@@ -125,7 +133,7 @@ fun AppTopBar(
 							}
 							.align(alignment = Alignment.CenterStart),
 						imageVector = Icons.Default.ArrowDropDown,
-						tint = BrandColor.GREEN_300,
+						tint = BrandColor.BLUE_300_NT,
 						contentDescription = null
 					)
 				}
@@ -181,7 +189,7 @@ fun AppTopBar(
 fun PreviewAppTopBar() {
 	AppTopBar(
 		modifier = Modifier.fillMaxWidth(),
-		backgroundColor = BrandColor.GREEN_900,
+		backgroundColor = BrandColor.GRAY_200,
 		title = "GOAT",
 		userLastName = "Heisey",
 		dks = "dks0564797",

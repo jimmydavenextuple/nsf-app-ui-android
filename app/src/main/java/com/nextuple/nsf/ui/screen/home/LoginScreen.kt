@@ -120,7 +120,7 @@ fun LoginScreen(
 					TopLabeledTextField(
 						modifier = Modifier
 							.fillMaxWidth(0.45f)
-							.padding(top = 12.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
+							.padding(top = 20.dp, bottom = 0.dp, start = 8.dp, end = 8.dp)
 							.align(Alignment.Start),
 						labelText = stringResource(id = R.string.login_id_label),
 						fieldValue = dks,

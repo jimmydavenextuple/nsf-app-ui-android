@@ -42,5 +42,5 @@ fun StatusText(
 @Composable
 @Preview
 fun PreviewOrderStatusText() {
-	StatusText(status = "Order Ready", backgroundColor = BrandColor.GREEN_500)
+	StatusText(status = "Order Ready", backgroundColor = BrandColor.BLUE_300_NT)
 }

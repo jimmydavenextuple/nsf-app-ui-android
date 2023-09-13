@@ -98,7 +98,8 @@ fun PackDetailsScreen(
 			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			fontSize = 20.sp,
-			letterSpacing = 0.5.sp
+			letterSpacing = 0.5.sp,
+			color = BrandColor.BLUE_800_NT
 		)
 
 		LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -235,7 +236,7 @@ private fun TextInfo(label: String, value: String) {
 @Composable
 fun PackTaskScreenPreview() {
 	PackDetailsScreen(
-		progressBarBackgroundColor = BrandColor.GREEN_900,
+		progressBarBackgroundColor = BrandColor.BLUE_800_NT,
 		holdSlipState = GenericViewState.Success,
 		athlete = "Heisey, A",
 		orderNum = "00000000000001",

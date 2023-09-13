@@ -26,7 +26,7 @@ fun SecondaryButton(
 	modifier: Modifier = Modifier,
 	text: String,
 	buttonColor: Color = Color.Transparent,
-	textColor: Color = BrandColor.BLACK,
+	textColor: Color = BrandColor.YELLOW_NT,
 	textSize: TextUnit = 16.sp,
 	buttonShape: Shape = RoundedCornerShape(12.dp),
 	enabled: Boolean = true,

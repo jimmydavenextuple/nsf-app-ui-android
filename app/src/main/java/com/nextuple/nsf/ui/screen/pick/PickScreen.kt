@@ -70,7 +70,7 @@ fun PickScreen(
 		) {
 			CircularProgressIndicator(
 				modifier = Modifier.align(Alignment.Center),
-				color = BrandColor.GRAY_900
+				color = BrandColor.BLUE_100_NT
 			)
 		} else if (
 			storeOverviewState == GenericViewState.Success &&
@@ -119,9 +119,9 @@ fun PickScreen(
 								circleSize = 16,
 								space = 0,
 								items = listOf(
-									Legend(BrandColor.GRAY_900, "UNWORKED"),
-									Legend(BrandColor.GREEN_400, "WORKED"),
-									Legend(BrandColor.YELLOW_400, "BEING WORKED")
+									Legend(BrandColor.BLUE_100_NT, "UNWORKED"),
+									Legend(BrandColor.BLUE_300_NT, "WORKED"),
+									Legend(BrandColor.YELLOW_NT, "BEING WORKED")
 								),
 								textStyle = legendsTextStyle
 							)

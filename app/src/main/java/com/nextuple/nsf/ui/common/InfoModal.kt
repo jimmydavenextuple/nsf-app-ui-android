@@ -122,7 +122,7 @@ fun InfoModal(
 				PrimaryButton(
 					modifier = Modifier.fillMaxWidth(0.85f),
 					text = buttonText,
-					buttonColor = BrandColor.ORANGE_600,
+					buttonColor = BrandColor.PINK_NT,
 					onButtonClick = {
 						buttonClick.invoke(shouldShowAgain)
 					},
@@ -148,7 +148,7 @@ fun CheckboxComponent(
 			checked = checkedState,
 			onCheckedChange = onCheckedChange,
 			colors = CheckboxDefaults.colors(
-				checkedColor = BrandColor.ORANGE_600,
+				checkedColor = BrandColor.PINK_NT,
 				uncheckedColor = BrandColor.GRAY_600
 			),
 			modifier = Modifier.absoluteOffset(x = (-12).dp)

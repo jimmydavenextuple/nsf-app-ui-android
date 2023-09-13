@@ -129,7 +129,7 @@ fun OrderDetails(
 		Column(
 			modifier = Modifier
 				.fillMaxWidth()
-				.background(color = BrandColor.GRAY_200)
+				.background(color = BrandColor.GRAY_100)
 				.padding(start = 20.dp)
 				.height(40.dp)
 		) {

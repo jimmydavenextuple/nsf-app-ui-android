@@ -75,23 +75,18 @@ fun AppTopBar(
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.SpaceBetween
 	) {
-		Image(
-			modifier = Modifier.clickable { Toast.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG).show() },
-			painter = painterResource(R.drawable.nextuple_fulllogo),
-			contentDescription = "nextuple logo",
-			)
-//		Text(
-//			modifier = Modifier.clickable {
-//				Toast.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG).show()
-//			},
-//			text = title,
-//			color = BrandColor.GRAY_50,
-//// 			fontFamily = FontFamily.SANS,
-//			fontFamily = FontFamily.ARCHIVO,
-//			fontWeight = FontWeight.Bold,
-//			fontStyle = FontStyle.Normal,
-//			fontSize = 32.sp
 
+		Text(
+			modifier = Modifier.clickable {
+				Toast.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG).show()
+			},
+			text = title,
+			color = BrandColor.GRAY_50,
+			fontFamily = FontFamily.ARCHIVO,
+			fontWeight = FontWeight.Bold,
+			fontStyle = FontStyle.Normal,
+			fontSize = 24.sp
+		)
 
 		Row(
 			verticalAlignment = Alignment.CenterVertically
@@ -102,7 +97,7 @@ fun AppTopBar(
 			) {
 				Text(
 					text = userLastName.uppercase(),
-					color = BrandColor.BLUE_800_NT,
+					color = BrandColor.GRAY_50,
 // 					fontFamily = FontFamily.SANS,
 					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
@@ -113,7 +108,7 @@ fun AppTopBar(
 				)
 				Text(
 					text = dks.replace("dks", "").uppercase(),
-					color = BrandColor.BLUE_800_NT,
+					color = BrandColor.GRAY_50,
 					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Light,
 					fontStyle = FontStyle.Normal,
@@ -133,7 +128,7 @@ fun AppTopBar(
 							}
 							.align(alignment = Alignment.CenterStart),
 						imageVector = Icons.Default.ArrowDropDown,
-						tint = BrandColor.BLUE_300_NT,
+						tint = BrandColor.BLUE_200_NT,
 						contentDescription = null
 					)
 				}
@@ -189,8 +184,8 @@ fun AppTopBar(
 fun PreviewAppTopBar() {
 	AppTopBar(
 		modifier = Modifier.fillMaxWidth(),
-		backgroundColor = BrandColor.GRAY_200,
-		title = "GOAT",
+		backgroundColor = BrandColor.BLUE_800_NT,
+		title = "NSF",
 		userLastName = "Heisey",
 		dks = "dks0564797",
 		items = listOf(

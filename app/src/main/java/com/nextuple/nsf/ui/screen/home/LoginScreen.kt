@@ -161,7 +161,7 @@ fun LoginScreen(
 				contentAlignment = Alignment.TopEnd
 			) {
 				Image(
-					modifier = Modifier.padding( top = 12.dp, end= 12.dp).height(40.dp),
+					modifier = Modifier.padding( top = 18.dp, end= 12.dp).height(40.dp),
 					painter = painterResource(R.drawable.nextuple_fulllogo),
 					contentDescription = null,
 					contentScale = ContentScale.FillHeight

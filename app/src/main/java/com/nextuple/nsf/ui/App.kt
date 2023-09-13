@@ -76,7 +76,7 @@ object AppConfig {
 	)
 }
 
-private val APP_TOP_BAR_COLOR = BrandColor.GREEN_900
+private val APP_TOP_BAR_COLOR = BrandColor.BLUE_800_NT
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +104,7 @@ fun App(
 				AppTopBar(
 					backgroundColor = APP_TOP_BAR_COLOR,
 					title = if (isHomeScreen) {
-						"GOAT"
+						"NSF"
 					} else {
 						getAppTopBarTitle(getCurrentRoute(backStackEntry).orEmpty())
 					},

@@ -219,7 +219,7 @@ private fun AllTabContainer(
 	val searchTintColor: Color
 
 	if (searchInput.value.isNotBlank()) {
-		searchBackgroundColor = BrandColor.ORANGE_600
+		searchBackgroundColor = BrandColor.PINK_NT
 		searchTextColor = BrandColor.GRAY_50
 		searchTintColor = BrandColor.GRAY_50
 	} else {
@@ -388,7 +388,7 @@ private fun OrderCard(
 						.width(8.dp)
 						.height(84.dp)
 						.background(
-							color = BrandColor.RED,
+							color = BrandColor.PINK_NT,
 							shape = RoundedCornerShape(size = 4.dp)
 						)
 				)
@@ -442,7 +442,7 @@ private fun OrderCard(
 				if (order.orderStatusText?.uppercase() != OrderStatusEnum.COMPLETED.name) {
 					order.athleteCheckInDetail?.checkInTime?.let {
 						isRunning = true
-						StatusText(status = TimeUtils.formatTime(elapsedTime), backgroundColor = BrandColor.RED)
+						StatusText(status = TimeUtils.formatTime(elapsedTime), backgroundColor = BrandColor.PINK_NT)
 					}
 				}
 				if (order.athleteCheckInDetail?.checkInTime == null) {
@@ -508,23 +508,23 @@ fun getStatusTextColor(text: String): Color {
 	 */
 	return when {
 		text.uppercase().startsWith(OrderStatusEnum.READY.name) -> {
-			BrandColor.BLUE_900
+			BrandColor.YELLOW_NT
 		}
 
 		text.uppercase().startsWith(OrderStatusEnum.EXTENDED.name) -> {
-			BrandColor.BLUE_900
+			BrandColor.YELLOW_NT
 		}
 
 		text.uppercase().contains(OrderStatusEnum.PROGRESS.name) -> {
-			BrandColor.BLUE_900
+			BrandColor.YELLOW_NT
 		}
 
 		text.uppercase().startsWith(OrderStatusEnum.COMPLETED.name) -> {
-			BrandColor.GREEN_500
+			BrandColor.BLUE_250_NT
 		}
 
 		text.uppercase().startsWith(OrderStatusEnum.CURBSIDE.name) -> {
-			BrandColor.RED
+			BrandColor.PINK_NT
 		}
 
 		text.uppercase().startsWith(OrderStatusEnum.AGED.name) -> {

@@ -49,9 +49,9 @@ fun PrimaryButton(
 			} else {
 				buttonColor
 			},
-			disabledContainerColor = BrandColor.PINK_100_NT,
+			disabledContainerColor = BrandColor.GRAY_700,
 			contentColor = contentColor,
-			disabledContentColor = BrandColor.PINK_NT
+			disabledContentColor = BrandColor.GRAY_50
 		),
 		enabled = enabled
 	) {

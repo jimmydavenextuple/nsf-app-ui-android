@@ -3,9 +3,14 @@ package com.nextuple.nsf
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.Constants
+import com.google.firebase.messaging.FirebaseMessaging
 import com.nextuple.nsf.service.DeviceService
 import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.LogService.Companion.EVENT_INACTIVITY_TIMEOUT
@@ -73,6 +78,21 @@ class MainActivity : ComponentActivity() {
 				)
 			}
 		}
+
+		//firebase
+		FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+			if (!task.isSuccessful) {
+				Log.w(Constants.MessageNotificationKeys.TAG, "Fetching FCM registration token failed", task.exception)
+				return@OnCompleteListener
+			}
+
+			// Get new FCM registration token
+			val token = task.result
+
+			// Log and toast
+			Log.d("TAG", "FCM registration token: $token")
+			Toast.makeText(baseContext,  token, Toast.LENGTH_SHORT).show()
+		})
 	}
 
 	override fun onStart() {

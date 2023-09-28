@@ -3,6 +3,7 @@ import com.nextuple.nsf.UtilKt
 buildscript {
     dependencies {
         classpath 'com.karumi:shot:5.14.1'
+        classpath 'com.google.gms:google-services:4.4.0'
     }
 }
 

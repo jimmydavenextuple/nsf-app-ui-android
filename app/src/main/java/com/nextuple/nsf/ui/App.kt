@@ -89,7 +89,8 @@ fun App(
 	settingsVM: SettingsViewModel,
 	scanManager: ScanManager,
 	haptics: Haptics,
-	onLoggedIn: () -> Unit
+	onLoggedIn: () -> Unit,
+	loadPickScreenOnNotificationTap: Boolean
 ) {
 	val navCtrl = rememberNavController()
 	val backStackEntry by navCtrl.currentBackStackEntryAsState()
@@ -137,7 +138,11 @@ fun App(
 			NavHost(
 				modifier = Modifier.padding(paddingValues),
 				navController = navCtrl,
-				startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
+				startDestination = if (isLoggedIn)
+					if(loadPickScreenOnNotificationTap)
+						Route.PICK
+					else  Route.HOME
+				else Route.LOGIN
 			) {
 				composableForLogin(
 					navCtrl = navCtrl,

@@ -59,6 +59,12 @@ class MainActivity : ComponentActivity() {
 		logService.start()
 		logService.setDevice(deviceService.getDevice())
 
+		var loadPickScreenOnNotificationTap = intent.getBooleanExtra("loadPickScreenOnNotificationTap", false)
+
+		if (intent.hasExtra("transactionId")) {  //Sets boolean here, to open pick screen on notification tap when the app is in background/not running
+			loadPickScreenOnNotificationTap = true
+		}
+
 		setContent {
 			AppTheme {
 				App(
@@ -74,7 +80,8 @@ class MainActivity : ComponentActivity() {
 						}
 					},
 					haptics = haptics,
-					onLoggedIn = ::startSessionListener
+					onLoggedIn = ::startSessionListener,
+					loadPickScreenOnNotificationTap = loadPickScreenOnNotificationTap
 				)
 			}
 		}

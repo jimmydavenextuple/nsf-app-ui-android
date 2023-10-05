@@ -41,7 +41,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //       Set up a Firebase Realtime Database reference to store the token under the user's ID.
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("/fcm_tokens");
-        String user = "User_NT"; // Replace with the user's identifier
+        String user = "User_NT3"; // Replace with the user's identifier
 
         // Write the FCM registration token to the database under the user's ID.
         databaseReference.child(user).setValue(token)
@@ -52,12 +52,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // ...
-
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        System.out.println("From: " + remoteMessage.getFrom());
-
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             System.out.println("Message Notification Body: " + remoteMessage.getNotification().getBody());
@@ -66,7 +60,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
         sendNotification(remoteMessage.getFrom(), remoteMessage.getNotification().getBody());
-        sendNotification(remoteMessage.getNotification().getBody());
+        sendNotification(remoteMessage.getNotification());
     }
 
     private void sendNotification(String from, String body) {
@@ -74,24 +68,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             @Override
             public void run() {
-                Toast.makeText(MyFirebaseMessagingService.this.getApplicationContext(), from + " -> " + body,Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyFirebaseMessagingService.this.getApplicationContext(), from + " -> " + body, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void sendNotification(String messageBody) {
+    private void sendNotification(RemoteMessage.Notification notification) {
+        // Create a PendingIntent that will start the PickScreen composable when the notification is tapped.
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        intent.putExtra("loadPickScreenOnNotificationTap", true);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 
         String channelId = "My channel ID";
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.ic_settings)
-                        .setContentTitle("My new notification")
-                        .setContentText(messageBody)
+                        .setSmallIcon(R.drawable.ic_circle_notification)
+                        .setContentTitle(notification.getTitle())
+                        .setContentText(notification.getBody())
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
@@ -107,6 +102,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(0 , notificationBuilder.build());
     }
 }

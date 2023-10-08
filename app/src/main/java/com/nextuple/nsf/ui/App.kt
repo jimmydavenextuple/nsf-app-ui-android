@@ -17,7 +17,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.messaging.FirebaseMessaging
 import com.nextuple.nsf.R
+import com.nextuple.nsf.service.DeviceService
 import com.nextuple.nsf.ui.AppConfig.NAV_ITEMS
 import com.nextuple.nsf.ui.nav.AppNavBar
 import com.nextuple.nsf.ui.nav.AppNavBarItem
@@ -90,7 +92,8 @@ fun App(
 	scanManager: ScanManager,
 	haptics: Haptics,
 	onLoggedIn: () -> Unit,
-	loadPickScreenOnNotificationTap: Boolean
+	loadPickScreenOnNotificationTap: Boolean,
+	deviceService: DeviceService
 ) {
 	val navCtrl = rememberNavController()
 	val backStackEntry by navCtrl.currentBackStackEntryAsState()
@@ -129,6 +132,13 @@ fun App(
 							userVM.logout()
 							pickVM.onLogout()
 							navCtrl.popBackStack()
+							//Firebase topic unsubscription
+							try {
+								FirebaseMessaging.getInstance().unsubscribeFromTopic(deviceService.getStore().id.toString() + "_notification_topic")
+								System.out.println("Unsubscribed from " + deviceService.getStore().id.toString() + "_notification_topic\"!")
+							} catch (e: Exception) {
+								System.out.println("Failed to unsubscribe!")
+							}
 						}
 					)
 				)
@@ -150,7 +160,8 @@ fun App(
 					userVM = userVM,
 					pickVM = pickVM,
 					prepVM = prepVM,
-					onLoggedIn
+					onLoggedIn,
+					deviceService = deviceService
 				)
 				composableForHome(
 					scanManager = scanManager,
@@ -472,7 +483,8 @@ private fun NavGraphBuilder.composableForLogin(
 	userVM: UserViewModel,
 	pickVM: PickViewModel,
 	prepVM: PrepViewModel,
-	onLoggedIn: () -> Unit
+	onLoggedIn: () -> Unit,
+	deviceService: DeviceService
 ) {
 	composable(Route.LOGIN) {
 		LoginScreen(
@@ -489,6 +501,14 @@ private fun NavGraphBuilder.composableForLogin(
 				appVM.getStoreOverview(userVM.user?.dks.orEmpty()) { storeOverviewState, storeOverview ->
 					pickVM.onStoreOverViewCompletion(storeOverviewState, storeOverview)
 					prepVM.onStoreOverViewCompletion(storeOverview)
+
+					//Firebase topic subscription
+					try {
+						FirebaseMessaging.getInstance().subscribeToTopic(deviceService.getStore().id.toString() + "_notification_topic")
+						System.out.println("Subscribed to " + deviceService.getStore().id.toString() + "_notification_topic\"!")
+					} catch (e: Exception) {
+						System.out.println("Failed to subscribe!")
+					}
 				}
 			}
 		)

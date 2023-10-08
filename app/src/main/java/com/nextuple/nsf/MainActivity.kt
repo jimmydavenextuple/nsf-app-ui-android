@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
 		var loadPickScreenOnNotificationTap = intent.getBooleanExtra("loadPickScreenOnNotificationTap", false)
 
-		if (intent.hasExtra("transactionId")) {  //Sets boolean here, to open pick screen on notification tap when the app is in background/not running
+		if (intent.hasExtra("storeNumber")) {    // This code sets a boolean flag to open the "Pick Screen" when the notification is tapped, when the app is in the background or not running.
 			loadPickScreenOnNotificationTap = true
 		}
 
@@ -81,7 +81,8 @@ class MainActivity : ComponentActivity() {
 					},
 					haptics = haptics,
 					onLoggedIn = ::startSessionListener,
-					loadPickScreenOnNotificationTap = loadPickScreenOnNotificationTap
+					loadPickScreenOnNotificationTap = loadPickScreenOnNotificationTap,
+					deviceService = deviceService
 				)
 			}
 		}

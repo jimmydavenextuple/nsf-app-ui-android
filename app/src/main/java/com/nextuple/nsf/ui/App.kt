@@ -132,13 +132,7 @@ fun App(
 							userVM.logout()
 							pickVM.onLogout()
 							navCtrl.popBackStack()
-							//Firebase topic unsubscription
-							try {
-								FirebaseMessaging.getInstance().unsubscribeFromTopic(deviceService.getStore().id.toString() + "_notification_topic")
-								System.out.println("Unsubscribed from " + deviceService.getStore().id.toString() + "_notification_topic\"!")
-							} catch (e: Exception) {
-								System.out.println("Failed to unsubscribe!")
-							}
+							unsubscribeToTopic(deviceService)
 						}
 					)
 				)
@@ -501,17 +495,32 @@ private fun NavGraphBuilder.composableForLogin(
 				appVM.getStoreOverview(userVM.user?.dks.orEmpty()) { storeOverviewState, storeOverview ->
 					pickVM.onStoreOverViewCompletion(storeOverviewState, storeOverview)
 					prepVM.onStoreOverViewCompletion(storeOverview)
-
-					//Firebase topic subscription
-					try {
-						FirebaseMessaging.getInstance().subscribeToTopic(deviceService.getStore().id.toString() + "_notification_topic")
-						System.out.println("Subscribed to " + deviceService.getStore().id.toString() + "_notification_topic\"!")
-					} catch (e: Exception) {
-						System.out.println("Failed to subscribe!")
-					}
 				}
+				subscribeToTopic(deviceService)
 			}
 		)
+	}
+}
+
+private fun subscribeToTopic(deviceService: DeviceService) {
+	//Firebase topic subscription
+	try {
+		FirebaseMessaging.getInstance()
+			.subscribeToTopic(deviceService.getStore().id.toString() + "_notification_topic")
+		System.out.println("Subscribed to " + deviceService.getStore().id.toString() + "_notification_topic\"!")
+	} catch (e: Exception) {
+		System.out.println("Failed to subscribe!")
+	}
+}
+
+private fun unsubscribeToTopic(deviceService: DeviceService) {
+	//Firebase topic unsubscription
+	try {
+		FirebaseMessaging.getInstance()
+			.unsubscribeFromTopic(deviceService.getStore().id.toString() + "_notification_topic")
+		System.out.println("Unsubscribed from " + deviceService.getStore().id.toString() + "_notification_topic\"!")
+	} catch (e: Exception) {
+		System.out.println("Failed to unsubscribe!")
 	}
 }
 

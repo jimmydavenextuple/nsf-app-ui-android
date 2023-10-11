@@ -18,8 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModel @Inject constructor(
 	@Suppress("UNUSED_PARAMETER")
-	handler: SavedStateHandle,
-	private val userService: UserService
+	handler: SavedStateHandle?,
+	private val userService: UserService?
 ) : ViewModel() {
 
 	sealed class ViewState {
@@ -52,6 +52,17 @@ class UserViewModel @Inject constructor(
 
 	var errMsg: String? by mutableStateOf(null)
 		private set
+
+	constructor(
+		user: User? = null,
+		errMsg: String? = null,
+		handler: SavedStateHandle?,
+		userService: UserService?
+	) : this(handler, userService) {
+		this.viewState = ViewState.LoggedIn
+		this.user = user
+		this.errMsg = errMsg
+	}
 
 	fun login(dks: String) = viewModelScope.launch {
 		if (dks.isEmpty()) {
@@ -92,7 +103,7 @@ class UserViewModel @Inject constructor(
 	fun resetFromError() = logout()
 
 	fun logout() {
-		userService.logout()
+		userService?.logout()
 		viewState = ViewState.LoggedOut
 		user = null
 		errMsg = null

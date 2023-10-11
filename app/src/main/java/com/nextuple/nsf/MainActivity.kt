@@ -1,5 +1,6 @@
 package com.nextuple.nsf
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,9 +12,11 @@ import androidx.activity.viewModels
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.Constants
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import com.nextuple.nsf.service.DeviceService
 import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.LogService.Companion.EVENT_INACTIVITY_TIMEOUT
+import com.nextuple.nsf.service.dto.User
 import com.nextuple.nsf.ui.App
 import com.nextuple.nsf.ui.state.AppViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
@@ -69,7 +72,7 @@ class MainActivity : ComponentActivity() {
 			AppTheme {
 				App(
 					appVM = appVM,
-					userVM = userVM,
+					userVM = getUserState(),
 					pickVM = pickVM,
 					prepVM = prepVM,
 					orderVM = orderVM,
@@ -115,6 +118,7 @@ class MainActivity : ComponentActivity() {
 
 	override fun onUserInteraction() {
 		super.onUserInteraction()
+		saveUserState()
 		startSessionListener()
 	}
 
@@ -134,5 +138,34 @@ class MainActivity : ComponentActivity() {
 
 	companion object {
 		private const val SESSION_TIMEOUT_IN_MILLIS: Long = 30 * 60 * 1000L
+	}
+
+	private fun saveUserState(){
+		val userIsLoggedIn = userVM.user != null
+		if(userIsLoggedIn){
+			val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+			val editor = sharedPreferences.edit()
+			val gson = Gson()
+			editor.putBoolean("isUserLoggedIn", true)
+			editor.putString("userInfo", gson.toJson(userVM.user).toString())
+			editor.putString("errorMsg", userVM.errMsg)
+			editor.putString("viewState", gson.toJson(userVM.viewState).toString())
+			editor.apply()
+		}
+	}
+
+	private fun getUserState(): UserViewModel {
+		val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+		val isUserLoggedIn = sharedPreferences.getBoolean("isUserLoggedIn", false)
+		if (isUserLoggedIn){
+			val userInfo = sharedPreferences.getString("userInfo", "")
+			val errorMsg = sharedPreferences.getString("errorMsg","")
+			val gson = Gson()
+			val user = gson.fromJson(userInfo, User::class.java)
+			return UserViewModel(user = user, errMsg = errorMsg, userService = null, handler = null)
+		}
+		else{
+			return userVM
+		}
 	}
 }

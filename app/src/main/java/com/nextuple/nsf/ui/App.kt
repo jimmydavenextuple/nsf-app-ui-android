@@ -1,5 +1,6 @@
 package com.nextuple.nsf.ui
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +49,8 @@ import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.Haptics
 import com.nextuple.nsf.ui.util.PICK_ITEM_SYMBOLOGY_PREFIXES
 import com.nextuple.nsf.ui.util.ScanManager
+import com.nextuple.nsf.util.UserStateUtils.clearUserState
+import com.nextuple.nsf.util.UserStateUtils.saveUserState
 
 object AppConfig {
 	val NAV_ITEMS = listOf(
@@ -93,7 +96,8 @@ fun App(
 	haptics: Haptics,
 	onLoggedIn: () -> Unit,
 	loadPickScreenOnNotificationTap: Boolean,
-	deviceService: DeviceService
+	deviceService: DeviceService,
+	context: Context
 ) {
 	val navCtrl = rememberNavController()
 	val backStackEntry by navCtrl.currentBackStackEntryAsState()
@@ -132,6 +136,7 @@ fun App(
 							userVM.logout()
 							pickVM.onLogout()
 							navCtrl.popBackStack()
+							clearUserState(context = context)
 							unsubscribeToTopic(deviceService)
 						}
 					)
@@ -142,11 +147,7 @@ fun App(
 			NavHost(
 				modifier = Modifier.padding(paddingValues),
 				navController = navCtrl,
-				startDestination = if (isLoggedIn)
-					if(loadPickScreenOnNotificationTap)
-						Route.PICK
-					else  Route.HOME
-				else Route.LOGIN
+				startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
 			) {
 				composableForLogin(
 					navCtrl = navCtrl,
@@ -155,7 +156,8 @@ fun App(
 					pickVM = pickVM,
 					prepVM = prepVM,
 					onLoggedIn,
-					deviceService = deviceService
+					deviceService = deviceService,
+					context = context
 				)
 				composableForHome(
 					scanManager = scanManager,
@@ -478,7 +480,8 @@ private fun NavGraphBuilder.composableForLogin(
 	pickVM: PickViewModel,
 	prepVM: PrepViewModel,
 	onLoggedIn: () -> Unit,
-	deviceService: DeviceService
+	deviceService: DeviceService,
+	context : Context
 ) {
 	composable(Route.LOGIN) {
 		LoginScreen(
@@ -497,6 +500,7 @@ private fun NavGraphBuilder.composableForLogin(
 					prepVM.onStoreOverViewCompletion(storeOverview)
 				}
 				subscribeToTopic(deviceService)
+				saveUserState(userVM, context = context)
 			}
 		)
 	}

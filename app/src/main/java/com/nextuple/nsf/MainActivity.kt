@@ -63,8 +63,10 @@ class MainActivity : ComponentActivity() {
 		logService.setDevice(deviceService.getDevice())
 
 		if (intent.hasExtra("notificationRoute")) {
-			appVM.notificationRoute = intent.getStringExtra("notificationRoute")
-			intent.removeExtra("notificationRoute")
+			appVM.notificationRoute = intent.getStringExtra("notificationRoute");
+			intent.removeExtra("notificationRoute");
+		} else if (intent.hasExtra("storeNumber")) { 	  // Open the "Pick Screen" when the notification is tapped, when the app is in the background or not running.
+			appVM.notificationRoute = Route.PICK;
 		}
 
 		val userState = getUserState(userVM, this);

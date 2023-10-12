@@ -15,6 +15,7 @@ import com.nextuple.nsf.service.DeviceService
 import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.LogService.Companion.EVENT_INACTIVITY_TIMEOUT
 import com.nextuple.nsf.ui.App
+import com.nextuple.nsf.ui.nav.Route
 import com.nextuple.nsf.ui.state.AppViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
@@ -61,10 +62,10 @@ class MainActivity : ComponentActivity() {
 		logService.start()
 		logService.setDevice(deviceService.getDevice())
 
-		var loadPickScreenOnNotificationTap = intent.getBooleanExtra("loadPickScreenOnNotificationTap", false)
+		var route = intent.getStringExtra("route")
 
 		if (intent.hasExtra("storeNumber")) {    // This code sets a boolean flag to open the "Pick Screen" when the notification is tapped, when the app is in the background or not running.
-			loadPickScreenOnNotificationTap = true
+			route = Route.PICK
 		}
 
 		val userState = getUserState(userVM, this);
@@ -85,9 +86,10 @@ class MainActivity : ComponentActivity() {
 					},
 					haptics = haptics,
 					onLoggedIn = ::startSessionListener,
-					loadPickScreenOnNotificationTap = loadPickScreenOnNotificationTap,
+					route = route,
 					deviceService = deviceService,
-					context = this
+					context = this,
+					intent = intent
 				)
 			}
 		}

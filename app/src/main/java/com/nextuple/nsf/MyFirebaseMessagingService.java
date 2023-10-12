@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.nextuple.nsf.ui.nav.Route;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -76,7 +77,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void sendNotification(RemoteMessage.Notification notification) {
         // Create a PendingIntent that will start the PickScreen composable when the notification is tapped.
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("loadPickScreenOnNotificationTap", true);
+        intent.putExtra("route", Route.PICK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 

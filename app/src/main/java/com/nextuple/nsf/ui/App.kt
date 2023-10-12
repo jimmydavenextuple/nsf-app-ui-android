@@ -1,6 +1,8 @@
 package com.nextuple.nsf.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,6 +16,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -51,6 +54,8 @@ import com.nextuple.nsf.ui.util.PICK_ITEM_SYMBOLOGY_PREFIXES
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.UserStateUtils.clearUserState
 import com.nextuple.nsf.util.UserStateUtils.saveUserState
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 object AppConfig {
 	val NAV_ITEMS = listOf(
@@ -83,6 +88,7 @@ object AppConfig {
 
 private val APP_TOP_BAR_COLOR = BrandColor.BLUE_800_NT
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(
@@ -95,9 +101,10 @@ fun App(
 	scanManager: ScanManager,
 	haptics: Haptics,
 	onLoggedIn: () -> Unit,
-	loadPickScreenOnNotificationTap: Boolean,
+	route: String?,
 	deviceService: DeviceService,
-	context: Context
+	context: Context,
+	intent: Intent
 ) {
 	val navCtrl = rememberNavController()
 	val backStackEntry by navCtrl.currentBackStackEntryAsState()
@@ -147,7 +154,10 @@ fun App(
 			NavHost(
 				modifier = Modifier.padding(paddingValues),
 				navController = navCtrl,
-				startDestination = if (isLoggedIn) Route.HOME else Route.LOGIN
+				startDestination =
+					if (isLoggedIn)
+						Route.HOME
+					else Route.LOGIN
 			) {
 				composableForLogin(
 					navCtrl = navCtrl,
@@ -163,9 +173,17 @@ fun App(
 					scanManager = scanManager,
 					onSearchClick = { homeSearchInput ->
 						navCtrl.navigate("${Route.ORDERS}?$homeSearchInput")
-					}
+					},
+					route = route,
+					appVM = appVM,
+					dks = dks,
+					pickVM = pickVM,
+					prepVM = prepVM,
+					navCtrl = navCtrl,
+					intent = intent
 				)
 				composable(Route.PICK) {
+
 					PickScreen(
 						tasksUnassigned = pickVM.pickTasksUnassigned.value,
 						unitsWorked = pickVM.storeOverview?.pickOverview?.unitsWorked,
@@ -528,9 +546,32 @@ private fun unsubscribeToTopic(deviceService: DeviceService) {
 	}
 }
 
-private fun NavGraphBuilder.composableForHome(scanManager: ScanManager, onSearchClick: (String) -> Unit) {
+private fun NavGraphBuilder.composableForHome(scanManager: ScanManager, onSearchClick: (String) -> Unit,
+											  route: String?,
+											  appVM: AppViewModel,
+											  dks: String,
+											  pickVM: PickViewModel,
+											  prepVM: PrepViewModel,
+											  navCtrl: NavHostController,
+											  intent: Intent) {
 	composable(Route.HOME) {
 		HomeScreen(scanManager = scanManager, onSearchClick = onSearchClick)
+
+		if (route == Route.PICK) {
+			appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
+				pickVM.onStoreOverViewCompletion(storeOverviewState, storeOverview)
+				prepVM.onStoreOverViewCompletion(storeOverview)
+			}
+			pickVM.getDeclineCodes(dks)
+			navCtrl.navigate(route) {
+//				popUpTo(navCtrl.graph.findStartDestination().id) {
+//					saveState = true
+//				}
+				launchSingleTop = true
+			}
+			intent.putExtra("route", Route.HOME )
+			System.out.println("$intent Intent!")
+		}
 	}
 }
 

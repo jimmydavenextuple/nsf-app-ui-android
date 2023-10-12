@@ -25,6 +25,8 @@ open class AppViewModel @Inject constructor(
 	var errMsg: String? by mutableStateOf(null)
 		protected set
 
+	var notificationRoute: String? by mutableStateOf(null)
+
 	private var storeOverview: StoreOverviewResponse? by mutableStateOf(null)
 
 	fun getStoreOverview(dks: String, onStoreOverviewCompletion: (GenericViewState, StoreOverviewResponse?) -> Unit) {

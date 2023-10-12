@@ -101,10 +101,8 @@ fun App(
 	scanManager: ScanManager,
 	haptics: Haptics,
 	onLoggedIn: () -> Unit,
-	route: String?,
 	deviceService: DeviceService,
-	context: Context,
-	intent: Intent
+	context: Context
 ) {
 	val navCtrl = rememberNavController()
 	val backStackEntry by navCtrl.currentBackStackEntryAsState()
@@ -174,13 +172,11 @@ fun App(
 					onSearchClick = { homeSearchInput ->
 						navCtrl.navigate("${Route.ORDERS}?$homeSearchInput")
 					},
-					route = route,
 					appVM = appVM,
 					dks = dks,
 					pickVM = pickVM,
 					prepVM = prepVM,
-					navCtrl = navCtrl,
-					intent = intent
+					navCtrl = navCtrl
 				)
 				composable(Route.PICK) {
 
@@ -547,30 +543,29 @@ private fun unsubscribeToTopic(deviceService: DeviceService) {
 }
 
 private fun NavGraphBuilder.composableForHome(scanManager: ScanManager, onSearchClick: (String) -> Unit,
-											  route: String?,
 											  appVM: AppViewModel,
 											  dks: String,
 											  pickVM: PickViewModel,
 											  prepVM: PrepViewModel,
-											  navCtrl: NavHostController,
-											  intent: Intent) {
+											  navCtrl: NavHostController
+) {
 	composable(Route.HOME) {
 		HomeScreen(scanManager = scanManager, onSearchClick = onSearchClick)
 
-		if (route == Route.PICK) {
+		if (appVM.notificationRoute == Route.PICK) {
 			appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
 				pickVM.onStoreOverViewCompletion(storeOverviewState, storeOverview)
 				prepVM.onStoreOverViewCompletion(storeOverview)
 			}
 			pickVM.getDeclineCodes(dks)
-			navCtrl.navigate(route) {
-//				popUpTo(navCtrl.graph.findStartDestination().id) {
-//					saveState = true
-//				}
+			appVM.notificationRoute = null
+			navCtrl.navigate(Route.PICK) {
+				popUpTo(navCtrl.graph.findStartDestination().id) {
+					saveState = true
+				}
 				launchSingleTop = true
 			}
-			intent.putExtra("route", Route.HOME )
-			System.out.println("$intent Intent!")
+
 		}
 	}
 }

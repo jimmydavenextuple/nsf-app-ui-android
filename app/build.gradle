@@ -156,9 +156,8 @@ dependencies {
 	// AndroidX
 	implementation 'androidx.core:core-ktx:1.10.1'
 	implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-	implementation("com.google.firebase:firebase-messaging-ktx:23.2.1")
-	implementation("com.google.firebase:firebase-firestore:24.8.1")
-	implementation("com.google.firebase:firebase-database:20.2.2")
+	implementation 'com.google.firebase:firebase-database:20.2.2'
+	implementation 'com.google.firebase:firebase-messaging:23.0.3'
 
 	testImplementation 'androidx.test.ext:junit:1.1.5'
 	testImplementation 'androidx.test.espresso:espresso-core:3.5.1'

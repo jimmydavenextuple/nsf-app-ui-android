@@ -77,7 +77,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void sendNotification(RemoteMessage.Notification notification) {
         // Create a PendingIntent that will start the PickScreen composable when the notification is tapped.
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("route", Route.PICK);
+        intent.putExtra("notificationRoute", Route.PICK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 

@@ -62,10 +62,9 @@ class MainActivity : ComponentActivity() {
 		logService.start()
 		logService.setDevice(deviceService.getDevice())
 
-		var route = intent.getStringExtra("route")
-
-		if (intent.hasExtra("storeNumber")) {    // This code sets a boolean flag to open the "Pick Screen" when the notification is tapped, when the app is in the background or not running.
-			route = Route.PICK
+		if (intent.hasExtra("notificationRoute")) {
+			appVM.notificationRoute = intent.getStringExtra("notificationRoute")
+			intent.removeExtra("notificationRoute")
 		}
 
 		val userState = getUserState(userVM, this);
@@ -86,10 +85,8 @@ class MainActivity : ComponentActivity() {
 					},
 					haptics = haptics,
 					onLoggedIn = ::startSessionListener,
-					route = route,
 					deviceService = deviceService,
-					context = this,
-					intent = intent
+					context = this
 				)
 			}
 		}

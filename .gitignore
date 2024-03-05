@@ -2,6 +2,7 @@
 .gradle/
 .idea/
 build/
+noti-tmp/
 
 # Snapshot Testing
 app/screenshots/dev/debug/screenshots-compose-default/
@@ -12,6 +13,6 @@ app/screenshots/dev/debug/screenshots-default/
 
 # Files
 .DS_Store
-#nsf.properties
-#nextuple-keystore.jks
+nsf.properties
+nextuple-keystore.jks
 local.properties

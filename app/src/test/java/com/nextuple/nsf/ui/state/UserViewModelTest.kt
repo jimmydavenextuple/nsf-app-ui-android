@@ -2,6 +2,8 @@ package com.nextuple.nsf.ui.state
 
 import androidx.lifecycle.SavedStateHandle
 import com.nextuple.nsf.CoroutineRule
+import com.nextuple.nsf.datastore.UserRepository
+import com.nextuple.nsf.service.ConfigService
 import com.nextuple.nsf.service.UserService
 import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.dto.User
@@ -11,6 +13,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
+import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,7 +21,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
@@ -40,6 +42,12 @@ class UserViewModelTest {
 	@MockK
 	private lateinit var userService: UserService
 
+	@MockK
+	private lateinit var configService: ConfigService
+
+	@MockK(relaxed = true)
+	private lateinit var userRepository: UserRepository
+
 	@Before
 	fun setUp() {
 		MockKAnnotations.init(this)
@@ -51,7 +59,6 @@ class UserViewModelTest {
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoginError, vm.viewState)
-		assertNull(vm.user)
 		assert(!vm.errMsg.isNullOrEmpty())
 
 		verify(exactly = 0) {
@@ -63,6 +70,7 @@ class UserViewModelTest {
 	fun `login should call API with the provided DKS`() = runTest {
 		val dks = "testDks123"
 
+		every { runBlocking { userService.login(any()) } } returns mockk()
 		vm.login(dks = dks)
 		advanceUntilIdle()
 
@@ -80,7 +88,6 @@ class UserViewModelTest {
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoggedIn, vm.viewState)
-		assertEquals(user, vm.user)
 		assertNull(vm.errMsg)
 	}
 
@@ -92,13 +99,14 @@ class UserViewModelTest {
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoginError, vm.viewState)
-		assertNull(vm.user)
 		assertEquals(errMsg, vm.errMsg)
 	}
 
 	@Test
-	fun `resetFromError should just call logout`() {
-		justRun { userService.logout() }
+	fun `resetFromError should just call logout`() = runTest {
+		justRun { runBlocking { userService.logout() } }
+		justRun { configService.clearStoreConfig() }
+
 		val spy = spyk(vm)
 		spy.resetFromError()
 		verify { spy.logout() }
@@ -113,20 +121,25 @@ class UserViewModelTest {
 				dks = "dks123"
 			)
 		)
-		justRun { userService.logout() }
+		justRun { runBlocking { userService.logout() } }
+		justRun { configService.clearStoreConfig() }
 
 		vm.login(dks = "any")
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoggedIn, vm.viewState)
-		assertNotNull(vm.user)
 		assertNull(vm.errMsg)
 
 		vm.logout()
+		advanceUntilIdle()
 
 		assertEquals(ViewState.LoggedOut, vm.viewState)
-		assertNull(vm.user)
 		assertNull(vm.errMsg)
+
+		verify {
+			runBlocking { userService.logout() }
+			configService.clearStoreConfig()
+		}
 	}
 
 	@Test
@@ -134,19 +147,24 @@ class UserViewModelTest {
 		val errMsg = "error message"
 
 		every { runBlocking { userService.login(any()) } } returns Result.Error(errMsg)
-		justRun { userService.logout() }
+		justRun { runBlocking { userService.logout() } }
+		justRun { configService.clearStoreConfig() }
 
 		vm.login(dks = "any")
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoginError, vm.viewState)
-		assertNull(vm.user)
 		assertEquals(errMsg, vm.errMsg)
 
 		vm.logout()
+		advanceUntilIdle()
 
 		assertEquals(ViewState.LoggedOut, vm.viewState)
-		assertNull(vm.user)
 		assertNull(vm.errMsg)
+
+		verify {
+			runBlocking { userService.logout() }
+			configService.clearStoreConfig()
+		}
 	}
 }

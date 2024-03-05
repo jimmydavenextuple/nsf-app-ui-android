@@ -1,7 +1,8 @@
 package com.nextuple.nsf.retrofit.dto.response
 
 data class GetDeclineCodesResponse(
-	val pickDeclineCodes: List<DeclineCode>
+    val pickDeclineCodes: List<DeclineCode>,
+    val pickupDeclineCodes: List<DeclineCode>
 )
 
 data class DeclineCode(

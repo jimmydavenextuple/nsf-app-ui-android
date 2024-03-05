@@ -1,150 +1,177 @@
 package com.nextuple.nsf.ui
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
-import android.util.Log
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.messaging.FirebaseMessaging
+import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
-import com.nextuple.nsf.service.DeviceService
+import com.nextuple.nsf.retrofit.dto.response.athleteFullName
+import com.nextuple.nsf.retrofit.dto.response.athleteProxyFullName
+import com.nextuple.nsf.service.dto.User
 import com.nextuple.nsf.ui.AppConfig.NAV_ITEMS
+import com.nextuple.nsf.ui.component.filter.Filter
 import com.nextuple.nsf.ui.nav.AppNavBar
 import com.nextuple.nsf.ui.nav.AppNavBarItem
 import com.nextuple.nsf.ui.nav.AppTopBar
 import com.nextuple.nsf.ui.nav.AppTopBarDropdownMenuItems
-import com.nextuple.nsf.ui.nav.Route
+import com.nextuple.nsf.ui.nav.NavUtil.getStartDestination
+import com.nextuple.nsf.ui.nav.Screen
 import com.nextuple.nsf.ui.screen.home.HomeScreen
 import com.nextuple.nsf.ui.screen.home.LoginScreen
-import com.nextuple.nsf.ui.screen.order.OrderDetails
+import com.nextuple.nsf.ui.screen.order.OrderDetailsScreen
+import com.nextuple.nsf.ui.screen.order.OrderPickupScreen
 import com.nextuple.nsf.ui.screen.order.OrderScreen
-import com.nextuple.nsf.ui.screen.order.PickOrderScreen
 import com.nextuple.nsf.ui.screen.pick.PickDetailsScreen
 import com.nextuple.nsf.ui.screen.pick.PickScreen
-import com.nextuple.nsf.ui.screen.prep.PackDetailsScreen
+import com.nextuple.nsf.ui.screen.prep.PackType
+import com.nextuple.nsf.ui.screen.prep.PrepOrderScreen
 import com.nextuple.nsf.ui.screen.prep.PrepScreen
-import com.nextuple.nsf.ui.screen.prep.StageDetailsScreen
+import com.nextuple.nsf.ui.screen.search.SearchResultsScreen
 import com.nextuple.nsf.ui.screen.settings.SettingsScreen
-import com.nextuple.nsf.ui.state.AppViewModel
+import com.nextuple.nsf.ui.state.ConfigViewModel
+import com.nextuple.nsf.ui.state.InfoViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.state.PrepViewModel
+import com.nextuple.nsf.ui.state.PrinterName
 import com.nextuple.nsf.ui.state.SettingsViewModel
 import com.nextuple.nsf.ui.state.UserViewModel
 import com.nextuple.nsf.ui.state.UserViewModel.ViewState
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.Haptics
-import com.nextuple.nsf.ui.util.PICK_ITEM_SYMBOLOGY_PREFIXES
 import com.nextuple.nsf.ui.util.ScanManager
-import com.nextuple.nsf.util.UserStateUtils.clearUserState
-import com.nextuple.nsf.util.UserStateUtils.saveUserState
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import com.nextuple.nsf.util.StringUtils
 
 object AppConfig {
 	val NAV_ITEMS = listOf(
 		AppNavBarItem(
 			iconResId = R.drawable.ic_home,
 			label = "Home",
-			route = Route.HOME,
+			route = Screen.HOME.route,
 			count = 0
 		),
 		AppNavBarItem(
 			iconResId = R.drawable.ic_pick,
 			label = "Pick",
-			route = Route.PICK,
+			route = Screen.PICK.route,
 			count = 0
 		),
 		AppNavBarItem(
 			iconResId = R.drawable.ic_prep,
 			label = "Prep",
-			route = Route.PREP,
+			route = Screen.PREP.route,
 			count = 0
 		),
 		AppNavBarItem(
 			iconResId = R.drawable.ic_orders,
 			label = "Orders",
-			route = Route.ORDERS,
+			route = Screen.ORDERS.route,
 			count = 0
 		)
 	)
 }
 
-private val APP_TOP_BAR_COLOR = BrandColor.BLUE_800_NT
-
-@SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(
-	appVM: AppViewModel,
+	infoVM: InfoViewModel,
 	userVM: UserViewModel,
 	pickVM: PickViewModel,
 	prepVM: PrepViewModel,
 	orderVM: OrderViewModel,
 	settingsVM: SettingsViewModel,
+	configVM: ConfigViewModel,
 	scanManager: ScanManager,
 	haptics: Haptics,
-	onLoggedIn: () -> Unit,
-	deviceService: DeviceService,
-	context: Context
+	intentData: Uri?,
+	onLoggedIn: () -> Unit
 ) {
 	val navCtrl = rememberNavController()
 	val backStackEntry by navCtrl.currentBackStackEntryAsState()
-	val isHomeScreen = isRouteInEntry(Route.HOME, backStackEntry)
+	var showToolbarSearch by remember { mutableStateOf(false) }
+	var deepLinkUri by remember { mutableStateOf(intentData) }
+	val user by userVM.user.collectAsStateWithLifecycle(User())
 
-	val isLoggedIn = userVM.user != null
-	val dks = userVM.user?.dks.orEmpty()
+	val onRefreshData: () -> Unit = {
+		infoVM.getStoreOverview()
+		infoVM.getDeclineCodes()
+	}
+	val onRefreshApp: (route: String) -> Unit = { route ->
+		onRefreshData()
+		navCtrl.navigate(route) {
+			popUpTo(navCtrl.graph.findStartDestination().id) {
+				saveState = true
+			}
+			launchSingleTop = true
+		}
+	}
 
 	Scaffold(
 		topBar = {
-			if (isLoggedIn) {
+			if (user.isLoggedIn()) {
+				val context = LocalContext.current
+
 				AppTopBar(
-					backgroundColor = APP_TOP_BAR_COLOR,
-					title = if (isHomeScreen) {
-						"NSF"
-					} else {
-						getAppTopBarTitle(getCurrentRoute(backStackEntry).orEmpty())
-					},
-					userLastName = userVM.user?.lastName.orEmpty(),
-					dks = userVM.user?.dks.orEmpty(),
+					screen = Screen.getByRoute(getCurrentRoute(backStackEntry).orEmpty()),
+					user = user,
+					orderType = pickVM.pickTask?.subFulfillmentType,
 					items = listOf(
 						AppTopBarDropdownMenuItems(
 							label = stringResource(id = R.string.dropdown_menu_settings),
 							R.drawable.ic_settings
 						) {
-							navCtrl.navigate(Route.SETTINGS)
+							navCtrl.navigate(Screen.SETTINGS.route)
 						},
-						AppTopBarDropdownMenuItems(
-							label = stringResource(id = R.string.dropdown_menu_feedback),
-							R.drawable.ic_feedback
-						) {},
+						// TODO: Uncomment after implementing.
+// 						AppTopBarDropdownMenuItems(
+// 							label = stringResource(id = R.string.dropdown_menu_feedback),
+// 							R.drawable.ic_feedback
+// 						) {},
 						AppTopBarDropdownMenuItems(
 							label = stringResource(id = R.string.dropdown_menu_logout),
 							R.drawable.ic_logout
 						) {
+							deepLinkUri = null
 							userVM.logout()
-							pickVM.onLogout()
 							navCtrl.popBackStack()
-							clearUserState(context = context)
-							unsubscribeToTopic(deviceService)
 						}
-					)
+					),
+					showSearchBar = showToolbarSearch,
+					toggleSearchBar = { showToolbarSearch = it },
+					scanManager = scanManager,
+					onSearchAction = { searchInput ->
+						if (searchInput.isNotEmpty()) {
+							navCtrl.navigate("${Screen.SEARCH_RESULTS.route}?$searchInput")
+						} else {
+							// todo: Confirm text with anna
+							Toast.makeText(context, "Please enter a value to search", Toast.LENGTH_LONG).show()
+						}
+					},
+					onBackAction = {
+						navCtrl.popBackStack()
+					}
 				)
 			}
 		},
@@ -152,333 +179,100 @@ fun App(
 			NavHost(
 				modifier = Modifier.padding(paddingValues),
 				navController = navCtrl,
-				startDestination =
-					if (isLoggedIn)
-						Route.HOME
-					else Route.LOGIN
+				startDestination = getStartDestination(user.isLoggedIn(), deepLinkUri)
 			) {
 				composableForLogin(
 					navCtrl = navCtrl,
-					appVM = appVM,
+					infoVM = infoVM,
 					userVM = userVM,
-					pickVM = pickVM,
-					prepVM = prepVM,
-					onLoggedIn,
-					deviceService = deviceService,
-					context = context
-				)
-				composableForHome(
+					configVM = configVM,
+					settingsVM = settingsVM,
 					scanManager = scanManager,
-					onSearchClick = { homeSearchInput ->
-						navCtrl.navigate("${Route.ORDERS}?$homeSearchInput")
-					},
-					appVM = appVM,
-					dks = dks,
-					pickVM = pickVM,
-					prepVM = prepVM,
-					navCtrl = navCtrl
+					haptics = haptics,
+					deepLinkUri = deepLinkUri,
+					onLoggedIn = onLoggedIn
 				)
-				composable(Route.PICK) {
+				composableForHome()
+				composableForPick(
+					navCtrl = navCtrl,
+					infoVM = infoVM,
+					pickVM = pickVM,
+					onRefreshData = onRefreshData
+				)
+				composableForPickDetails(
+					navCtrl = navCtrl,
+					scanManager = scanManager,
+					haptics = haptics,
+					infoVM = infoVM,
+					configVM = configVM,
+					pickVM = pickVM
+				)
+				composableForPrep(
+					navCtrl = navCtrl,
+					infoVM = infoVM,
+					prepVM = prepVM,
+					scanManager = scanManager,
+					onRefreshData = onRefreshData
+				)
+				composableForPrepOrder(
+					navCtrl = navCtrl,
+					settingsVM = settingsVM,
+					prepVM = prepVM,
+					configVM = configVM,
+					scanManager = scanManager,
+					infoVM = infoVM
+				)
+				composableForOrders(
+					navCtrl = navCtrl,
+					orderVM = orderVM
+				)
+				composableForOrderDetails(
+					navCtrl = navCtrl,
+					orderVM = orderVM,
+					settingsVM = settingsVM,
+					infoVM = infoVM,
+					scanManager = scanManager,
+					configVM = configVM
+				)
+				composableForOrderPickup(
+					navCtrl = navCtrl,
+					orderVM = orderVM,
+					scanManager = scanManager,
+					settingsVM = settingsVM
+				)
+				composableForSettings(
+					settingsVM = settingsVM
+				)
+				composableForSearchResults(
+					navCtrl = navCtrl,
+					orderVM = orderVM,
+					scanManager = scanManager
+				)
+			}
 
-					PickScreen(
-						tasksUnassigned = pickVM.pickTasksUnassigned.value,
-						unitsWorked = pickVM.storeOverview?.pickOverview?.unitsWorked,
-						totalUnits = pickVM.totalStoreUnits.value,
-						inProgressUnits = pickVM.storeOverview?.pickOverview?.unitsInProgress,
-						storeOverviewState = pickVM.storeOverviewState,
-						hasActiveTask = pickVM.currentPickTask.value != null,
-						onHasActiveTask = {
-							navCtrl.navigate(Route.PICK_DETAILS) {
-								popUpTo(Route.HOME)
-							}
-						},
-						startTaskStatus = pickVM.startPickState,
-						onStartPicking = {
-							pickVM.startPick(dks)
-						},
-						startTaskCompletion = {
-							pickVM.resetStartPickState()
-							navCtrl.navigate(Route.PICK_DETAILS)
-						},
-						resetScreen = {
-							pickVM.resetPickScreen()
+			if (showToolbarSearch) {
+				Box(
+					modifier = Modifier
+						.fillMaxSize()
+						.background(BrandColor.GRAY_TRANSPARENT)
+						.clickable {
+							showToolbarSearch = false
 						}
-					)
-				}
-				composable(Route.PREP) {
-					PrepScreen(
-						storeOverViewState = appVM.storeOverviewState,
-						startTaskStatus = prepVM.startPackState,
-						currentPrepStage = prepVM.currentPreStage.value,
-						navigateToStage2 = {
-							navCtrl.navigate(Route.STAGE_ORDER) {
-								popUpTo(Route.HOME)
-							}
-						},
-						navigateToStage1 = {
-							navCtrl.navigate(Route.PACK_ORDER) {
-								popUpTo(Route.HOME)
-							}
-						},
-						prepTasks = prepVM.storeOverview?.prepOverview?.prepTasks,
-						onStartPack = { taskId ->
-							prepVM.startPack(taskId = taskId, dks = dks)
-						},
-						startTaskCompletion = {
-							prepVM.resetPackState()
-							navCtrl.navigate(Route.PACK_ORDER) {
-								popUpTo(Route.HOME)
-							}
-						},
-						onBenchActionCallback = {
-							prepVM.resetPackState()
-							appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
-								pickVM.onStoreOverViewCompletion(
-									storeOverviewState,
-									storeOverview
-								)
-								prepVM.onStoreOverViewCompletion(storeOverview)
-							}
-						}
-					)
-				}
-				composable("${Route.ORDERS}?{searchInputText}") { navBackStackEntry ->
-					val searchInputText =
-						navBackStackEntry.arguments?.getString("searchInputText") ?: ""
-					OrderScreen(
-						scanManager = scanManager,
-						viewState = orderVM.viewState,
-						orderDetailsState = orderVM.orderDetailsState,
-						homeSearchInput = searchInputText,
-						getOrders = { query, pastDays ->
-							orderVM.getOrders(query = query, pastDays = pastDays, dks = userVM.user?.dks ?: "")
-						},
-						getOrderDetails = { fulfillmentRequestNumber ->
-							orderVM.getOrderDetails(
-								fulfillmentRequestNumber = fulfillmentRequestNumber,
-								dks = userVM.user?.dks ?: ""
-							)
-						},
-						getOrderDetailsCompletion = {
-							navCtrl.navigate(Route.ORDERS_DETAILS)
-							orderVM.resetOrderDetailsState()
-						},
-						allOrderList = orderVM.orderList,
-						pickupOrderList = orderVM.pickUpOrderList.value
-					)
-				}
-				composable(Route.ORDERS_DETAILS) {
-					OrderDetails(
-						viewState = orderVM.viewState,
-						startPickupViewState = orderVM.startPickupState,
-						orderDetailsResponse = orderVM.orderDetailResponse,
-						onBackButtonClick = {
-							navCtrl.popBackStack()
-						},
-						onStartPickup = { fulfillmentRequestNumber ->
-							orderVM.startPickup(dks = userVM.user?.dks ?: "", fulfillmentRequestNumber = fulfillmentRequestNumber)
-						},
-						onPickupExtend = { fulfillmentRequestNumber ->
-							orderVM.pickupExtend(dks = userVM.user?.dks ?: "", fulfillmentRequestNumber = fulfillmentRequestNumber)
-						},
-						onPickupRemoveCheckIn = { taskId ->
-							orderVM.pickupRemoveCheckIn(dks = userVM.user?.dks ?: "", taskId = taskId)
-						},
-						onStartPickupCompletion = {
-							navCtrl.navigate(Route.ORDERS_PICKUP)
-							orderVM.resetStarPickupState()
-						}
-					)
-				}
-
-				composable(Route.ORDERS_PICKUP) {
-					PickOrderScreen(
-						completeOrderPickupState = orderVM.completeOrderPickupState,
-						orderDetails = orderVM.orderDetailResponse,
-						onBackButtonClick = {
-							navCtrl.popBackStack()
-						},
-						onOrderPickupClicked = { taskId ->
-							orderVM.completePickupTask(dks = userVM.user?.dks ?: "", taskId = taskId)
-						},
-						onOrderPickupSuccess = {
-							orderVM.resetCompleteOrderPickState()
-							navCtrl.navigate(Route.ORDERS) {
-								popUpTo(Route.ORDERS)
-							}
-						}
-					)
-				}
-				composable(Route.PICK_DETAILS) {
-					PickDetailsScreen(
-						scanManager = scanManager,
-						progressBarBackgroundColor = APP_TOP_BAR_COLOR,
-						pickDeclineState = pickVM.pickDeclineState,
-						recordPickState = pickVM.recordPickState,
-						declineCodesState = pickVM.declineCodesState,
-						currentPickTaskItem = pickVM.currentPickItem.value,
-						unitsWorked = pickVM.pickTask?.totalWorkedQty ?: 0,
-						totalUnits = pickVM.pickTask?.totalQty ?: 0,
-						declineModalOptions = pickVM.declineCodes?.pickDeclineCodes?.map { it.displayName },
-						onDeclineClick = {
-							pickVM.getDeclineCodes(dks)
-						},
-						onDeclineReasonSelected = { declineReason ->
-							pickVM.declinePick(declineReason, dks)
-						},
-						onItemPick = { upc, symbology ->
-							if (symbology == null ||
-								PICK_ITEM_SYMBOLOGY_PREFIXES.none {
-									symbology.equals(it, ignoreCase = true)
-								}
-							) {
-								haptics.boop()
-								return@PickDetailsScreen
-							}
-
-							if (!pickVM.pickItem(upc, dks)) {
-								haptics.boop()
-								haptics.vibrate(1000)
-							}
-						},
-						onDeclineCompletion = {
-							pickVM.resetPickDeclineState()
-							if (pickVM.currentPickItem.value == null) {
-								appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
-									pickVM.onStoreOverViewCompletion(
-										storeOverviewState,
-										storeOverview
-									)
-									prepVM.onStoreOverViewCompletion(storeOverview)
-								}
-								navCtrl.navigate(Route.PICK) {
-									launchSingleTop = true
-								}
-							}
-						},
-						onRecordPickCompletion = {
-							pickVM.resetRecordPickState()
-							if (pickVM.currentPickItem.value == null) {
-								appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
-									pickVM.onStoreOverViewCompletion(
-										storeOverviewState,
-										storeOverview
-									)
-									prepVM.onStoreOverViewCompletion(storeOverview)
-								}
-								navCtrl.navigate(Route.PICK) {
-									launchSingleTop = true
-								}
-							}
-						}
-					)
-				}
-				composable(Route.PACK_ORDER) {
-					PackDetailsScreen(
-						progressBarBackgroundColor = APP_TOP_BAR_COLOR,
-						holdSlipState = prepVM.holdSlipState,
-						athlete = prepVM.athlete.value,
-						orderNum = prepVM.orderNum.value,
-						packItems = prepVM.packItems.value,
-						onPrintHoldSlip = {
-							prepVM.packAndGetHoldSlip(dks = dks)
-						},
-						onPrintHoldSlipSuccessCallBack = {
-							prepVM.resetHoldSlipState()
-							try {
-								settingsVM.printBOPISHoldSlip(prepVM.stageTask!!.holdSlipZPL)
-							} catch (e: Exception) {
-								Log.e("nullHoldSlip", "Hold Slip not Printed: hold slip info not found")
-							}
-							navCtrl.navigate(Route.STAGE_ORDER) {
-								popUpTo(Route.HOME)
-							}
-						},
-						resetScreen = {
-							prepVM.resetHoldSlipState()
-						}
-					)
-				}
-				composable(Route.STAGE_ORDER) {
-					StageDetailsScreen(
-						progressBarBackgroundColor = APP_TOP_BAR_COLOR,
-						holdLocationState = prepVM.holdLocationState,
-						storeOverviewState = appVM.storeOverviewState,
-						scanManager = scanManager,
-						athlete = prepVM.athlete.value,
-						orderNum = prepVM.orderNum.value,
-						stageTask = prepVM.stageTask,
-						onRecordHoldingLocation = { containerId, holdingLocation ->
-							prepVM.recordHoldingLocation(
-								containerId,
-								holdingLocation,
-								dks
-							)
-						},
-						onStageCompletionCallBack = {
-							appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
-								pickVM.onStoreOverViewCompletion(
-									storeOverviewState,
-									storeOverview
-								)
-								prepVM.onStoreOverViewCompletion(storeOverview)
-								prepVM.resetHoldLocationState()
-								navCtrl.navigate(Route.PREP) {
-									popUpTo(Route.HOME)
-								}
-							}
-						},
-						onReprintHoldSlip = {
-							try {
-								settingsVM.printBOPISHoldSlip(prepVM.stageTask!!.holdSlipZPL)
-							} catch (e: Exception) {
-								Log.e("nullHoldSlip", "Hold Slip not Printed: hold slip info not found")
-							}
-						}
-					)
-				}
-				composable(Route.SETTINGS) {
-					SettingsScreen(
-						printersList = settingsVM.printersList,
-						printerConnectionState = settingsVM.printerConnectionState,
-						ipPrefix = settingsVM.ipPrefix,
-						onConnectPrinter = settingsVM::connectPrinter,
-						onDisConnectPrinter = settingsVM::disConnectPrinter,
-						onReset = {
-							settingsVM.resetConnectionState()
-						},
-						onBackButtonClick = {
-							navCtrl.popBackStack()
-						}
-					)
-				}
+				)
 			}
 		},
 		bottomBar = {
-			if (isLoggedIn) {
+			if (user.isLoggedIn()) {
 				AppNavBar(
 					items = NAV_ITEMS,
 					isSelected = { route ->
 						isRouteInEntry(route, backStackEntry)
 					},
-					onSelect = { route ->
-						appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
-							pickVM.onStoreOverViewCompletion(storeOverviewState, storeOverview)
-							prepVM.onStoreOverViewCompletion(storeOverview)
-						}
-						pickVM.getDeclineCodes(dks)
-						navCtrl.navigate(route) {
-							popUpTo(navCtrl.graph.findStartDestination().id) {
-								saveState = true
-							}
-							launchSingleTop = true
-							// 	restoreState = true
-						}
-					},
+					onSelect = onRefreshApp,
 					tasksUnassigned = listOf(
 						0, // home tab
-						pickVM.pickTasksUnassigned.value, // pick tab
-						pickVM.prepTasksUnassigned.value, // prep tab
+						infoVM.pickTasksUnassigned, // pick tab
+						infoVM.prepTasksUnassigned, // prep tab
 						0 // orders tab
 					)
 				)
@@ -489,84 +283,463 @@ fun App(
 
 private fun NavGraphBuilder.composableForLogin(
 	navCtrl: NavController,
-	appVM: AppViewModel,
+	infoVM: InfoViewModel,
 	userVM: UserViewModel,
-	pickVM: PickViewModel,
-	prepVM: PrepViewModel,
-	onLoggedIn: () -> Unit,
-	deviceService: DeviceService,
-	context : Context
+	configVM: ConfigViewModel,
+	settingsVM: SettingsViewModel,
+	scanManager: ScanManager,
+	haptics: Haptics,
+	deepLinkUri: Uri?,
+	onLoggedIn: () -> Unit
 ) {
-	composable(Route.LOGIN) {
+	composable(Screen.LOGIN.route) {
 		LoginScreen(
 			isInvalid = userVM.viewState == ViewState.LoginError,
 			resetIsInvalid = userVM::resetFromError,
 			errorMessage = userVM.errMsg,
 			showProgressBar = userVM.viewState == ViewState.LoggingIn,
-			onSubmitDks = userVM::login,
+			onSubmitDks = {
+				userVM.login(it)
+				settingsVM.retrieveSavedPrinters()
+			},
 			isLoggedIn = userVM.viewState == ViewState.LoggedIn,
 			onLoggedIn = {
-				pickVM.getDeclineCodes(userVM.user?.dks.orEmpty())
+				configVM.setStoreConfig()
+				infoVM.getDeclineCodes()
 				onLoggedIn.invoke()
-				navCtrl.navigate(Route.HOME)
-				appVM.getStoreOverview(userVM.user?.dks.orEmpty()) { storeOverviewState, storeOverview ->
-					pickVM.onStoreOverViewCompletion(storeOverviewState, storeOverview)
-					prepVM.onStoreOverViewCompletion(storeOverview)
-				}
-				subscribeToTopic(deviceService)
-				saveUserState(userVM, context = context)
+				navCtrl.navigate(getStartDestination(true, deepLinkUri))
+				infoVM.getStoreOverview()
+			},
+			scanManager = scanManager,
+			haptics = haptics,
+			isInValidSymbology = {
+				configVM.isInvalidSymbology(it)
 			}
 		)
 	}
 }
 
-private fun subscribeToTopic(deviceService: DeviceService) {
-	//Firebase topic subscription
-	try {
-		FirebaseMessaging.getInstance()
-			.subscribeToTopic(deviceService.getStore().id.toString() + "_notification_topic")
-		System.out.println("Subscribed to " + deviceService.getStore().id.toString() + "_notification_topic\"!")
-	} catch (e: Exception) {
-		System.out.println("Failed to subscribe!")
+private fun NavGraphBuilder.composableForHome() {
+	composable(Screen.HOME.route) {
+		HomeScreen()
 	}
 }
 
-private fun unsubscribeToTopic(deviceService: DeviceService) {
-	//Firebase topic unsubscription
-	try {
-		FirebaseMessaging.getInstance()
-			.unsubscribeFromTopic(deviceService.getStore().id.toString() + "_notification_topic")
-		System.out.println("Unsubscribed from " + deviceService.getStore().id.toString() + "_notification_topic\"!")
-	} catch (e: Exception) {
-		System.out.println("Failed to unsubscribe!")
-	}
-}
-
-private fun NavGraphBuilder.composableForHome(scanManager: ScanManager, onSearchClick: (String) -> Unit,
-											  appVM: AppViewModel,
-											  dks: String,
-											  pickVM: PickViewModel,
-											  prepVM: PrepViewModel,
-											  navCtrl: NavHostController
+private fun NavGraphBuilder.composableForPick(
+	navCtrl: NavController,
+	infoVM: InfoViewModel,
+	pickVM: PickViewModel,
+	onRefreshData: () -> Unit
 ) {
-	composable(Route.HOME) {
-		HomeScreen(scanManager = scanManager, onSearchClick = onSearchClick)
-
-		if (appVM.notificationRoute == Route.PICK) {
-			appVM.getStoreOverview(dks) { storeOverviewState, storeOverview ->
-				pickVM.onStoreOverViewCompletion(storeOverviewState, storeOverview)
-				prepVM.onStoreOverViewCompletion(storeOverview)
-			}
-			pickVM.getDeclineCodes(dks)
-			appVM.notificationRoute = null
-			navCtrl.navigate(Route.PICK) {
-				popUpTo(navCtrl.graph.findStartDestination().id) {
-					saveState = true
+	composable(Screen.PICK.route) {
+		PickScreen(
+			tasksUnassigned = infoVM.pickTasksUnassigned,
+			unitsWorked = infoVM.totalStoreUnitsWorked,
+			totalUnits = infoVM.totalStoreUnits,
+			inProgressUnits = infoVM.totalStoreUnitsInProgress,
+			storeOverviewState = infoVM.storeOverviewState,
+			hasActiveTask = pickVM.currentPickItem.value != null,
+			onHasActiveTask = {
+				navCtrl.navigate(Screen.PICK_DETAILS.route) {
+					popUpTo(Screen.HOME.route)
 				}
-				launchSingleTop = true
+			},
+			startTaskStatus = pickVM.startPickState,
+			onStartPicking = {
+				pickVM.startPick()
+			},
+			startTaskCompletion = {
+				pickVM.resetPickScreen()
+				navCtrl.navigate(Screen.PICK_DETAILS.route)
+			},
+			resetScreen = {
+				pickVM.resetPickScreen()
+				onRefreshData()
 			}
+		)
+	}
+}
 
+private fun NavGraphBuilder.composableForPickDetails(
+	navCtrl: NavController,
+	scanManager: ScanManager,
+	haptics: Haptics,
+	infoVM: InfoViewModel,
+	configVM: ConfigViewModel,
+	pickVM: PickViewModel
+) {
+	composable(Screen.PICK_DETAILS.route) {
+		PickDetailsScreen(
+			scanManager = scanManager,
+			pickDeclineState = pickVM.pickDeclineState,
+			recordPickState = pickVM.recordPickState,
+			declineCodesState = infoVM.declineCodesState,
+			fulfillmentType = pickVM.pickTask?.fulfillmentType,
+			subFulfillmentType = pickVM.pickTask?.subFulfillmentType,
+			currentPickTaskItem = pickVM.currentPickItem.value,
+			unitsWorked = pickVM.pickTask?.totalWorkedQty ?: 0,
+			totalUnits = pickVM.pickTask?.totalQty ?: 0,
+			declineModalOptions = infoVM.declineCodes?.pickDeclineCodes?.map {
+				it.displayName to it.id
+			}?.toTypedArray()?.let { linkedMapOf(*it) },
+			onDeclineClick = {
+				infoVM.getDeclineCodes()
+			},
+			onDeclineReasonSelected = { declineReason, declineReasonText ->
+				pickVM.declinePick(declineReason, declineReasonText)
+			},
+			onCheckItemScan = { upc, symbology ->
+				if (symbology == null || configVM.isInvalidSymbology(symbology)) {
+					haptics.boop()
+					return@PickDetailsScreen false
+				}
+
+				if (!pickVM.matchUpc(upc)) {
+					haptics.boop()
+					haptics.vibrate(1000)
+					return@PickDetailsScreen false
+				}
+
+				return@PickDetailsScreen true
+			},
+			onItemPick = { upc, pickLocation ->
+				if (!pickVM.pickItem(upc, pickLocation)) {
+					haptics.boop()
+					haptics.vibrate(1000)
+				}
+			},
+			onDeclineCompletion = {
+				pickVM.resetPickDeclineState()
+				if (pickVM.currentPickItem.value == null) {
+					infoVM.getStoreOverview()
+					navCtrl.navigate(Screen.PICK.route) {
+						launchSingleTop = true
+					}
+				}
+			},
+			onRecordPickCompletion = {
+				pickVM.resetRecordPickState()
+				if (pickVM.currentPickItem.value == null) {
+					infoVM.getStoreOverview()
+					navCtrl.navigate(Screen.PICK.route) {
+						launchSingleTop = true
+					}
+				}
+			}
+		)
+	}
+}
+
+private fun NavGraphBuilder.composableForPrep(
+	navCtrl: NavController,
+	infoVM: InfoViewModel,
+	prepVM: PrepViewModel,
+	scanManager: ScanManager,
+	onRefreshData: () -> Unit
+) {
+	composable(Screen.PREP.route) {
+		PrepScreen(
+			currentPrepStage = prepVM.currentPrepStage.value,
+			navigateToPrepOrder = {
+				val frNo = prepVM.stageTask?.fulfillmentRequestNumber?.ifEmpty { null }
+					?: prepVM.packTask?.fulfillmentRequestNumber?.ifEmpty { null }
+
+				if (frNo != null) {
+					navCtrl.navigate("${Screen.PREP_ORDER.route}/${PackType.ORDER}/$frNo") {
+						popUpTo(Screen.HOME.route)
+					}
+				}
+			},
+			numPackTasks = infoVM.prepTasksUnassigned,
+			scanManager = scanManager,
+			onScanGear = { upc ->
+				navCtrl.navigate("${Screen.PREP_ORDER.route}/${PackType.GEAR}/$upc") {
+					popUpTo(Screen.HOME.route)
+				}
+			},
+			onClickPackByOrder = {
+				navCtrl.navigate("${Screen.ORDERS.route}?filter=PACK") {
+					popUpTo(Screen.HOME.route)
+				}
+			},
+			resetScreen = {
+				onRefreshData()
+			}
+		)
+	}
+}
+
+private fun NavGraphBuilder.composableForPrepOrder(
+	navCtrl: NavController,
+	settingsVM: SettingsViewModel,
+	prepVM: PrepViewModel,
+	configVM: ConfigViewModel,
+	infoVM: InfoViewModel,
+	scanManager: ScanManager
+) {
+	composable("${Screen.PREP_ORDER.route}/{packType}/{data}") { navBackStackEntry ->
+		val packType = navBackStackEntry.arguments?.getString("packType")?.let {
+			PackType.valueOf(it.trim().uppercase())
+		}!!
+		val data = navBackStackEntry.arguments?.getString("data") ?: ""
+
+		PrepOrderScreen(
+			scanManager = scanManager,
+			settingsVM = settingsVM,
+			infoVM = infoVM,
+			configVM = configVM,
+			navCtrl = navCtrl,
+			packType = packType,
+			data = data
+		) {
+			prepVM.resetPrepStage()
 		}
+	}
+}
+
+private fun NavGraphBuilder.composableForOrders(
+	navCtrl: NavController,
+	orderVM: OrderViewModel
+) {
+	composable("${Screen.ORDERS.route}?filter={filter}") { navBackStackEntry ->
+		// Keeping it simple because the current use-case is only one possible filter pre-selected.
+		val presetFilter = navBackStackEntry.arguments?.getString("filter")?.ifEmpty { null }
+		if (presetFilter != null) {
+			orderVM.resetFilters()
+			orderVM.setFilter(Filter(text = presetFilter, isSelected = true))
+
+			// Nav right back without arguments to "clear" it. Otherwise, the pack persists
+			// even when removed until next Orders tab refresh.
+			navCtrl.navigate(Screen.ORDERS.route) {
+				popUpTo(Screen.HOME.route)
+			}
+		}
+
+		OrderScreen(
+			viewState = orderVM.viewState,
+			orderDetailsState = orderVM.orderDetailsState,
+			getOrders = { query ->
+				orderVM.getOrders(query = query)
+			},
+			getOrderDetails = { fulfillmentRequestNumber ->
+				orderVM.getOrderDetails(
+					fulfillmentRequestNumber = fulfillmentRequestNumber
+				)
+			},
+			getOrderDetailsCompletion = {
+				navCtrl.navigate(Screen.ORDERS_DETAILS.route)
+				orderVM.resetOrderDetailsState()
+			},
+			readyOrders = orderVM.readyOrders,
+			inProgressOrders = orderVM.inProgressOrders,
+			orderTypeFilters = orderVM.orderTypeFilters,
+			orderStatusFilters = orderVM.orderStatusFilters,
+			selectedTab = orderVM.selectedTab,
+			onSelectTab = orderVM::setTab,
+			onApplyFilters = orderVM::setFilters
+		)
+	}
+}
+
+private fun NavGraphBuilder.composableForOrderDetails(
+	navCtrl: NavController,
+	orderVM: OrderViewModel,
+	settingsVM: SettingsViewModel,
+	infoVM: InfoViewModel,
+	scanManager: ScanManager,
+	configVM: ConfigViewModel
+) {
+	composable(Screen.ORDERS_DETAILS.route) {
+		val orderDetailsRes = orderVM.orderDetailResponse
+		val athleteDetail = orderDetailsRes?.athleteDetail
+
+		// TODO: this is a quick fix until the vm gets refactored
+		settingsVM.resetHoldSlipPrintState()
+
+		// TODO: Cleanup params. Order detail response is already being passed in along with its individual properties
+		OrderDetailsScreen(
+			viewState = orderVM.viewState,
+			startPickupViewState = orderVM.startPickupState,
+			orderDetailsResponse = orderVM.orderDetailResponse,
+			athleteName = athleteDetail?.athleteFullName().orEmpty(),
+			athleteProxyName = athleteDetail?.athleteProxyFullName().orEmpty(),
+			athletePhoneNumber = StringUtils.toPhoneNumberFormatted(athleteDetail?.athletePhoneNumber.orEmpty()),
+			orderNumber = orderDetailsRes?.orderNumber.orEmpty(),
+			orderDate = orderVM.orderDate,
+			expectedDate = orderVM.expectedDate,
+			receivedDate = orderVM.receivedDate,
+			packedOnDate = orderVM.packedOnDate,
+			holdingLocation = orderVM.orderDetailResponse?.fulfillmentRequestDetail?.containers?.firstOrNull()?.holdingLocation ?: "",
+			holdingAreas = configVM.getHoldingLocations(),
+			declineModalOptions = infoVM.declineCodes?.pickupDeclineCodes,
+			onStartPickup = { fulfillmentRequestNumber ->
+				orderVM.startPickup(fulfillmentRequestNumber = fulfillmentRequestNumber)
+			},
+			onPickupExtend = { fulfillmentRequestNumber ->
+				orderVM.pickupExtend(fulfillmentRequestNumber = fulfillmentRequestNumber)
+			},
+			onPickupRemoveCheckIn = { taskId ->
+				orderVM.pickupRemoveCheckIn(taskId = taskId)
+			},
+			onStartPickupCompletion = {
+				navCtrl.navigate(Screen.ORDERS_PICKUP.route)
+				orderVM.resetStarPickupState()
+			},
+			holdSlipState = orderVM.holdSlipState,
+			onPrintHoldSlip = { fulfillmentRequestNumber ->
+				orderVM.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)
+			},
+			printHoldSlipState = settingsVM.holdSlipPrintState,
+			onPrintHoldSlipSuccessCallBack = {
+				orderVM.resetHoldSlipState()
+				settingsVM.printBOPISHoldSlip(orderVM.holdSlipZpl!!)
+			},
+			onResetPrintHoldSlip = {
+				settingsVM.resetHoldSlipPrintState()
+			},
+			ipPrefix = settingsVM.ipPrefix,
+			printer = settingsVM.findPrinter(PrinterName.BOPIS),
+			printerConnectionState = settingsVM.printerConnectionState,
+			onConnectPrinter = settingsVM::connectPrinter,
+			onResetPrinter = {
+				settingsVM.resetConnectionState()
+			},
+			cancelReasonData = orderVM.cancelReasonData,
+			onCancelOrder = { fulfillmentRequestNumber, declinedReason, shouldTranslateReason ->
+				orderVM.cancelOrder(
+					fulfillmentRequestNumber = fulfillmentRequestNumber,
+					declinedReason = declinedReason,
+					shouldTranslateReason = shouldTranslateReason
+				)
+			},
+			onCancelComplete = {
+				orderVM.resetCancelReasonData()
+				navCtrl.navigate(Screen.ORDERS.route)
+			},
+			onCancelAgedError = orderVM::cancelAgedOrderError,
+			onLocationChange = { containerId, holdingLocation ->
+				orderVM.recordHoldingLocation(
+					containerId,
+					holdingLocation
+				)
+			},
+			scanLocationState = orderVM.scanLocationState,
+			resetScanLocationState = orderVM::resetScanLocationState,
+			onPackOrder = { frNo ->
+				navCtrl.navigate("${Screen.PREP_ORDER.route}/${PackType.ORDER}/$frNo") {
+					popUpTo(Screen.HOME.route)
+				}
+			},
+			scanManager = scanManager
+		)
+	}
+}
+
+private fun NavGraphBuilder.composableForOrderPickup(
+	navCtrl: NavController,
+	orderVM: OrderViewModel,
+	scanManager: ScanManager,
+	settingsVM: SettingsViewModel
+) {
+	composable(Screen.ORDERS_PICKUP.route) {
+		OrderPickupScreen(
+			scanManager = scanManager,
+			completeOrderPickupState = orderVM.completeOrderPickupState,
+			orderNumber = orderVM.orderDetailResponse?.orderNumber,
+			athleteDetail = orderVM.orderDetailResponse?.athleteDetail,
+			checkInDetail = orderVM.orderDetailResponse?.athleteCheckInDetail,
+			frDetail = orderVM.orderDetailResponse?.fulfillmentRequestDetail,
+			onOrderPickupClicked = { taskId ->
+				orderVM.completePickupTask(taskId = taskId)
+			},
+			onOrderPickupSuccess = {
+				orderVM.resetCompleteOrderPickState()
+				navCtrl.navigate(Screen.ORDERS.route) {
+					popUpTo(Screen.ORDERS.route)
+				}
+			},
+			onScanSuccess = orderVM::holdSuccessSlipScan,
+			scanHoldSlipState = orderVM.holdSlipScanState,
+			onResetHoldSlipScan = orderVM::resetHoldSlipScanState,
+			onPrintHoldSlip = { fulfillmentRequestNumber ->
+				orderVM.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)
+			},
+			printHoldSlipState = settingsVM.holdSlipPrintState,
+			onPrintHoldSlipSuccessCallBack = {
+				orderVM.resetHoldSlipState()
+				settingsVM.printBOPISHoldSlip(orderVM.holdSlipZpl!!)
+			},
+			holdSlipState = orderVM.holdSlipState,
+			onResetPrintHoldSlip = {
+				settingsVM.resetHoldSlipPrintState()
+			},
+			ipPrefix = settingsVM.ipPrefix,
+			printer = settingsVM.findPrinter(PrinterName.BOPIS),
+			printerConnectionState = settingsVM.printerConnectionState,
+			onConnectPrinter = settingsVM::connectPrinter,
+			onResetPrinter = {
+				settingsVM.resetConnectionState()
+			}
+		)
+	}
+}
+
+private fun NavGraphBuilder.composableForSettings(
+	settingsVM: SettingsViewModel
+) {
+	composable(Screen.SETTINGS.route) {
+		val context = LocalContext.current
+
+		SettingsScreen(
+			printersList = settingsVM.printersList,
+			printerConnectionState = settingsVM.printerConnectionState,
+			ipPrefix = settingsVM.ipPrefix,
+			isDebug = BuildConfig.DEBUG,
+			onConnectPrinter = settingsVM::connectPrinter,
+			onDisConnectPrinter = settingsVM::disConnectPrinter,
+			onReset = {
+				settingsVM.resetConnectionState()
+			},
+			togglePrinterBypass = {
+				val bypass = settingsVM.toggleBypassPrinter()
+
+				Toast.makeText(
+					context,
+					"PrinterBypass: $bypass",
+					Toast.LENGTH_SHORT
+				).show()
+			}
+		)
+	}
+}
+
+private fun NavGraphBuilder.composableForSearchResults(
+	navCtrl: NavController,
+	orderVM: OrderViewModel,
+	scanManager: ScanManager
+) {
+	composable("${Screen.SEARCH_RESULTS.route}?{searchInputText}") { navBackStackEntry ->
+		val searchInputText = navBackStackEntry.arguments?.getString("searchInputText") ?: ""
+
+		SearchResultsScreen(
+			viewState = orderVM.viewState,
+			orderDetailsState = orderVM.orderDetailsState,
+			searchInput = searchInputText,
+			getOrders = {
+				orderVM.getOrders(query = it)
+			},
+			orderResults = orderVM.readyOrders + orderVM.inProgressOrders,
+			getOrderDetails = { fulfillmentRequestNumber ->
+				orderVM.getOrderDetails(
+					fulfillmentRequestNumber = fulfillmentRequestNumber
+				)
+			},
+			getOrderDetailsCompletion = {
+				navCtrl.navigate(Screen.ORDERS_DETAILS.route)
+				orderVM.resetOrderDetailsState()
+			},
+			scanManager = scanManager
+		)
 	}
 }
 
@@ -575,19 +748,3 @@ private fun isRouteInEntry(route: String, entry: NavBackStackEntry?): Boolean =
 
 private fun getCurrentRoute(entry: NavBackStackEntry?): String? =
 	entry?.destination?.hierarchy?.firstOrNull()?.route
-
-fun getAppTopBarTitle(route: String): String {
-	return when (route) {
-		Route.LOGIN -> "lOGIN"
-		Route.HOME -> "HOME"
-		Route.PICK_DETAILS,
-		Route.PICK -> "PICK"
-		Route.PACK_ORDER, Route.STAGE_ORDER,
-		Route.PREP -> "PREP"
-		Route.ORDERS -> "ORDERS"
-		Route.ORDERS_DETAILS -> "ORDER DETAILS"
-		Route.ORDERS_PICKUP -> "PICK UP"
-		Route.SETTINGS -> "SETTINGS"
-		else -> ""
-	}
-}

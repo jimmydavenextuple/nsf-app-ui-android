@@ -2,10 +2,12 @@ package com.nextuple.nsf.hilt
 
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.retrofit.ApiCallAdapterFactory
-import com.nextuple.nsf.retrofit.api.AppApi
+import com.nextuple.nsf.retrofit.api.ConfigApi
+import com.nextuple.nsf.retrofit.api.InfoApi
 import com.nextuple.nsf.retrofit.api.OrderApi
+import com.nextuple.nsf.retrofit.api.PackTaskApi
 import com.nextuple.nsf.retrofit.api.PickApi
-import com.nextuple.nsf.retrofit.api.PrepApi
+import com.nextuple.nsf.retrofit.api.StageTaskApi
 import com.nextuple.nsf.retrofit.api.UserApi
 import dagger.Module
 import dagger.Provides
@@ -46,11 +48,17 @@ internal object RetrofitModule {
 	fun providePickApi(retrofit: Retrofit): PickApi = retrofit.create(PickApi::class.java)
 
 	@Provides
-	fun provideAppApi(retrofit: Retrofit): AppApi = retrofit.create(AppApi::class.java)
+	fun provideAppApi(retrofit: Retrofit): InfoApi = retrofit.create(InfoApi::class.java)
 
 	@Provides
-	fun providePrepApi(retrofit: Retrofit): PrepApi = retrofit.create(PrepApi::class.java)
+	fun providePrepApi(retrofit: Retrofit): PackTaskApi = retrofit.create(PackTaskApi::class.java)
 
 	@Provides
 	fun provideOrderApi(retrofit: Retrofit): OrderApi = retrofit.create(OrderApi::class.java)
+
+	@Provides
+	fun provideStageTaskApi(retrofit: Retrofit): StageTaskApi = retrofit.create(StageTaskApi::class.java)
+
+	@Provides
+	fun provideConfigApi(retrofit: Retrofit): ConfigApi = retrofit.create(ConfigApi::class.java)
 }

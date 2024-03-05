@@ -5,19 +5,19 @@ import com.nextuple.nsf.service.dto.Device
 import com.nextuple.nsf.service.dto.Store
 
 class DeviceService(
-	private val logService: LogService,
-	private val getDeviceModel: () -> String,
-	private val getDeviceId: () -> String,
-	private val getMacAddress: () -> String
+    private val logService: LogService,
+    private val getDeviceModel: () -> String,
+    private val getDeviceId: () -> String,
+    private val getMacAddress: () -> String
 ) {
-	fun getStore(): Store {
-		val store = 1234
-		val brand = Brand.toBrand("DSG")
+	fun getStore(): Store? = runCatching {
 		return Store(
-			id = store.toString(),
-			brand = brand
+			id = "1234",
+			brand = Brand.NT
 		)
-	}
+	}.onFailure {
+		logService.trackError("getStore", it)
+	}.getOrDefault(null)
 
 	fun getDevice(): Device {
 		val model = runCatching {

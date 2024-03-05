@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,10 +17,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,10 +35,17 @@ import com.nextuple.nsf.ui.common.DisplayLegends
 import com.nextuple.nsf.ui.common.InfoModal
 import com.nextuple.nsf.ui.common.Legend
 import com.nextuple.nsf.ui.common.PrimaryButton
+import com.nextuple.nsf.ui.common.Tab
+import com.nextuple.nsf.ui.component.EmptyStateScreen
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
+
+enum class PickScreenTab(val displayName: String) {
+	PICKUP("PICKUP"),
+	SFS("SFS")
+}
 
 @Composable
 fun PickScreen(
@@ -43,20 +55,84 @@ fun PickScreen(
 	inProgressUnits: Int? = null,
 	hasActiveTask: Boolean = false,
 	onHasActiveTask: () -> Unit,
-	storeOverviewState: GenericViewState = GenericViewState.Loading,
+	storeOverviewState: GenericViewState = GenericViewState.Idle,
 	startTaskStatus: GenericViewState = GenericViewState.Idle,
 	onStartPicking: () -> Unit = {},
 	startTaskCompletion: () -> Unit = {},
 	resetScreen: () -> Unit = {}
 ) {
+	var selectedTab by rememberSaveable { mutableStateOf(PickScreenTab.PICKUP) }
+
+	if (hasActiveTask) {
+		LaunchedEffect(Unit) { onHasActiveTask() }
+	}
+
+	// handling overview when already logged in or deeplink to app
+	LaunchedEffect(storeOverviewState) {
+		if (storeOverviewState == GenericViewState.Idle) {
+			resetScreen()
+		}
+	}
+
+	Column {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.height(40.dp)
+		) {
+			Tab(
+				modifier = Modifier.weight(1f),
+				title = PickScreenTab.PICKUP.displayName,
+				count = tasksUnassigned ?: 0,
+				isSelected = selectedTab == PickScreenTab.PICKUP
+			) {
+				selectedTab = PickScreenTab.PICKUP
+				resetScreen()
+			}
+			Tab(
+				modifier = Modifier.weight(1f),
+				title = PickScreenTab.SFS.displayName,
+				count = 0, // TODO: fix for sfs orders
+				isSelected = selectedTab == PickScreenTab.SFS
+			) {
+				selectedTab = PickScreenTab.SFS
+				resetScreen()
+			}
+		}
+		if (selectedTab == PickScreenTab.PICKUP) {
+			PickupTabContainer(
+				tasksUnassigned,
+				storeOverviewState,
+				startTaskStatus,
+				unitsWorked,
+				totalUnits,
+				inProgressUnits,
+				onStartPicking,
+				startTaskCompletion,
+				resetScreen
+			)
+		} else {
+			SfsTabContainer()
+		}
+	}
+}
+
+@Composable
+private fun PickupTabContainer(
+	tasksUnassigned: Int?,
+	storeOverviewState: GenericViewState,
+	startTaskStatus: GenericViewState,
+	unitsWorked: Int?,
+	totalUnits: Int?,
+	inProgressUnits: Int?,
+	onStartPicking: () -> Unit,
+	startTaskCompletion: () -> Unit,
+	resetScreen: () -> Unit
+) {
 	var showInfoModal by remember { mutableStateOf(false) }
 
 	fun dialogVisibility(visibility: Boolean) {
 		showInfoModal = visibility
-	}
-
-	if (hasActiveTask) {
-		LaunchedEffect(Unit) { onHasActiveTask() }
 	}
 
 	Box(
@@ -70,7 +146,7 @@ fun PickScreen(
 		) {
 			CircularProgressIndicator(
 				modifier = Modifier.align(Alignment.Center),
-				color = BrandColor.BLUE_100_NT
+				color = BrandColor.GRAY_900
 			)
 		} else if (
 			storeOverviewState == GenericViewState.Success &&
@@ -119,9 +195,9 @@ fun PickScreen(
 								circleSize = 16,
 								space = 0,
 								items = listOf(
-									Legend(BrandColor.BLUE_100_NT, "UNWORKED"),
-									Legend(BrandColor.BLUE_300_NT, "WORKED"),
-									Legend(BrandColor.YELLOW_NT, "BEING WORKED")
+									Legend(BrandColor.GRAY_900, "UNWORKED"),
+									Legend(BrandColor.GREEN_400, "WORKED"),
+									Legend(BrandColor.YELLOW_400, "BEING WORKED")
 								),
 								textStyle = legendsTextStyle
 							)
@@ -157,6 +233,22 @@ fun PickScreen(
 }
 
 @Composable
+private fun SfsTabContainer() {
+	Box(
+		modifier = Modifier
+			.fillMaxHeight()
+			.background(BrandColor.WHITE),
+		contentAlignment = Alignment.Center
+	) {
+		EmptyStateScreen(
+			title = stringResource(id = R.string.pick_under_construction_title),
+			body = stringResource(id = R.string.pick_under_construction_body),
+			imageVector = ImageVector.vectorResource(id = R.drawable.under_construction)
+		)
+	}
+}
+
+@Composable
 @PreviewPdt
 fun PreviewPickScreen() {
 	PickScreen(
@@ -165,4 +257,10 @@ fun PreviewPickScreen() {
 		hasActiveTask = false,
 		onHasActiveTask = {}
 	)
+}
+
+@Composable
+@PreviewPdt
+fun PreviewSfsTabScreen() {
+	SfsTabContainer()
 }

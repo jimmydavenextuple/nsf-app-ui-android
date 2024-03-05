@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.GOAT" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/green_900</item>
+    <style name="Theme.NSF" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/blue_nt</item>
     </style>
 </resources>

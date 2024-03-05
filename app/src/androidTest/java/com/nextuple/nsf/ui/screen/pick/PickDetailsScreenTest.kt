@@ -1,12 +1,13 @@
 package com.nextuple.nsf.ui.screen.pick
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
-import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
+import com.nextuple.nsf.util.FulfillmentType.BOPIS
+import com.nextuple.nsf.util.SubFulfillmentType
+import com.karumi.shot.ScreenshotTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -25,8 +26,9 @@ class PickDetailsScreenTest : ScreenshotTest {
 		composeTestRule.setContent {
 			PickDetailsScreen(
 				scanManager = NoOpScanManager(),
-				progressBarBackgroundColor = BrandColor.GREEN_900,
 				pickDeclineState = GenericViewState.Loading,
+				fulfillmentType = BOPIS,
+				subFulfillmentType = SubFulfillmentType.BOPIS,
 				currentPickTaskItem = PickTaskItem(
 					sku = "2345",
 					productBrand = "BOMBAS",
@@ -48,8 +50,9 @@ class PickDetailsScreenTest : ScreenshotTest {
 				),
 				unitsWorked = 1,
 				totalUnits = 3,
-				declineModalOptions = listOf(),
-				onItemPick = { _, _ -> }
+				declineModalOptions = linkedMapOf(),
+				onItemPick = { _, _ -> },
+				onCheckItemScan = { _, _ -> true }
 			)
 		}
 	}

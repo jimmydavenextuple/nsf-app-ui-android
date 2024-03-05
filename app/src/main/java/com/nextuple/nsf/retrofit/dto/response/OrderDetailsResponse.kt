@@ -4,24 +4,27 @@ import com.nextuple.nsf.retrofit.dto.StageTaskContainer
 import com.nextuple.nsf.retrofit.dto.Status
 
 data class OrderDetailsResponse(
-	/*
-		TODO: Revisit mapping once FIT 2.0 is fully ready
-	 */
 	val orderNumber: String? = null,
-	val orderStatusText: String? = null,
+    val orderStatusText: String? = null,
 
-	val packedOnDate: String? = null,
-	val packedByUserId: String? = null,
+    val orderDate: String? = null,
+    val expectedDeliveryDate: String? = null,
+    val receivedDate: String? = null,
 
-	val pickupByDate: String? = null,
+    val pickedByUserId: String? = null,
+    val packedOnDate: String? = null,
+    val packedByUserId: String? = null,
+    val stagedByUserId: String? = null,
+
+    val pickupByDate: String? = null,
 	// If count <=0 show EXTEND_PICKUP
-	val pickupExtendedCount: Int? = null,
-	val pickedUpDate: String? = null,
+    val pickupExtendedCount: Int? = null,
+    val pickedUpDate: String? = null,
 
-	val athleteDetail: AthleteDetail? = null,
-	val athleteCheckInDetail: AthleteCheckInDetail? = null,
+    val athleteDetail: AthleteDetail? = null,
+    val athleteCheckInDetail: AthleteCheckInDetail? = null,
 
-	val fulfillmentRequestDetail: FulfillmentRequestDetail
+    val fulfillmentRequestDetail: FulfillmentRequestDetail
 )
 
 data class AthleteDetail(
@@ -55,11 +58,14 @@ data class FulfillmentRequestDetail(
 	var totalContainerCount: Int? = null,
 	val containers: List<StageTaskContainer> = emptyList(),
 
+	/**
+	 * TODO: Extract this or containers since GetOrders API fills this field, but GetOrderDetails API does not and uses containers.
+	 */
 	val holdingLocation: String? = null
 )
 
-fun AthleteDetail.athleteFullName() = "$athleteFirstName $athleteLastName"
+fun AthleteDetail.athleteFullName() = "${athleteFirstName.orEmpty()} ${athleteLastName.orEmpty()}".trim()
 
-fun AthleteDetail.athleteShortName() = "$athleteLastName, ${athleteFirstName?.firstOrNull() ?: ""}."
+fun AthleteDetail.athleteShortName() = "${athleteLastName.orEmpty()}, ${athleteFirstName?.firstOrNull() ?: ""}."
 
-fun AthleteDetail.athleteProxyFullName() = "$athleteProxyFirstName $athleteProxyLastName"
+fun AthleteDetail.athleteProxyFullName() = "${athleteProxyFirstName.orEmpty()} ${athleteProxyLastName.orEmpty()}".trim()

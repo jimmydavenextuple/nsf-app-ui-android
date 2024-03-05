@@ -1,8 +1,8 @@
 package com.nextuple.nsf.ui.screen.pick
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.ui.util.GenericViewState
+import com.karumi.shot.ScreenshotTest
 import org.junit.Rule
 import org.junit.Test
 

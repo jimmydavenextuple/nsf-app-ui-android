@@ -1,6 +1,7 @@
 package com.nextuple.nsf.ui.screen.home
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.karumi.shot.ScreenshotTest
 import org.junit.Rule
 import org.junit.Test
@@ -18,7 +19,7 @@ class LoginScreenTest : ScreenshotTest {
 
 	@Test
 	fun loginScreenErrorInvalidDKS() {
-		renderLoginScreen(true, "Invalid DKS number.")
+		renderLoginScreen(true, "Invalid Id.")
 
 		compareScreenshot(composeTestRule)
 	}
@@ -32,8 +33,10 @@ class LoginScreenTest : ScreenshotTest {
 				showProgressBar = false,
 				onSubmitDks = {},
 				isLoggedIn = false,
-				onLoggedIn = {
-				}
+				onLoggedIn = {},
+				scanManager = NoOpScanManager(),
+				haptics = null,
+				isInValidSymbology = { _ -> false }
 			)
 		}
 	}

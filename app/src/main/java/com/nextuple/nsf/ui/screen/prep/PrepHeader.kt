@@ -1,0 +1,86 @@
+package com.nextuple.nsf.ui.screen.prep
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.nextuple.nsf.R
+import com.nextuple.nsf.ui.theme.BrandColor
+import com.nextuple.nsf.ui.theme.FontFamily
+import com.nextuple.nsf.ui.util.PreviewPdtWidth
+
+@Composable
+fun PrepHeader(
+	modifier: Modifier = Modifier,
+	athlete: String,
+	orderNum: String
+) {
+	Column(modifier = modifier) {
+		Row(
+			modifier = Modifier
+				.padding(horizontal = 32.dp, vertical = 8.dp)
+		) {
+			HeaderText(
+				modifier = Modifier
+					.fillMaxWidth(.5f),
+				title = stringResource(id = R.string.athlete),
+				value = athlete
+			)
+			Spacer(modifier = Modifier.weight(1f))
+			HeaderText(
+				title = stringResource(id = R.string.order_num),
+				value = orderNum
+			)
+		}
+		Divider(
+			modifier = Modifier,
+			thickness = 1.dp,
+			color = BrandColor.GRAY_350
+		)
+	}
+}
+
+@Composable
+fun HeaderText(modifier: Modifier = Modifier, title: String, value: String) {
+	Column(modifier = modifier) {
+		Text(
+			text = title,
+			fontFamily = FontFamily.ARCHIVO,
+			fontWeight = FontWeight.Bold,
+			fontSize = 14.sp,
+			letterSpacing = 1.5.sp
+		)
+		Text(
+			text = value,
+			fontFamily = FontFamily.ARCHIVO,
+			fontWeight = FontWeight.Normal,
+			fontSize = 14.sp,
+			letterSpacing = 0.5.sp,
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis
+		)
+	}
+}
+
+@PreviewPdtWidth
+@Composable
+private fun PrepHeaderPreview() {
+	PrepHeader(
+		modifier = Modifier
+			.fillMaxWidth()
+			.background(BrandColor.GRAY_50),
+		athlete = "Chester Arthur",
+		orderNum = "XX345674902"
+	)
+}

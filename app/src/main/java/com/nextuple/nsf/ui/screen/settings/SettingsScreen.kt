@@ -1,20 +1,13 @@
 package com.nextuple.nsf.ui.screen.settings
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -35,14 +28,12 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColor
 import com.nextuple.nsf.R
-import com.nextuple.nsf.ui.common.BackButton
-import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.InfoModal
 import com.nextuple.nsf.ui.common.MultiOptionModal
 import com.nextuple.nsf.ui.common.TertiaryButton
-import com.nextuple.nsf.ui.common.TopLabeledTextField
+import com.nextuple.nsf.ui.component.PrinterModal
+import com.nextuple.nsf.ui.state.Printer
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
@@ -53,46 +44,34 @@ fun SettingsScreen(
 	printersList: List<Printer>?,
 	printerConnectionState: GenericViewState = GenericViewState.Idle,
 	ipPrefix: String?,
+	isDebug: Boolean,
 	onConnectPrinter: (Printer, String) -> Unit,
 	onDisConnectPrinter: (Printer) -> Unit,
-	onBackButtonClick: () -> Unit,
-	onReset: () -> Unit
+	onReset: () -> Unit,
+	togglePrinterBypass: () -> Unit = {}
 ) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
 			.padding()
-			.background(BrandColor.GRAY_100)
+			.background(BrandColor.GRAY_50)
 	) {
-		//Header
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.background(color = BrandColor.GRAY_100)
-				.padding(start = 20.dp)
-				.height(40.dp)
-		) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				BackButton(
-					modifier = Modifier.fillMaxHeight().padding(top = 10.dp, bottom = 10.dp),
-					onBackButtonClick = onBackButtonClick
-				)
-
-			}
-		}
 		Card(
 			modifier = Modifier
-				.padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 8.dp)
+				.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
 				.fillMaxWidth()
 				.wrapContentHeight(),
 			shape = RoundedCornerShape(12.dp),
-			colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_50),
+			colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_100) ,
 			elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
 		) {
 			Column(modifier = Modifier.padding(12.dp)) {
 				Text(
+					modifier = Modifier.clickable(
+						enabled = isDebug
+					) {
+						togglePrinterBypass()
+					},
 					text = stringResource(id = R.string.printers_title),
 					style = TextStyle(
 						fontWeight = FontWeight.Bold,
@@ -105,8 +84,7 @@ fun SettingsScreen(
 					PrinterListItem(printer, ipPrefix, onReset, printerConnectionState, onConnectPrinter, onDisConnectPrinter)
 				}
 				PrinterProblem(
-					modifier = Modifier.padding(top = 22.dp, bottom = 10.dp),
-					onButtonClick = {}
+					modifier = Modifier.padding(top = 22.dp, bottom = 10.dp)
 				)
 			}
 		}
@@ -117,17 +95,8 @@ fun SettingsScreen(
 private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> Unit, printerConnectionState: GenericViewState, onConnectPrinter: (Printer, String) -> Unit, onDisConnectPrinter: (Printer) -> Unit) {
 	var showConnectModal by remember { mutableStateOf(false) }
 	var showDisconnectModal by remember { mutableStateOf(false) }
-	var connectModalButtonState by remember { mutableStateOf(ButtonState.DEFAULT) }
-	var isConnectModalButtonEnabled by remember { mutableStateOf(false) }
-	var ipInput by remember { mutableStateOf("") }
 
-	fun resetDialogData() {
-		connectModalButtonState = ButtonState.DEFAULT
-		isConnectModalButtonEnabled = false
-		ipInput = ""
-	}
-
-	Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+	Row(modifier = Modifier.padding(6.dp), verticalAlignment = Alignment.CenterVertically) {
 		Text(
 			modifier = Modifier.weight(0.3f),
 			text = printer.printerName,
@@ -144,7 +113,7 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 				.fillMaxWidth()
 				.wrapContentHeight(),
 			shape = RoundedCornerShape(12.dp),
-			colors = CardDefaults.cardColors(containerColor = if (printer.connectionStatus) BrandColor.BLUE_100_NT else BrandColor.GRAY_100)
+			colors = CardDefaults.cardColors(containerColor = if (printer.connectionStatus) BrandColor.GRAY_50 else BrandColor.GRAY_100)
 		) {
 			Row(
 				modifier = Modifier
@@ -164,18 +133,6 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 						.weight(0.6f)
 						.padding(start = 4.dp, end = 4.dp)
 				) {
-					Text(
-						modifier = Modifier,
-						text = stringResource(id = R.string.printer_ip_caps),
-						maxLines = 1,
-						style = TextStyle(
-							fontWeight = FontWeight.Bold,
-							fontFamily = FontFamily.ARCHIVO,
-							fontSize = 12.sp,
-							color = BrandColor.BLACK,
-							letterSpacing = 1.5.sp
-						)
-					)
 					if (printer.connectionStatus) {
 						Text(
 							text = printer.ipAddress,
@@ -228,78 +185,14 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 	}
 
 	if (showConnectModal) {
-		InfoModal(
-			title = stringResource(id = R.string.connect_printer),
-			subTitle = stringResource(id = R.string.connect_printer_subtitle),
-			buttonText = stringResource(id = R.string.connect),
-			buttonState = connectModalButtonState,
-			isButtonEnabled = isConnectModalButtonEnabled,
-			showCheckBox = false,
-			visualContent = {
-				TopLabeledTextField(
-					modifier = Modifier.fillMaxWidth(0.5f),
-					labelText = stringResource(id = R.string.printer_ip),
-					fieldValue = ipInput,
-					prefixText = ipPrefix ?: "",
-					isPrefixEnabled = true,
-					onValueChange = {
-						ipInput = it
-						isConnectModalButtonEnabled = isValidIPv4Address(ipPrefix + ipInput)
-					}
-				)
-
-				Row(
-					modifier = Modifier,
-					horizontalArrangement = Arrangement.Center,
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Icon(
-						modifier = Modifier
-							.padding(end = 8.dp)
-							.size(width = 16.dp, height = 8.dp),
-						painter = painterResource(id = R.drawable.ic_arrow_drop_down),
-						contentDescription = "drop down arrow"
-					)
-					Spacer(modifier = Modifier.height(32.dp))
-					TertiaryButton(
-						text = stringResource(id = R.string.cant_find_the_ip),
-						onButtonClick = { }
-					)
-				}
-			},
-			buttonClick = {
-				if (connectModalButtonState == ButtonState.DEFAULT) {
-					onConnectPrinter(printer, ipPrefix + ipInput)
-				}
-			},
-			crossIconClick = {
-				showConnectModal = false
-				resetDialogData()
-			},
-			onDismissRequest = {
-				showConnectModal = false
-				resetDialogData()
-			}
+		PrinterModal(
+			ipPrefix = ipPrefix,
+			printer = printer,
+			onReset = onReset,
+			printerConnectionState = printerConnectionState,
+			toggleModal = { showConnectModal = it },
+			onConnectPrinter = onConnectPrinter
 		)
-	}
-
-	when (printerConnectionState) {
-		GenericViewState.Loading -> {
-			connectModalButtonState = ButtonState.LOADING
-		}
-
-		GenericViewState.Success -> {
-			connectModalButtonState = ButtonState.DONE
-			Handler(Looper.getMainLooper()).postDelayed({
-				onReset.invoke()
-				showConnectModal = false
-				resetDialogData()
-			}, 1000)
-		}
-
-		else -> {
-			connectModalButtonState = ButtonState.DEFAULT
-		}
 	}
 
 	if (showDisconnectModal) {
@@ -325,9 +218,11 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 
 @Composable
 private fun PrinterProblem(
-	modifier: Modifier = Modifier,
-	onButtonClick: () -> Unit
+	modifier: Modifier = Modifier
 ) {
+	var showPrinterProblemDialog by remember { mutableStateOf(false) }
+	val toggleDialog: (Boolean) -> Unit = { showPrinterProblemDialog = it }
+
 	Row(
 		modifier = modifier,
 		verticalAlignment = Alignment.CenterVertically
@@ -335,32 +230,38 @@ private fun PrinterProblem(
 		Icon(
 			modifier = Modifier
 				.padding()
-				.clickable { onButtonClick() },
+				.clickable { toggleDialog(true) },
 			painter = painterResource(id = R.drawable.ic_info),
 			contentDescription = "back button",
 			tint = BrandColor.BLUE_300_NT
 		)
 
 		TertiaryButton(text = stringResource(id = R.string.printer_problems)) {
-			onButtonClick()
+			toggleDialog(true)
 		}
+	}
+
+	if (showPrinterProblemDialog) {
+		val hideDialog = { toggleDialog(false) }
+
+		InfoModal(
+			title = stringResource(id = R.string.printer_problems_title),
+			subTitle = stringResource(id = R.string.printer_problems_info),
+			buttonText = stringResource(id = R.string.ok),
+			buttonClick = { hideDialog() },
+			crossIconClick = { hideDialog() },
+			onDismissRequest = { hideDialog() }
+		)
 	}
 }
 
-fun isValidIPv4Address(input: String): Boolean {
-	val pattern = Regex("^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$")
-	return pattern.matches(input)
-}
-
-private fun getPrinterIcon(isConnected: Boolean): Int {
+fun getPrinterIcon(isConnected: Boolean): Int {
 	return if (isConnected) R.drawable.ic_printer_connected else R.drawable.ic_printer_normal
 }
 
-private fun getPrinterConnectIcon(isConnected: Boolean): Int {
-	return if (isConnected) R.drawable.ic_close else R.drawable.ic_plus_orange
+fun getPrinterConnectIcon(isConnected: Boolean): Int {
+	return if (isConnected) R.drawable.ic_close_14x14 else R.drawable.ic_plus
 }
-
-data class Printer(val printerName: String, val ipAddress: String, var connectionStatus: Boolean)
 
 @Composable
 @PreviewPdt
@@ -381,12 +282,18 @@ fun PreviewPrepScreen() {
 				printerName = "SDD",
 				ipAddress = stringResource(id = R.string.printer_ip_caps),
 				connectionStatus = false
+			),
+			Printer(
+				printerName = "BOPL",
+				ipAddress = stringResource(id = R.string.printer_ip_caps),
+				connectionStatus = false
 			)
 		),
 		ipPrefix = "",
 		onReset = {},
 		onConnectPrinter = { _, _ -> },
 		onDisConnectPrinter = {},
-		onBackButtonClick = {}
+		togglePrinterBypass = {},
+		isDebug = false
 	)
 }

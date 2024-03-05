@@ -3,6 +3,7 @@ package com.nextuple.nsf.ui.common
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -31,12 +32,14 @@ fun ScrollToReveal(
 	mainContent: @Composable ColumnScope.() -> Unit,
 	secondaryContent: @Composable RowScope.() -> Unit,
 	secondaryModifier: Modifier = Modifier,
+	scrollState: ScrollState = rememberScrollState(),
 	defaultRevealContent: Boolean = false
 ) {
 	val revealContent = remember { mutableStateOf(defaultRevealContent) }
 
 	val nestedScrollConnection = remember {
 		object : NestedScrollConnection {
+
 			override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
 				// Hide FAB
 				if (available.y < -1) {
@@ -60,7 +63,7 @@ fun ScrollToReveal(
 			modifier = Modifier
 				.padding(it)
 				.fillMaxSize()
-				.verticalScroll(rememberScrollState()),
+				.verticalScroll(scrollState),
 			verticalArrangement = Arrangement.SpaceBetween
 
 		) {
@@ -88,6 +91,7 @@ fun PreviewDemo() {
 		mainContent = {},
 		secondaryContent = {},
 		secondaryModifier = Modifier.padding(top = 17.dp),
-		defaultRevealContent = true
+		defaultRevealContent = true,
+		scrollState = ScrollState(0)
 	)
 }

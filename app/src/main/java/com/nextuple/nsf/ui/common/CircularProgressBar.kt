@@ -50,38 +50,38 @@ import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun CircularProgressBar(
-	modifier: Modifier = Modifier,
-	completedUnits: Int,
-	inProgressUnits: Int,
-	totalUnits: Int,
-	progressBarSize: Dp = 240.dp,
-	indicatorThickness: Dp = 20.dp,
-	animationDuration: Int = 1000,
-	animationDelay: Int = 0,
+    modifier: Modifier = Modifier,
+    completedUnits: Int,
+    inProgressUnits: Int,
+    totalUnits: Int,
+    progressBarSize: Dp = 240.dp,
+    indicatorThickness: Dp = 20.dp,
+    animationDuration: Int = 1000,
+    animationDelay: Int = 0,
 	backgroundIndicatorColor: Color = BrandColor.BLUE_100_NT,
 	completedIndicatorColor: Color = BrandColor.BLUE_300_NT,
 	inProgressIndicatorColor: Color = BrandColor.YELLOW_NT,
-	showLegends: Boolean = false,
-	backgroundLegendText: String = "Unworked",
-	completedLegendText: String = "Progress",
-	inProgressLegendText: String = "Being Worked",
-	centerText: String? = null,
-	showCenterImage: Boolean = true,
-	roundBorder: Boolean = true,
-	centerIconModifier: Modifier = Modifier.clickable { },
-	centerProgressTextStyle: TextStyle = TextStyle(
+    showLegends: Boolean = false,
+    backgroundLegendText: String = "Unworked",
+    completedLegendText: String = "Progress",
+    inProgressLegendText: String = "Being Worked",
+    centerText: String? = null,
+    showCenterImage: Boolean = true,
+    roundBorder: Boolean = true,
+    centerIconModifier: Modifier = Modifier.clickable { },
+    centerProgressTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.Bold,
 		fontFamily = FontFamily.ARCHIVO,
 		letterSpacing = 1.5.sp,
 		fontSize = MaterialTheme.typography.displayLarge.fontSize
 	),
-	centerTextStyle: TextStyle = TextStyle(
+    centerTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.SemiBold,
 		fontFamily = FontFamily.ARCHIVO,
 		letterSpacing = 1.5.sp,
 		fontSize = MaterialTheme.typography.bodySmall.fontSize
 	),
-	legendsTextStyle: TextStyle = TextStyle(
+    legendsTextStyle: TextStyle = TextStyle(
 		fontFamily = FontFamily.ARCHIVO,
 		fontWeight = FontWeight.Medium,
 		textAlign = TextAlign.Center,
@@ -213,9 +213,7 @@ private fun DisplayText(
 		Text(
 			text = "$completedUnits/$totalUnits",
 			style = centerProgressTextStyle,
-// 			fontFamily = FontFamily.SANS
-			fontFamily = FontFamily.ARCHIVO,
-			color = BrandColor.BLUE_800_NT
+			fontFamily = FontFamily.SANS
 		)
 		centerText?.let {
 			Text(
@@ -247,10 +245,10 @@ private fun DisplayImage(
 
 @Composable
 fun DisplayLegends(
-	circleSize: Int = 24,
-	space: Int = 8,
-	items: List<Legend>,
-	textStyle: TextStyle
+    circleSize: Int = 24,
+    space: Int = 8,
+    items: List<Legend>,
+    textStyle: TextStyle
 ) {
 	Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 		items.forEach {

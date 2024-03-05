@@ -7,15 +7,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.nextuple.nsf.service.dto.Result
 import androidx.lifecycle.viewModelScope
 import com.nextuple.nsf.retrofit.dto.DeclineItemRequest
 import com.nextuple.nsf.retrofit.dto.PickItemRequest
 import com.nextuple.nsf.retrofit.dto.PickTask
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
-import com.nextuple.nsf.retrofit.dto.response.GetDeclineCodesResponse
 import com.nextuple.nsf.retrofit.dto.response.StoreOverviewResponse
 import com.nextuple.nsf.service.PickService
-import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.dto.Result.ErrorType.NOT_FOUND
 import com.nextuple.nsf.ui.util.GenericViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,9 +27,6 @@ open class PickViewModel @Inject constructor(
 	private val pickService: PickService
 ) : ViewModel() {
 
-	var storeOverviewState: GenericViewState by mutableStateOf(GenericViewState.Loading)
-		private set
-
 	var startPickState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 
@@ -38,9 +34,6 @@ open class PickViewModel @Inject constructor(
 		private set
 
 	var recordPickState: GenericViewState by mutableStateOf(GenericViewState.Idle)
-		private set
-
-	var declineCodesState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 
 	var errMsg: String? by mutableStateOf(null)
@@ -54,40 +47,19 @@ open class PickViewModel @Inject constructor(
 			it.pickedQty.plus(it.declinedQty) != it.qty
 		}
 	}
-	var storeOverview: StoreOverviewResponse? by mutableStateOf(null)
-		protected set
 
-	var pickTasksUnassigned = derivedStateOf {
-		storeOverview?.pickOverview?.tasksUnassigned ?: 0
-	}
-
-	var prepTasksUnassigned = derivedStateOf {
-		storeOverview?.prepOverview?.tasksUnassigned ?: 0
-	}
-
-	var declineCodes: GetDeclineCodesResponse? by mutableStateOf(null)
-		private set
-
-	var totalStoreUnits = derivedStateOf {
-		storeOverview?.pickOverview?.run {
-			unitsUnassigned + unitsWorked + unitsInProgress
-		} ?: 0
-	}
-
-	var currentPickTask = derivedStateOf {
-		storeOverview?.userOverview?.currentPickTask
+	fun onStoreOverview(res: StoreOverviewResponse?) {
+		pickTask = res?.userOverview?.currentPickTask
 	}
 
 	fun resetPickScreen() {
 		startPickState = GenericViewState.Idle
-		storeOverviewState = GenericViewState.Success
 	}
 
-	fun startPick(dks: String) {
-		storeOverviewState = GenericViewState.Idle
+	fun startPick() {
 		startPickState = GenericViewState.Loading
 		viewModelScope.launch {
-			pickTask = when (val response = pickService.startPick(dks = dks)) {
+			pickTask = when (val response = pickService.startPick()) {
 				is Result.Success -> {
 					errMsg = null
 					startPickState = GenericViewState.Success
@@ -110,65 +82,43 @@ open class PickViewModel @Inject constructor(
 		}
 	}
 
-	fun declinePick(declineReason: String, dks: String) {
+	fun declinePick(declineReason: String, declineReasonText: String) {
 		pickDeclineState = GenericViewState.Loading
 		viewModelScope.launch {
 			val declineItemRequest = DeclineItemRequest(
 				taskId = pickTask?.id ?: 0,
 				sku = currentPickItem.value?.sku ?: "",
-				declinedQty = currentPickItem.value?.qty ?: 0,
-				declineReason = declineReason
+				declinedQty = getDeclineQty(),
+				declineReason = declineReason,
+				declineReasonText = declineReasonText
 			)
-			pickTask = when (val response = pickService.declinePick(declineItemRequest = declineItemRequest, dks = dks)) {
-				is Result.Success -> {
-					errMsg = null
-					pickDeclineState = GenericViewState.Success
-					response.data
-				}
-
-				is Result.Error -> {
-					errMsg = response.msg
-					pickDeclineState = GenericViewState.Failure
-					null
-				}
-			}
-		}
-	}
-
-	fun onLogout() {
-		declineCodes = null
-	}
-
-	fun getDeclineCodes(dks: String) {
-		if (declineCodes?.pickDeclineCodes.isNullOrEmpty()) {
-			declineCodesState = GenericViewState.Loading
-			viewModelScope.launch {
-				declineCodes = when (val response = pickService.getDeclineCodes(dks = dks)) {
+			pickTask =
+				when (val response = pickService.declinePick(req = declineItemRequest)) {
 					is Result.Success -> {
 						errMsg = null
-						declineCodesState = GenericViewState.Success
+						pickDeclineState = GenericViewState.Success
 						response.data
 					}
 
 					is Result.Error -> {
 						errMsg = response.msg
-						declineCodesState = GenericViewState.Failure
+						pickDeclineState = GenericViewState.Failure
 						null
 					}
 				}
-			}
 		}
 	}
 
 	/**
 	 * @return true if UPC is a match, false if not a match
 	 */
-	fun pickItem(upc: String?, dks: String): Boolean {
+	fun pickItem(upc: String?, pickLocation: String?): Boolean {
 		if (upc.isNullOrEmpty()) {
 			errMsg = "Upc should not be Null or Blank"
 			recordPickState = GenericViewState.Failure
 			return false
 		}
+
 		if (pickTask?.id == null) {
 			errMsg = "task should not be Null"
 			recordPickState = GenericViewState.Failure
@@ -179,7 +129,7 @@ open class PickViewModel @Inject constructor(
 			recordPickState = GenericViewState.Failure
 			return false
 		}
-		if (matchUpc(upc) == null) {
+		if (!matchUpc(upc)) {
 			return false
 		}
 
@@ -189,11 +139,11 @@ open class PickViewModel @Inject constructor(
 				taskId = pickTask?.id ?: 0,
 				sku = currentPickItem.value?.sku ?: "",
 				scannedUpc = upc,
-				pickedQty = currentPickItem.value?.qty ?: 0,
-				pickedLocation = currentPickItem.value?.locations?.firstOrNull().orEmpty()
+				pickedQty = 1,
+				pickedLocation = pickLocation
 			)
 			pickTask = when (
-				val res = pickService.pickItem(pickItemRequest = pickItemRequest, dks = dks)
+				val res = pickService.pickItem(req = pickItemRequest)
 			) {
 				is Result.Success -> {
 					errMsg = null
@@ -211,51 +161,22 @@ open class PickViewModel @Inject constructor(
 		return true
 	}
 
-	fun onStoreOverViewCompletion(storeOverviewState: GenericViewState, storeOverviewResponse: StoreOverviewResponse?) {
-		storeOverview = storeOverviewResponse
-		pickTask = storeOverview?.userOverview?.currentPickTask
-		this.storeOverviewState = storeOverviewState
-	}
-
-	private fun matchUpc(upc: String?): String? {
-		upc ?: return null
-		if (currentPickItem.value?.upcs?.contains(upc) == true) {
-			return upc
-		}
-		return null
-	}
-
-	fun resetStartPickState() {
-		startPickState = GenericViewState.Idle
-		storeOverview = storeOverview?.let {
-			it.copy(
-				pickOverview = it.pickOverview.copy(
-					tasksUnassigned = (it.pickOverview.tasksUnassigned).minus(1),
-					tasksInProgress = (it.pickOverview.unitsInProgress).plus(1),
-					unitsUnassigned = (it.pickOverview.unitsUnassigned).minus(pickTask?.totalQty ?: 0),
-					unitsInProgress = (it.pickOverview.unitsInProgress).plus(pickTask?.totalQty ?: 0)
-				)
-			)
-		}
-	}
+	fun matchUpc(upc: String?): Boolean =
+		upc != null && currentPickItem.value?.upcs.orEmpty().contains(upc)
 
 	fun resetPickDeclineState() {
 		pickDeclineState = GenericViewState.Idle
-		clearCurrentActivePickTask()
 	}
 
 	fun resetRecordPickState() {
 		recordPickState = GenericViewState.Idle
-		clearCurrentActivePickTask()
 	}
 
-	private fun clearCurrentActivePickTask() {
-		storeOverview = storeOverview?.let {
-			it.copy(
-				userOverview = it.userOverview.copy(
-					currentPickTask = null
-				)
-			)
-		}
+	fun onLogout() {
+		pickTask = null
 	}
+
+	private fun getDeclineQty(): Int = currentPickItem.value?.let {
+		it.qty - it.pickedQty - it.declinedQty
+	} ?: 0
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -40,16 +41,21 @@ import com.nextuple.nsf.ui.theme.FontFamily
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopLabeledTextField(
-	modifier: Modifier = Modifier,
-	labelText: String,
-	fieldValue: String,
-	isPrefixEnabled: Boolean = false,
-	prefixText: String = "",
-	isInvalid: Boolean = false,
-	onValueChange: (newValue: String) -> Unit,
-	errorMessage: String = "",
-	textFieldShape: Shape = RoundedCornerShape(4.dp),
-	keyboardActions: KeyboardActions = KeyboardActions { }
+    modifier: Modifier = Modifier,
+    labelText: String,
+    fieldValue: String,
+    isPrefixEnabled: Boolean = false,
+    prefixText: String = "",
+    isInvalid: Boolean = false,
+    onValueChange: (newValue: String) -> Unit,
+    errorMessage: String = "",
+    errorFillColor: Color = BrandColor.GRAY_50,
+    textFieldShape: Shape = RoundedCornerShape(4.dp),
+    keyboardActions: KeyboardActions = KeyboardActions { },
+    borderStroke: BorderStroke = BorderStroke(
+		width = 0.5.dp,
+		color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY_700
+	)
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 
@@ -60,9 +66,9 @@ fun TopLabeledTextField(
 				.testTag("TopLabeledTextFieldLabelText"),
 			text = labelText,
 			textAlign = TextAlign.Start,
-			color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY_600,
+			color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY_900,
 			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight.Bold,
+			fontWeight = FontWeight.Normal,
 			fontStyle = FontStyle.Normal,
 			fontSize = 12.sp
 		)
@@ -75,10 +81,7 @@ fun TopLabeledTextField(
 					.height(44.dp)
 					.padding(top = 2.dp, bottom = 2.dp)
 					.border(
-						BorderStroke(
-							width = 0.5.dp,
-							color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY
-						),
+						border = borderStroke,
 						shape = textFieldShape
 					),
 				verticalAlignment = Alignment.CenterVertically
@@ -103,24 +106,28 @@ fun TopLabeledTextField(
 					keyboardActions = keyboardActions,
 					interactionSource = interactionSource
 				) { innerTextField ->
-					TextFieldDefaults.OutlinedTextFieldDecorationBox(
+					val containerColor = if (isInvalid) errorFillColor else Color.White
+					OutlinedTextFieldDefaults.DecorationBox(
 						value = fieldValue,
 						innerTextField = innerTextField,
-						singleLine = true,
 						enabled = true,
+						singleLine = true,
 						visualTransformation = VisualTransformation.None,
 						interactionSource = interactionSource,
-						contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-							top = 0.dp,
-							bottom = 0.dp,
+						colors = TextFieldDefaults
+							.colors(
+								focusedContainerColor = containerColor,
+								unfocusedContainerColor = containerColor,
+								disabledContainerColor = containerColor,
+								cursorColor = BrandColor.GRAY_900,
+								focusedIndicatorColor = Color.Transparent,
+								unfocusedIndicatorColor = Color.Transparent
+							),
+						contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
 							start = 0.dp,
-							end = 8.dp
-						),
-						colors = TextFieldDefaults.textFieldColors(
-							containerColor = Color.White,
-							cursorColor = BrandColor.GRAY_900,
-							focusedIndicatorColor = Color.Transparent,
-							unfocusedIndicatorColor = Color.Transparent
+							top = 0.dp,
+							end = 8.dp,
+							bottom = 0.dp
 						)
 					)
 				}
@@ -135,10 +142,7 @@ fun TopLabeledTextField(
 					.height(44.dp)
 					.padding(top = 2.dp, bottom = 2.dp)
 					.border(
-						BorderStroke(
-							width = 0.5.dp,
-							color = if (isInvalid) BrandColor.RED_600 else BrandColor.GRAY
-						),
+						border = borderStroke,
 						shape = textFieldShape
 					),
 				singleLine = true,
@@ -146,24 +150,27 @@ fun TopLabeledTextField(
 				keyboardActions = keyboardActions,
 				interactionSource = interactionSource
 			) { innerTextField ->
-				TextFieldDefaults.OutlinedTextFieldDecorationBox(
+				val containerColor = if (isInvalid) errorFillColor else Color.White
+				OutlinedTextFieldDefaults.DecorationBox(
 					value = fieldValue,
 					innerTextField = innerTextField,
-					singleLine = true,
 					enabled = true,
+					singleLine = true,
 					visualTransformation = VisualTransformation.None,
 					interactionSource = interactionSource,
-					contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
-						top = 0.dp,
-						bottom = 0.dp,
-						start = 8.dp,
-						end = 8.dp
-					),
-					colors = TextFieldDefaults.textFieldColors(
-						containerColor = Color.White,
+					colors = TextFieldDefaults.colors(
+						focusedContainerColor = containerColor,
+						unfocusedContainerColor = containerColor,
+						disabledContainerColor = containerColor,
 						cursorColor = BrandColor.GRAY_900,
 						focusedIndicatorColor = Color.Transparent,
 						unfocusedIndicatorColor = Color.Transparent
+					),
+					contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
+						start = 8.dp,
+						top = 0.dp,
+						end = 8.dp,
+						bottom = 0.dp
 					)
 				)
 			}
@@ -185,8 +192,8 @@ fun TopLabeledTextField(
 @Preview(showBackground = true)
 fun PreviewTopLabeledTextField() {
 	TopLabeledTextField(
-		labelText = "DKS Number",
-		fieldValue = "dks123456",
+		labelText = "Login ID",
+		fieldValue = "1234",
 		onValueChange = {}
 
 	)

@@ -12,19 +12,22 @@ data class PackTask(
 	var declinedQty: Int? = null,
 	var totalWorkedQty: Int? = null,
 	var totalRemainingQty: Int? = null,
-	val items: List<PackTaskItem>
+	val items: List<PackTaskItem> = emptyList()
 )
 
 data class PackTaskItem(
-	val id: Long,
-	val sku: String,
-	val primaryAttr: ProductAttribute? = null,
-	val secondaryAttr: ProductAttribute? = null,
-	val tertiaryAttr: ProductAttribute? = null,
-	val qty: Int,
-	val packedQty: Int,
-	val declinedQty: Int,
-	val productName: String,
-	val productImageUrls: List<String>,
-	val scannedBarcode: String? = null
+    val id: Long,
+    val sku: String,
+    val primaryAttr: ProductAttribute? = null,
+    val secondaryAttr: ProductAttribute? = null,
+    val tertiaryAttr: ProductAttribute? = null,
+    val qty: Int,
+    val packedQty: Int,
+    val declinedQty: Int,
+    val productName: String,
+    val productImageUrls: List<String>,
+    val scannedBarcode: String? = null,
+
+    @Transient
+	var isScanned: Boolean = false
 )

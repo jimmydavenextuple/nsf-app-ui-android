@@ -27,15 +27,15 @@ import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun PrimaryButton(
-	modifier: Modifier = Modifier,
-	text: String,
+    modifier: Modifier = Modifier,
+    text: String,
 	buttonColor: Color = BrandColor.PINK_NT,
 	contentColor: Color = BrandColor.GRAY_50,
-	buttonShape: Shape = RoundedCornerShape(12.dp),
-	enabled: Boolean = true,
-	textSize: TextUnit = 16.sp,
-	buttonState: ButtonState = ButtonState.DEFAULT,
-	onButtonClick: () -> Unit
+    buttonShape: Shape = RoundedCornerShape(4.dp),
+    enabled: Boolean = true,
+    textSize: TextUnit = 14.sp,
+    buttonState: ButtonState = ButtonState.DEFAULT,
+    onButtonClick: () -> Unit
 ) {
 	Button(
 		modifier = modifier
@@ -49,9 +49,9 @@ fun PrimaryButton(
 			} else {
 				buttonColor
 			},
-			disabledContainerColor = BrandColor.GRAY_700,
+			disabledContainerColor = BrandColor.GRAY_400,
 			contentColor = contentColor,
-			disabledContentColor = BrandColor.GRAY_50
+			disabledContentColor = BrandColor.GRAY_700
 		),
 		enabled = enabled
 	) {
@@ -75,7 +75,7 @@ fun PrimaryButton(
 					fontSize = textSize,
 					fontFamily = FontFamily.ARCHIVO,
 					letterSpacing = 1.5.sp,
-					fontWeight = FontWeight.Bold
+					fontWeight = FontWeight(700)
 				)
 			}
 		}

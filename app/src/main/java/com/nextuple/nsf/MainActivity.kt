@@ -1,22 +1,22 @@
 package com.nextuple.nsf
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.Constants
 import com.google.firebase.messaging.FirebaseMessaging
+import com.nextuple.nsf.messaging.MyFirebaseMessagingService
 import com.nextuple.nsf.service.DeviceService
 import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.LogService.Companion.EVENT_INACTIVITY_TIMEOUT
 import com.nextuple.nsf.ui.App
-import com.nextuple.nsf.ui.nav.Route
-import com.nextuple.nsf.ui.state.AppViewModel
+import com.nextuple.nsf.ui.state.ConfigViewModel
+import com.nextuple.nsf.ui.state.InfoViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.state.PrepViewModel
@@ -27,8 +27,6 @@ import com.nextuple.nsf.ui.util.Haptics
 import com.nextuple.nsf.ui.util.OnDataScanned
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.DataWedgeBroadcastReceiver
-import com.nextuple.nsf.util.UserStateUtils.clearUserState
-import com.nextuple.nsf.util.UserStateUtils.getUserState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -40,7 +38,8 @@ class MainActivity : ComponentActivity() {
 	private val prepVM: PrepViewModel by viewModels()
 	private val orderVM: OrderViewModel by viewModels()
 	private val settingsVM: SettingsViewModel by viewModels()
-	private val appVM: AppViewModel by viewModels()
+	private val infoVM: InfoViewModel by viewModels()
+	private val configVM: ConfigViewModel by viewModels()
 
 	@Inject
 	lateinit var logService: LogService
@@ -62,55 +61,66 @@ class MainActivity : ComponentActivity() {
 		logService.start()
 		logService.setDevice(deviceService.getDevice())
 
-		if (intent.hasExtra("notificationRoute")) {
-			appVM.notificationRoute = intent.getStringExtra("notificationRoute");
-			intent.removeExtra("notificationRoute");
-		} else if (intent.hasExtra("storeNumber")) { 	  // Open the "Pick Screen" when the notification is tapped, when the app is in the background or not running.
-			appVM.notificationRoute = Route.PICK;
-		}
-
-		val userState = getUserState(userVM, this);
+		infoVM.setOnStoreOverviewCallbacks(
+			pickVM::onStoreOverview,
+			prepVM::onStoreOverview
+		)
+		userVM.setOnLogoutCallbacks(
+			pickVM::onLogout,
+			prepVM::onLogout,
+			infoVM::onLogout
+		)
+		settingsVM.setIpPrefix()
 
 		setContent {
 			AppTheme {
 				App(
-					appVM = appVM,
-					userVM = userState,
+					infoVM = infoVM,
+					userVM = userVM,
 					pickVM = pickVM,
 					prepVM = prepVM,
 					orderVM = orderVM,
 					settingsVM = settingsVM,
+					configVM = configVM,
 					scanManager = object : ScanManager {
 						override fun set(onDataScanned: OnDataScanned) {
-							dataWedge.setOnDataScanned(onDataScanned)
+							dataWedge.setOnDataScanned(
+								logService = logService,
+								onDataScanned = onDataScanned
+							)
 						}
 					},
 					haptics = haptics,
-					onLoggedIn = ::startSessionListener,
-					deviceService = deviceService,
-					context = this
+					intentData = intent.data,
+					onLoggedIn = ::startSessionListener
 				)
 			}
 		}
 
-		//firebase
-		FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-			if (!task.isSuccessful) {
-				Log.w(
-					Constants.MessageNotificationKeys.TAG,
-					"Fetching FCM registration token failed",
-					task.exception
-				)
-				return@OnCompleteListener
+		// firebase
+		FirebaseMessaging.getInstance().token.addOnCompleteListener(
+			OnCompleteListener { task ->
+				if (!task.isSuccessful) {
+					logService.trackError(
+						"FailedFetchingFireBaseToken",
+						Throwable(task.exception),
+						mapOf("Details" to task.result)
+					)
+					return@OnCompleteListener
+				}
+
+				// Get new FCM registration token
+				val token = task.result
+
+				// Log and toast
+				logService.trackEvent("FetchedFireBaseToken",
+					mapOf("FirebaseToken" to token))
+				if(BuildConfig.DEBUG) {
+					Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+					MyFirebaseMessagingService.sendRegistrationToServer(token, logService)
+				}
 			}
-
-			// Get new FCM registration token
-			val token = task.result
-
-			// Log and toast
-			Log.d("TAG", "FCM registration token: $token")
-			Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
-		})
+		)
 	}
 
 	override fun onStart() {
@@ -139,12 +149,9 @@ class MainActivity : ComponentActivity() {
 	private val runnable = kotlinx.coroutines.Runnable {
 		logService.trackEvent(EVENT_INACTIVITY_TIMEOUT)
 		userVM.logout()
-		pickVM.onLogout()
-		clearUserState(this)
 	}
 
 	companion object {
 		private const val SESSION_TIMEOUT_IN_MILLIS: Long = 30 * 60 * 1000L
 	}
 }
-

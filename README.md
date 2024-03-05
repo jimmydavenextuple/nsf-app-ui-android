@@ -1,6 +1,4 @@
-# Nextuple Store Fulfillment
-
-Currently, we refer to this new app as "NSF" until the official name is determined.
+# NSF - Store App
 
 ## Development Environment Setup
 
@@ -8,9 +6,15 @@ Currently, we refer to this new app as "NSF" until the official name is determin
 
 Our Gradle build requires certain environment variables to exist in order to sync and build.
 
-For first-time setup, install Safe CLI: https://github.com/Qarik-Group/safe
-
-Next, run `./init.sh` and verify that `fit.properties` exists with the expected properties.
+IS_LOCAL=true
+LOGIN_ENABLED=true
+STORE_PASSWORD=
+KEY_ALIAS=Nextuple Inc
+KEY_PASSWORD=
+GOAT_API_LOCAL=
+GOAT_API_DEV=https://internal-demo.nextuple.com/services/bff/
+GOAT_API_STAGE=
+GOAT_API_PROD=
 
 ### Emulator
 

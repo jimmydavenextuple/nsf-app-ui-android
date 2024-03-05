@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "com.nextuple.nsf";
+option java_multiple_files = true;
+
+message Printer{
+ string printerName = 1;
+ string ipAddress = 2;
+ bool connectionStatus = 3;
+}
+
+message Printers {
+ repeated Printer printerList = 1;
+}

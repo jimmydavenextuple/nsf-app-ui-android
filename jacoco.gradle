@@ -1,5 +1,5 @@
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.9"
 }
 project.afterEvaluate {
     if (android.hasProperty("applicationVariants")) {
@@ -20,23 +20,28 @@ ext.excludes = [
         '**/R.class',
         '**/databinding/*Binding.*',
         'android/**/*.*',
-        'com/nextuple/nsf/GoatApp*.*',
+        'com/nextuple/nsf/Printer*.*',
+        'com/nextuple/nsf/Printers*.*',
+        'com/nextuple/nsf/User*.*',
+        'com/nextuple/nsf/NSFApp*.*',
         'com/nextuple/nsf/MainActivity*.*',
+        'com/nextuple/nsf/datastore',
         'com/nextuple/nsf/hilt',
         'com/nextuple/nsf/retrofit/dto',
         'com/nextuple/nsf/service/dto',
+        'com/nextuple/nsf/ui/ElapsedTimeChip*.*',
         'com/nextuple/nsf/ui/App*.*',
         'com/nextuple/nsf/ui/common',
+        'com/nextuple/nsf/ui/component',
         'com/nextuple/nsf/ui/nav',
         'com/nextuple/nsf/ui/screen',
-        'com/nextuple/nsf/ui/state/SettingsViewModel*.*',
         'com/nextuple/nsf/ui/theme',
         'com/nextuple/nsf/ui/util',
-        'com/nextuple/nsf/util/FulfillmentTypeEnum*.*',
-        'com/nextuple/nsf/util/OrderScreenTabsEnum*.*',
-        'com/nextuple/nsf/util/OrderStatusEnum*.*',
+        'com/nextuple/nsf/util',
         'dagger/hilt/internal/aggregatedroot/codegen',
         'hilt_aggregated_deps',
+        // Proto
+        '**/*.proto',
         // butterKnife
         '**/*$ViewInjector*.*',
         '**/*$ViewBinder*.*',
@@ -69,7 +74,10 @@ ext.excludes = [
         '**/*_MembersInjector.class',
         '**/*_Provide*Factory*.*',
         '**/BuildConfig.*',
-        '**/Manifest*.*'
+        '**/Manifest*.*',
+        '**/pipeline/*',
+        '**/.github/*',
+        'version'
 ]
 def createVariantCoverage(variant) {
     def variantName = variant.name

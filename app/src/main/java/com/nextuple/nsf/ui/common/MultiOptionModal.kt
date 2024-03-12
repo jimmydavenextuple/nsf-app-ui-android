@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,7 +36,7 @@ import com.nextuple.nsf.ui.theme.FontFamily
 @Composable
 fun MultiOptionModal(
 	title: String?,
-	subTitle: String,
+	subTitle: String?,
 	buttons: List<String>,
 	buttonClick: (String) -> Unit,
 	crossIconClick: () -> Unit,
@@ -54,6 +56,7 @@ fun MultiOptionModal(
 		)
 	) {
 		Surface(
+			modifier = Modifier.verticalScroll(rememberScrollState()),
 			shape = shape,
 			color = backgroundColor
 		) {
@@ -88,24 +91,28 @@ fun MultiOptionModal(
 						)
 					}
 				}
-				Spacer(modifier = Modifier.height(19.dp))
-				Text(
-					text = subTitle,
-					style = TextStyle(
-						fontSize = 16.sp,
-						letterSpacing = 0.5.sp,
-						fontFamily = FontFamily.ARCHIVO,
-						fontWeight = FontWeight.Normal
+				if (title != null) {
+					Spacer(modifier = Modifier.height(19.dp))
+				}
+				if (subTitle != null) {
+					Text(
+						text = subTitle,
+						style = TextStyle(
+							fontSize = 16.sp,
+							letterSpacing = 0.5.sp,
+							fontFamily = FontFamily.ARCHIVO,
+							fontWeight = FontWeight.Normal
+						)
 					)
-				)
 
-				Spacer(modifier = Modifier.height(24.dp))
+					Spacer(modifier = Modifier.height(24.dp))
+				}
 
 				if (buttons.isNotEmpty()) {
 					PrimaryButton(
 						modifier = Modifier.fillMaxWidth(0.8f),
 						text = buttons[0],
-						buttonColor = BrandColor.ORANGE_600,
+						buttonColor = BrandColor.PINK_NT,
 						onButtonClick = { buttonClick(buttons[0]) },
 						contentColor = BrandColor.GRAY_100
 					)
@@ -131,7 +138,7 @@ fun MultiOptionModal(
 @Preview
 fun MultiOptionModalPreview() {
 	MultiOptionModal(
-		title = "Multiple Locations",
+		title = "Unit Locations",
 		subTitle = "This product has multiple locations assigned to it. Where did you pick this unit it from?",
 		buttons = listOf("F1.S1.04A", "F1.S1.04B", "OTHER"),
 		buttonClick = { },

@@ -7,20 +7,56 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nextuple.nsf.retrofit.dto.RecordHoldingLocationRequest
+import com.nextuple.nsf.retrofit.dto.response.DeclineCode
 import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
+import com.nextuple.nsf.service.LogService
+import com.nextuple.nsf.service.LogService.Companion.EVENT_AGED_ORDER_CANCEL
+import com.nextuple.nsf.service.LogService.Companion.EVENT_ORDER_CANCEL
 import com.nextuple.nsf.service.OrderService
-import com.nextuple.nsf.service.dto.Result
+import com.nextuple.nsf.service.StageTaskService
+import com.nextuple.nsf.ui.component.filter.Filter
+import com.nextuple.nsf.ui.component.filter.toSelectedValues
+import com.nextuple.nsf.ui.component.filter.toUpdated
+import com.nextuple.nsf.ui.screen.order.OrderScreenTab
+import com.nextuple.nsf.ui.screen.order.OrderScreenTab.READY
+import com.nextuple.nsf.ui.util.DeclineAction
 import com.nextuple.nsf.ui.util.GenericViewState
+import com.nextuple.nsf.util.OrderStatus
+import com.nextuple.nsf.util.TimeUtils
+import com.nextuple.nsf.service.dto.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
 	@Suppress("UNUSED_PARAMETER")
 	handler: SavedStateHandle,
-	private val orderService: OrderService
+	private val orderService: OrderService,
+	private val stageTaskService: StageTaskService,
+	private val logService: LogService
 ) : ViewModel() {
+
+	companion object {
+		private val ORDER_TYPES = listOf(
+			"bopis",
+			"bopl"
+		)
+		private val ORDER_STATUSES = listOf(
+			"pack",
+			"stage",
+			"ready",
+			"aged",
+			"canceled",
+			"extended",
+			"completed"
+		)
+
+		private val ORDER_TYPE_FILTERS_INITIAL = ORDER_TYPES.map { Filter(it) }
+		private val ORDER_STATUS_FILTERS_INITIAL = ORDER_STATUSES.map { Filter(it) }
+	}
 
 	var viewState: GenericViewState by mutableStateOf(GenericViewState.Loading)
 		private set
@@ -34,20 +70,83 @@ class OrderViewModel @Inject constructor(
 	var startPickupState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 
+	var holdSlipState: GenericViewState by mutableStateOf(GenericViewState.Idle)
+		private set
+
+	var holdSlipScanState: GenericViewState by mutableStateOf(GenericViewState.Idle)
+		private set
+
+	var cancelReasonData: CancelReasonData by mutableStateOf(CancelReasonData())
+		private set
+
 	var errMsg: String? by mutableStateOf(null)
 		private set
 
 	var orderDetailResponse: OrderDetailsResponse? by mutableStateOf(null)
 		private set
 
-	var orderList: List<OrderDetailsResponse>? by mutableStateOf(null)
+	val orderDate: String by derivedStateOf {
+		formatTimeStamp(
+			timestamp = orderDetailResponse?.orderDate,
+			errorName = "OrderDetailResponse_OrderDate"
+		)
+	}
+
+	val expectedDate: String by derivedStateOf {
+		formatTimeStamp(
+			timestamp = orderDetailResponse?.expectedDeliveryDate,
+			errorName = "OrderDetailResponse_ExpectedDate"
+		)
+	}
+
+	val receivedDate: String by derivedStateOf {
+		formatTimeStamp(
+			timestamp = orderDetailResponse?.receivedDate,
+			errorName = "OrderDetailResponse_ReceivedDate"
+		)
+	}
+
+	val packedOnDate: String by derivedStateOf {
+		formatTimeStamp(
+			timestamp = orderDetailResponse?.packedOnDate,
+			errorName = "OrderDetailResponse_PackedOnDate"
+		)
+	}
+
+	var holdSlipZpl: MutableList<String>? by mutableStateOf(null)
 		private set
 
-	var pickUpOrderList = derivedStateOf { orderList }
+	var scanLocationState: GenericViewState by mutableStateOf(GenericViewState.Idle)
+		private set
 
-	fun getOrders(query: String? = null, pastDays: String? = null, dks: String) = viewModelScope.launch {
+	private var orderList: List<OrderDetailsResponse>? by mutableStateOf(null)
+
+	val readyOrders by derivedStateOf {
+		orderList.orEmpty().filter { OrderStatus.isReadyStatusText(it.orderStatusText) }
+	}
+
+	val inProgressOrders by derivedStateOf {
+		orderList.orEmpty().filter { !OrderStatus.isReadyStatusText(it.orderStatusText) }
+	}
+
+	var orderTypeFilters by mutableStateOf(ORDER_TYPE_FILTERS_INITIAL)
+		private set
+	var orderStatusFilters by mutableStateOf(ORDER_STATUS_FILTERS_INITIAL)
+		private set
+
+	var selectedTab by mutableStateOf(READY)
+		private set
+
+	fun getOrders(query: String? = null) = viewModelScope.launch {
 		viewState = GenericViewState.Loading
-		orderList = when (val res = orderService.getOrders(query = query, pastDays = pastDays, dks = dks)) {
+		orderList = when (
+			val res = orderService.getOrders(
+				query = query,
+				orderTypeFilter = orderTypeFilters.toSelectedValues(),
+				orderStatusFilter = orderStatusFilters.toSelectedValues(),
+				minOrderStatus = OrderStatus.PACK.statusText
+			)
+		) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = GenericViewState.Success
@@ -60,11 +159,39 @@ class OrderViewModel @Inject constructor(
 				null
 			}
 		}
+
+		if (orderList != null) {
+			selectedTab = OrderScreenTab.determineSelectedTab(
+				current = selectedTab,
+				hasReadyOrders = readyOrders.isNotEmpty(),
+				hasInProgressOrders = inProgressOrders.isNotEmpty(),
+				selectedFilters = orderStatusFilters.toSelectedValues()
+			)
+		}
 	}
 
-	fun getOrderDetails(fulfillmentRequestNumber: String, dks: String) = viewModelScope.launch {
+	fun setFilters(orderTypeFilters: List<Filter>, orderStatusFilters: List<Filter>) {
+		this.orderTypeFilters = orderTypeFilters
+		this.orderStatusFilters = orderStatusFilters
+	}
+
+	fun setFilter(filter: Filter) {
+		orderTypeFilters = orderTypeFilters.toUpdated(filter)
+		orderStatusFilters = orderStatusFilters.toUpdated(filter)
+	}
+
+	fun resetFilters() {
+		orderTypeFilters = ORDER_TYPE_FILTERS_INITIAL
+		orderStatusFilters = ORDER_STATUS_FILTERS_INITIAL
+	}
+
+	fun setTab(tab: OrderScreenTab) {
+		selectedTab = tab
+	}
+
+	fun getOrderDetails(fulfillmentRequestNumber: String) = viewModelScope.launch {
 		orderDetailsState = GenericViewState.Loading
-		orderDetailResponse = when (val res = orderService.getOrderDetails(fulfillmentRequestNumber, dks)) {
+		orderDetailResponse = when (val res = orderService.getOrderDetails(fulfillmentRequestNumber)) {
 			is Result.Success -> {
 				errMsg = null
 				orderDetailsState = GenericViewState.Success
@@ -79,9 +206,49 @@ class OrderViewModel @Inject constructor(
 		}
 	}
 
-	fun pickupExtend(dks: String, fulfillmentRequestNumber: String) = viewModelScope.launch {
+	fun cancelOrder(fulfillmentRequestNumber: String, declinedReason: DeclineCode, shouldTranslateReason: Boolean = false) = viewModelScope.launch {
+		cancelReasonData = CancelReasonData(GenericViewState.Loading)
+		val res = orderService.recordDecline(
+			fulfillmentRequestNumber = fulfillmentRequestNumber,
+			declinedReason = declinedReason.id,
+			shouldTranslateReason = shouldTranslateReason,
+			action = DeclineAction.PICKUP_DECLINE.name
+		)
+		when (res) {
+			is Result.Success -> {
+				cancelReasonData = CancelReasonData(
+					state = GenericViewState.Success,
+					isDamaged = declinedReason.id == "DAMAGE"
+				)
+			}
+			is Result.Error -> {
+				cancelReasonData = CancelReasonData(GenericViewState.Failure)
+				logService.trackError(
+					EVENT_ORDER_CANCEL,
+					Throwable(res.msg),
+					mapOf(
+						"Order Number" to orderDetailResponse?.orderNumber.orEmpty(),
+						"FR Details" to orderDetailResponse?.fulfillmentRequestDetail?.fulfillmentRequestNumber.orEmpty()
+					)
+				)
+			}
+		}
+	}
+
+	fun cancelAgedOrderError(error: String) {
+		logService.trackError(
+			EVENT_AGED_ORDER_CANCEL,
+			Throwable(error),
+			mapOf(
+				"Order Number" to orderDetailResponse?.orderNumber.orEmpty(),
+				"FR Details" to orderDetailResponse?.fulfillmentRequestDetail?.fulfillmentRequestNumber.orEmpty()
+			)
+		)
+	}
+
+	fun pickupExtend(fulfillmentRequestNumber: String) = viewModelScope.launch {
 		viewState = GenericViewState.Loading
-		orderDetailResponse = when (val res = orderService.pickupExtend(dks = dks, fulfillmentRequestNumber = fulfillmentRequestNumber)) {
+		orderDetailResponse = when (val res = orderService.pickupExtend(fulfillmentRequestNumber = fulfillmentRequestNumber)) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = GenericViewState.Success
@@ -96,9 +263,9 @@ class OrderViewModel @Inject constructor(
 		}
 	}
 
-	fun pickupRemoveCheckIn(dks: String, taskId: String) = viewModelScope.launch {
+	fun pickupRemoveCheckIn(taskId: String) = viewModelScope.launch {
 		viewState = GenericViewState.Loading
-		orderDetailResponse = when (val res = orderService.pickupRemoveCheckIn(dks = dks, taskId = taskId)) {
+		orderDetailResponse = when (val res = orderService.pickupRemoveCheckIn(taskId = taskId)) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = GenericViewState.Success
@@ -113,9 +280,9 @@ class OrderViewModel @Inject constructor(
 		}
 	}
 
-	fun startPickup(dks: String, fulfillmentRequestNumber: String) = viewModelScope.launch {
+	fun startPickup(fulfillmentRequestNumber: String) = viewModelScope.launch {
 		startPickupState = GenericViewState.Loading
-		orderDetailResponse = when (val res = orderService.startPickupTask(dks = dks, fulfillmentRequestNumber = fulfillmentRequestNumber)) {
+		orderDetailResponse = when (val res = orderService.startPickupTask(fulfillmentRequestNumber = fulfillmentRequestNumber)) {
 			is Result.Success -> {
 				errMsg = null
 				startPickupState = GenericViewState.Success
@@ -130,10 +297,10 @@ class OrderViewModel @Inject constructor(
 		}
 	}
 
-	fun completePickupTask(dks: String, taskId: String) = viewModelScope.launch {
+	fun completePickupTask(taskId: String) = viewModelScope.launch {
 		completeOrderPickupState = GenericViewState.Loading
 		orderDetailResponse =
-			when (val res = orderService.completePickupTask(dks = dks, taskId = taskId)) {
+			when (val res = orderService.completePickupTask(taskId = taskId)) {
 				is Result.Success -> {
 					errMsg = null
 					completeOrderPickupState = GenericViewState.Success
@@ -146,6 +313,69 @@ class OrderViewModel @Inject constructor(
 					null
 				}
 			}
+	}
+
+	fun getHoldSlip(fulfillmentRequestNumber: String) = viewModelScope.launch {
+		holdSlipState = GenericViewState.Loading
+		holdSlipZpl =
+			when (val res = stageTaskService.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)) {
+				is Result.Success -> {
+					errMsg = null
+					holdSlipState = GenericViewState.Success
+					res.data?.holdSlipZPL
+				}
+
+				is Result.Error -> {
+					errMsg = res.msg
+					holdSlipState = GenericViewState.Failure
+					null
+				}
+			}
+	}
+
+	fun holdSuccessSlipScan(scanData: String) {
+		holdSlipScanState = GenericViewState.Loading
+		if (scanData == orderDetailResponse?.orderNumber) {
+			holdSlipScanState = GenericViewState.Success
+		} else {
+			holdSlipScanState = GenericViewState.Failure
+		}
+	}
+
+	fun recordHoldingLocation(containerId: Long, holdingLocation: String) {
+		viewModelScope.launch {
+			scanLocationState = GenericViewState.Loading
+			val recordHoldingLocationRequest = RecordHoldingLocationRequest(
+				containerId = containerId,
+				holdingLocation = holdingLocation
+			)
+
+			when (
+				val response =
+					stageTaskService.recordHoldingLocation(recordHoldingLocationRequest)
+			) {
+				is Result.Success -> {
+					errMsg = null
+					scanLocationState = GenericViewState.Success
+					response.data
+				}
+
+				is Result.Error -> {
+					errMsg = response.msg
+					if (response.type == Result.ErrorType.NOT_FOUND) {
+						scanLocationState = GenericViewState.Failure
+					} else if (errMsg?.contains("should be in IN_PROGRESS") == true) {
+						errMsg = null
+						scanLocationState = GenericViewState.Success
+					} else {
+						resetScanLocationState()
+						/*
+							TODO: Display Toast Error Message From View
+						 */
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -168,4 +398,45 @@ class OrderViewModel @Inject constructor(
 	fun resetStarPickupState() {
 		startPickupState = GenericViewState.Idle
 	}
+
+	/**
+	 * Removing existing holdSlip state and default to default state.
+	 */
+	fun resetHoldSlipState() {
+		holdSlipState = GenericViewState.Idle
+	}
+
+	/**
+	 * Removing existing holdSlipScan state and default to default state.
+	 */
+	fun resetHoldSlipScanState() {
+		holdSlipScanState = GenericViewState.Idle
+	}
+
+	/**
+	 * Removing existing scanLocation state and default to default state.
+	 */
+	fun resetScanLocationState() {
+		scanLocationState = GenericViewState.Idle
+	}
+
+	/**
+	 * Removing existing cancel state and default to default state.
+	 */
+	fun resetCancelReasonData() {
+		cancelReasonData = CancelReasonData()
+	}
+
+	private fun formatTimeStamp(timestamp: String?, errorName: String): String = runCatching {
+		timestamp?.ifEmpty { null }?.let {
+			TimeUtils.formatTimeStamp(Instant.parse(it))
+		}
+	}.onFailure {
+		logService.trackError(errorName, it)
+	}.getOrNull().orEmpty()
 }
+
+data class CancelReasonData(
+	val state: GenericViewState = GenericViewState.Idle,
+	val isDamaged: Boolean = false
+)

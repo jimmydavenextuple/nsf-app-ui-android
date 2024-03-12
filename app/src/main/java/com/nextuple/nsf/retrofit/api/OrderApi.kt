@@ -1,7 +1,10 @@
 package com.nextuple.nsf.retrofit.api
 
 import com.nextuple.nsf.retrofit.dto.ApiResponse
+import com.nextuple.nsf.retrofit.dto.RecordDeclineRequest
+import com.nextuple.nsf.retrofit.dto.RecordDeclineResponse
 import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -14,7 +17,10 @@ interface OrderApi {
 	suspend fun getOrders(
 		@Query("store") store: String,
 		@Query("query") query: String?,
-		@Query("pastDays") pastDays: String?,
+		@Query("orderTypeFilter") orderTypeFilter: List<String>? = null,
+		@Query("orderStatusFilter") orderStatusFilter: List<String>? = null,
+		@Query("minOrderStatus") minOrderStatus: String? = null,
+		@Query("pastDays") pastDays: String? = null,
 		@Header("userId") userId: String
 	): ApiResponse<List<OrderDetailsResponse>>
 
@@ -23,6 +29,12 @@ interface OrderApi {
 		@Path("fulfillmentRequestNumber") fulfillmentRequestNumber: String,
 		@Header("userId") userId: String
 	): ApiResponse<OrderDetailsResponse>
+
+	@POST("v1/orders/record-decline")
+	suspend fun recordDecline(
+		@Body recordDeclineRequest: RecordDeclineRequest,
+		@Header("userId") userId: String
+	): ApiResponse<RecordDeclineResponse>
 
 	@POST("v1/pickup-task/extend/{fulfillmentRequestNumber}")
 	suspend fun pickupExtend(

@@ -4,5 +4,6 @@ data class DeclineItemRequest(
 	val taskId: Long,
 	val sku: String,
 	val declinedQty: Int,
-	val declineReason: String
+	val declineReason: String,
+	val declineReasonText: String
 )

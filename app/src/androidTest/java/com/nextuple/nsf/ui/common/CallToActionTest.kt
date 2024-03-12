@@ -6,6 +6,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.nextuple.nsf.ui.common.callToAction.CallToAction
+import com.nextuple.nsf.ui.common.callToAction.CallToActionMode
 import com.karumi.shot.ScreenshotTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking

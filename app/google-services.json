@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1087718825857",
+    "firebase_url": "https://nsf-notification-uservic-12f45-default-rtdb.firebaseio.com",
+    "project_id": "nsf-notification-uservic-12f45",
+    "storage_bucket": "nsf-notification-uservic-12f45.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087718825857:android:a7ee5c292a7d119517d280",
+        "android_client_info": {
+          "package_name": "com.nextuple.nsf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXbGR2YEk6dGCdMNeomUVk4FvovY7YhrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087718825857:android:05e294bac5f5cad517d280",
+        "android_client_info": {
+          "package_name": "com.nextuple.nsf.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXbGR2YEk6dGCdMNeomUVk4FvovY7YhrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087718825857:android:05e294bac5f5cad517d280",
+        "android_client_info": {
+          "package_name": "com.nextuple.nsf.local"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXbGR2YEk6dGCdMNeomUVk4FvovY7YhrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

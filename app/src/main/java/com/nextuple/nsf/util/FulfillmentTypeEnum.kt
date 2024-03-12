@@ -5,9 +5,11 @@ enum class FulfillmentType {
 	SFS
 }
 
-enum class SubFulfillmentType {
-	BOPIS,
-	BOPL,
+enum class SubFulfillmentType(
+	val defaultLocation: String = ""
+) {
+	BOPIS(defaultLocation = "Sales Floor"),
+	BOPL(defaultLocation = "BOPL Area"),
 	SFS,
 	LTL,
 	SAME_DAY

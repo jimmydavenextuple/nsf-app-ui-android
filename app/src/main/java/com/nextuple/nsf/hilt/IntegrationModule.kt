@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.Vibrator
+import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.ui.util.Haptics
 import com.nextuple.nsf.util.DataWedgeBroadcastReceiver
 import dagger.Module
@@ -27,8 +28,13 @@ internal object IntegrationModule {
 		val serviceName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 			Context.VIBRATOR_MANAGER_SERVICE
 		} else {
+			// Min SDK at time of this change is 30, so we still need this.
+			@Suppress("DEPRECATION")
 			Context.VIBRATOR_SERVICE
 		}
 		return app.getSystemService(serviceName) as Vibrator
 	}
+
+	@Provides
+	fun provideIsDebug(): Boolean = BuildConfig.DEBUG
 }

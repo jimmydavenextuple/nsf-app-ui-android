@@ -13,3 +13,10 @@ private const val APP_TOP_BAR_HEIGHT_DP = 48
 	showBackground = true
 )
 annotation class PreviewPdt
+
+@Preview(
+	name = "PDT_WIDTH",
+	widthDp = 360,
+	showBackground = true
+)
+annotation class PreviewPdtWidth

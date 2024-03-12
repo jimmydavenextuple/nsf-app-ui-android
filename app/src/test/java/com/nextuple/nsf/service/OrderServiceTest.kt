@@ -1,8 +1,10 @@
 package com.nextuple.nsf.service
 
 import com.nextuple.nsf.CoroutineRule
+import com.nextuple.nsf.datastore.UserRepository
 import com.nextuple.nsf.retrofit.api.OrderApi
 import com.nextuple.nsf.retrofit.dto.ApiResponse
+import com.nextuple.nsf.retrofit.dto.RecordDeclineResponse
 import com.nextuple.nsf.retrofit.dto.response.FulfillmentRequestDetail
 import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
 import com.nextuple.nsf.service.dto.Brand
@@ -17,7 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,6 +39,9 @@ class OrderServiceTest {
 	@MockK
 	private lateinit var deviceService: DeviceService
 
+	@MockK
+	private lateinit var userRepository: UserRepository
+
 	@Before
 	fun setUp() {
 		MockKAnnotations.init(this)
@@ -44,51 +49,73 @@ class OrderServiceTest {
 
 	@Test
 	fun `getOrders should return general error on api success response having null data`() = runTest {
-		every { runBlocking { orderApi.getOrders(any(), any(), any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.DSG)
+		every { runBlocking { orderApi.getOrders(any(), any(), any(), any(), any(), any(), any()) } } returns ApiResponse.Success()
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		val res = service.getOrders(query = null, dks = "anyDks", pastDays = null)
+		val res = service.getOrders(query = null)
 		advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
+		assertEquals(Result.generalError(), res)
 	}
 
 	@Test
 	fun `getOrders should call getOrders api with the expected values`() = runTest {
-		val dks = "dks123"
-
-		every { runBlocking { orderApi.getOrders(any(), any(), any(), any()) } } returns ApiResponse.Success(
+		every { runBlocking { orderApi.getOrders(any(), any(), any(), any(), any(), any(), any()) } } returns ApiResponse.Success(
 			data = listOf(OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123")))
 		)
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.DSG)
-		service.getOrders(query = "any", dks = dks, pastDays = null)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+
+		service.getOrders(query = "any")
 		advanceUntilIdle()
 
 		verify {
-			runBlocking { orderApi.getOrders(any(), any(), any(), any()) }
+			runBlocking { orderApi.getOrders(any(), any(), any(), any(), any(), any(), any()) }
 		}
+	}
+
+	@Test
+	fun `getOrders should return general error if getStore is null`() = runTest {
+		every { deviceService.getStore() } returns null
+
+		val res = service.getOrders(query = "any")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `getOrders should return general error if getDks is null`() = runTest {
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns null
+
+		val res = service.getOrders(query = "any")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
 	}
 
 	@Test
 	fun `getOrderDetails should return general error on api success response having null data`() = runTest {
 		every { runBlocking { orderApi.orderDetails(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.DSG)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		val res = service.getOrderDetails(dks = "anyDks", fulfillmentRequestNumber = "anyNumber")
+		val res = service.getOrderDetails(fulfillmentRequestNumber = "anyNumber")
 		advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
+		assertEquals(Result.generalError(), res)
 	}
 
 	@Test
 	fun `getOrderDetails should call getOrderDetails api with the expected values`() = runTest {
-		val dks = "dks123"
-
+		every { runBlocking { userRepository.getDks() } } returns "dks"
 		every { runBlocking { orderApi.orderDetails(any(), any()) } } returns ApiResponse.Success(
 			data = OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123"))
 		)
 
-		service.getOrderDetails(dks = dks, fulfillmentRequestNumber = "any_number")
+		service.getOrderDetails(fulfillmentRequestNumber = "any_number")
 		advanceUntilIdle()
 
 		verify {
@@ -97,25 +124,35 @@ class OrderServiceTest {
 	}
 
 	@Test
-	fun `startPickup should return general error on api success response having null data`() = runTest {
-		every { runBlocking { orderApi.startPickupTask(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.DSG)
+	fun `getOrderDetails should return general error if getDks is null`() = runTest {
+		every { runBlocking { userRepository.getDks() } } returns null
 
-		val res = service.startPickupTask(dks = "anyDks", fulfillmentRequestNumber = "anyNumber")
+		val res = service.getOrderDetails(fulfillmentRequestNumber = "any_number")
 		advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
+		assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `startPickup should return general error on api success response having null data`() = runTest {
+		every { runBlocking { orderApi.startPickupTask(any(), any()) } } returns ApiResponse.Success()
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+
+		val res = service.startPickupTask(fulfillmentRequestNumber = "anyNumber")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
 	}
 
 	@Test
 	fun `startPickup should call startPickup api with the expected values`() = runTest {
-		val dks = "dks123"
-
+		every { runBlocking { userRepository.getDks() } } returns "dks"
 		every { runBlocking { orderApi.startPickupTask(any(), any()) } } returns ApiResponse.Success(
 			data = OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123"))
 		)
 
-		service.startPickupTask(dks = dks, fulfillmentRequestNumber = "any_number")
+		service.startPickupTask(fulfillmentRequestNumber = "any_number")
 		advanceUntilIdle()
 
 		verify {
@@ -124,25 +161,35 @@ class OrderServiceTest {
 	}
 
 	@Test
-	fun `extendPickup should return general error on api success response having null data`() = runTest {
-		every { runBlocking { orderApi.pickupExtend(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.DSG)
+	fun `startPickup should return general error if getDks is null`() = runTest {
+		every { runBlocking { userRepository.getDks() } } returns null
 
-		val res = service.pickupExtend(dks = "anyDks", fulfillmentRequestNumber = "anyNumber")
+		val res = service.startPickupTask(fulfillmentRequestNumber = "any_number")
 		advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
+		assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `extendPickup should return general error on api success response having null data`() = runTest {
+		every { runBlocking { orderApi.pickupExtend(any(), any()) } } returns ApiResponse.Success()
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+
+		val res = service.pickupExtend(fulfillmentRequestNumber = "anyNumber")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
 	}
 
 	@Test
 	fun `extendPickup should call extendPickup api with the expected values`() = runTest {
-		val dks = "dks123"
-
 		every { runBlocking { orderApi.pickupExtend(any(), any()) } } returns ApiResponse.Success(
 			data = OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123"))
 		)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		service.pickupExtend(dks = dks, fulfillmentRequestNumber = "any_number")
+		service.pickupExtend(fulfillmentRequestNumber = "any_number")
 		advanceUntilIdle()
 
 		verify {
@@ -151,25 +198,35 @@ class OrderServiceTest {
 	}
 
 	@Test
-	fun `removeCheckIn should return general error on api success response having null data`() = runTest {
-		every { runBlocking { orderApi.pickupRemoveCheckIn(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.DSG)
+	fun `extendPickup should return general error if getDks is null`() = runTest {
+		every { runBlocking { userRepository.getDks() } } returns null
 
-		val res = service.pickupRemoveCheckIn(dks = "anyDks", taskId = "anyNumber")
+		val res = service.pickupExtend(fulfillmentRequestNumber = "any_number")
 		advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
+		assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `removeCheckIn should return general error on api success response having null data`() = runTest {
+		every { runBlocking { orderApi.pickupRemoveCheckIn(any(), any()) } } returns ApiResponse.Success()
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+
+		val res = service.pickupRemoveCheckIn(taskId = "anyNumber")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
 	}
 
 	@Test
 	fun `removeCheckIn should call removeCheckIn api with the expected values`() = runTest {
-		val dks = "dks123"
-
 		every { runBlocking { orderApi.pickupRemoveCheckIn(any(), any()) } } returns ApiResponse.Success(
 			data = OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123"))
 		)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		service.pickupRemoveCheckIn(dks = dks, taskId = "any_number")
+		service.pickupRemoveCheckIn(taskId = "any_number")
 		advanceUntilIdle()
 
 		verify {
@@ -178,29 +235,85 @@ class OrderServiceTest {
 	}
 
 	@Test
-	fun `completePickupTask should return general error on api success response having null data`() = runTest {
-		every { runBlocking { orderApi.completePickupTask(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.DSG)
+	fun `removeCheckIn should return general error if getDks is null`() = runTest {
+		every { runBlocking { userRepository.getDks() } } returns null
 
-		val res = service.completePickupTask(dks = "anyDks", taskId = "anyNumber")
+		val res = service.pickupRemoveCheckIn(taskId = "any_number")
 		advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
+		assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `completePickupTask should return general error on api success response having null data`() = runTest {
+		every { runBlocking { orderApi.completePickupTask(any(), any()) } } returns ApiResponse.Success()
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+
+		val res = service.completePickupTask(taskId = "anyNumber")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
 	}
 
 	@Test
 	fun `completePickupTask should call completePickupTask api with the expected values`() = runTest {
-		val dks = "dks123"
-
 		every { runBlocking { orderApi.completePickupTask(any(), any()) } } returns ApiResponse.Success(
 			data = OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123"))
 		)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		service.completePickupTask(dks = dks, taskId = "any_number")
+		service.completePickupTask(taskId = "any_number")
 		advanceUntilIdle()
 
 		verify {
 			runBlocking { orderApi.completePickupTask(any(), any()) }
 		}
+	}
+
+	@Test
+	fun `completePickupTask should return general error if getDks is null`() = runTest {
+		every { runBlocking { userRepository.getDks() } } returns null
+
+		val res = service.completePickupTask(taskId = "any_number")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `recordDecline should call recordDecline api with the expected values`() = runTest {
+		every { runBlocking { orderApi.recordDecline(any(), any()) } } returns ApiResponse.Success(
+			RecordDeclineResponse(true, "")
+		)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+
+		service.recordDecline(fulfillmentRequestNumber = "", declinedReason = "", shouldTranslateReason = false, action = "")
+		advanceUntilIdle()
+
+		verify {
+			runBlocking { orderApi.recordDecline(any(), any()) }
+		}
+	}
+
+	@Test
+	fun `recordDecline should return generalError is the response is null`() = runTest {
+		every { runBlocking { orderApi.recordDecline(any(), any()) } } returns ApiResponse.Success()
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+
+		val res = service.recordDecline(fulfillmentRequestNumber = "", declinedReason = "", shouldTranslateReason = false, action = "")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `recordDecline should return general error if getDks is null`() = runTest {
+		every { runBlocking { userRepository.getDks() } } returns null
+
+		val res = service.recordDecline(fulfillmentRequestNumber = "", declinedReason = "", shouldTranslateReason = false, action = "")
+		advanceUntilIdle()
+
+		assertEquals(Result.generalError(), res)
 	}
 }

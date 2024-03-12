@@ -1,13 +1,13 @@
 package com.nextuple.nsf.service.dto
 
 enum class Brand(val chainName: String) {
-	NEXTUPLE(chainName = "NEXTUPLE"),
+	NT(chainName = "NEXTUPLE"),
 	UNKNOWN(chainName = "UNKNOWN");
 
 	companion object {
 
 		fun toBrand(chainName: String): Brand = when (chainName.uppercase()) {
-			NEXTUPLE.chainName.uppercase() -> NEXTUPLE
+			NT.chainName.uppercase() -> NT
 			else -> UNKNOWN
 		}
 	}

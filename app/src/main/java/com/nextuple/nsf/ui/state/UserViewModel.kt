@@ -6,18 +6,25 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nextuple.nsf.BuildConfig
+import com.nextuple.nsf.datastore.UserRepository
+import com.nextuple.nsf.service.ConfigService
 import com.nextuple.nsf.service.UserService
-import com.nextuple.nsf.service.dto.Result
-import com.nextuple.nsf.service.dto.User
+import com.nextuple.nsf.service.dto.Brand
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.nextuple.nsf.service.dto.Result
+import com.nextuple.nsf.service.dto.Store
+import com.nextuple.nsf.service.dto.User
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
 	@Suppress("UNUSED_PARAMETER")
 	handler: SavedStateHandle,
-	private val userService: UserService
+	private val userService: UserService,
+	private val userRepository: UserRepository,
+	private val configService: ConfigService
 ) : ViewModel() {
 
 	sealed class ViewState {
@@ -45,41 +52,54 @@ class UserViewModel @Inject constructor(
 	var viewState: ViewState by mutableStateOf(ViewState.LoggedOut)
 		private set
 
-	var user: User? by mutableStateOf(null)
+	var user = userRepository.userFlow
 		private set
 
 	var errMsg: String? by mutableStateOf(null)
 		private set
 
+	private var onLogoutCallbacks: List<() -> Unit> = emptyList()
+
+	fun setOnLogoutCallbacks(vararg callbacks: () -> Unit) {
+		onLogoutCallbacks = callbacks.toList()
+	}
+
 	fun login(dks: String) = viewModelScope.launch {
 		if (dks.isEmpty()) {
-			errMsg = "Invalid DKS number."
+			errMsg = "Invalid Id."
 			viewState = ViewState.LoginError
 			return@launch
 		}
 
 		viewState = ViewState.LoggingIn
-		user = when (val res = userService.login(dks)) {
+
+		when (val res = userService.login(appendDksPrefixIfNeeded(dks))) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = ViewState.LoggedIn
-				res.data
 			}
 
 			is Result.Error -> {
 				errMsg = res.msg
 				viewState = ViewState.LoginError
-				null
 			}
 		}
 	}
 
 	fun resetFromError() = logout()
 
-	fun logout() {
+	fun logout() = viewModelScope.launch {
 		userService.logout()
 		viewState = ViewState.LoggedOut
-		user = null
 		errMsg = null
+		configService.clearStoreConfig()
+		onLogoutCallbacks.forEach { callback -> callback() }
 	}
+
+	private fun appendDksPrefixIfNeeded(dks: String): String =
+		if (!dks.lowercase().startsWith("dks") && dks.all { it.isDigit() }) {
+			"dks$dks"
+		} else {
+			dks
+		}
 }

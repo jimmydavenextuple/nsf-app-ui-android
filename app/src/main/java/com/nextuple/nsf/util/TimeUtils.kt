@@ -3,10 +3,14 @@ package com.nextuple.nsf.util
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 object TimeUtils {
+
+	private const val OUTPUT_FORMAT = "MMMM d, yyyy"
 
 	fun calculateTimeDifferenceInSeconds(timestamp: String): Long? {
 		return try {
@@ -21,16 +25,22 @@ object TimeUtils {
 		}
 	}
 
-	fun formatTime(seconds: Long?): String {
-		if (seconds == null) {
-			return "-- : --"
-		}
-		val hours = seconds / 3600
-		val minutes = (seconds % 3600) / 60
-		val remainingSeconds = seconds % 60
+	fun Long.formatTime(): String {
+		val hours = this / 3600
+		val minutes = (this % 3600) / 60
+		val remainingSeconds = this % 60
 		if (hours == 0L) {
 			return "%02d:%02d".format(minutes, remainingSeconds)
 		}
 		return "%02d:%02d:%02d".format(hours, minutes, remainingSeconds)
+	}
+
+	fun formatTimeStamp(
+		timeStamp: Instant,
+		outputPattern: String = OUTPUT_FORMAT
+	): String {
+		val outputFormatter = DateTimeFormatter.ofPattern(outputPattern, Locale.ENGLISH)
+		val dateTime = LocalDateTime.ofInstant(timeStamp, ZoneId.systemDefault())
+		return dateTime.format(outputFormatter)
 	}
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.IntentFilter
+import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.ui.util.OnDataScanned
 
 class DataWedgeBroadcastReceiver : BroadcastReceiver() {
@@ -18,11 +19,15 @@ class DataWedgeBroadcastReceiver : BroadcastReceiver() {
 
 		const val INTENT_DATA_KEY = "com.motorolasolutions.emdk.datawedge.data_string"
 		const val INTENT_LABEL_KEY = "com.motorolasolutions.emdk.datawedge.label_type"
+
+		private const val EVENT_NAME = "Scan"
 	}
 
+	private var logService: LogService? = null
 	private var onDataScanned: OnDataScanned = { _, _ -> }
 
-	fun setOnDataScanned(onDataScanned: OnDataScanned) {
+	fun setOnDataScanned(logService: LogService? = null, onDataScanned: OnDataScanned) {
+		this.logService = logService
 		this.onDataScanned = onDataScanned
 	}
 
@@ -55,11 +60,13 @@ class DataWedgeBroadcastReceiver : BroadcastReceiver() {
 
 		val src = intent.getStringExtra(INTENT_SRC_KEY) ?: INTENT_SRC
 		if (!src.equals(INTENT_SRC, ignoreCase = true)) {
+			logService?.trackError(EVENT_NAME, Throwable("unsupported src $src"))
 			return
 		}
 
 		val data = intent.getStringExtra(INTENT_DATA_KEY)?.trim { it <= ' ' }.orEmpty()
 		if (data.isEmpty()) {
+			logService?.trackError(EVENT_NAME, Throwable("empty data"))
 			return
 		}
 
@@ -67,8 +74,18 @@ class DataWedgeBroadcastReceiver : BroadcastReceiver() {
 		val label = intent.getStringExtra(INTENT_LABEL_KEY)
 		val symbology = runCatching {
 			label?.substring(11)?.lowercase()
+		}.onFailure {
+			logService?.trackError(EVENT_NAME, it)
 		}.getOrNull()
 
+		logService?.trackEvent(
+			eventName = EVENT_NAME,
+			additionalProps = mapOf(
+				"dataSymbologyPair" to "data $data symbology $symbology",
+				"data" to data,
+				"symbology" to symbology.orEmpty()
+			)
+		)
 		onDataScanned(data, symbology)
 	}
 }

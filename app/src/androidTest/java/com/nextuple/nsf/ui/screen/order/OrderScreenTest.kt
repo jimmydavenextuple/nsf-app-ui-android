@@ -1,9 +1,9 @@
 package com.nextuple.nsf.ui.screen.order
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.karumi.shot.ScreenshotTest
-import com.nextuple.nsf.ui.util.NoOpScanManager
+import com.nextuple.nsf.ui.screen.order.OrderScreenTab.READY
 import com.nextuple.nsf.util.TestData
+import com.karumi.shot.ScreenshotTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,13 +21,16 @@ class OrderScreenTest : ScreenshotTest {
 	private fun renderOrderScreen() {
 		composeTestRule.setContent {
 			OrderScreen(
-				scanManager = NoOpScanManager(),
-				getOrders = { _, _ -> },
+				getOrders = { _ -> },
 				getOrderDetails = {},
-				allOrderList = TestData.SAMPLE_ORDERS_RESPONSE,
-				pickupOrderList = TestData.SAMPLE_ORDERS_RESPONSE,
 				getOrderDetailsCompletion = {},
-				homeSearchInput = ""
+				readyOrders = TestData.SAMPLE_ORDERS_RESPONSE,
+				inProgressOrders = TestData.SAMPLE_ORDERS_RESPONSE,
+				orderTypeFilters = emptyList(),
+				orderStatusFilters = emptyList(),
+				selectedTab = READY,
+				onSelectTab = {},
+				onApplyFilters = { _, _ -> }
 			)
 		}
 	}

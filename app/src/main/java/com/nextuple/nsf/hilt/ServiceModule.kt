@@ -4,23 +4,29 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
 import android.provider.Settings
-import com.nextuple.nsf.retrofit.api.AppApi
+import com.nextuple.nsf.datastore.UserRepository
+import com.nextuple.nsf.retrofit.api.ConfigApi
+import com.nextuple.nsf.retrofit.api.InfoApi
 import com.nextuple.nsf.retrofit.api.OrderApi
+import com.nextuple.nsf.retrofit.api.PackTaskApi
 import com.nextuple.nsf.retrofit.api.PickApi
-import com.nextuple.nsf.retrofit.api.PrepApi
+import com.nextuple.nsf.retrofit.api.StageTaskApi
 import com.nextuple.nsf.retrofit.api.UserApi
-import com.nextuple.nsf.service.AppService
+import com.nextuple.nsf.service.ConfigService
 import com.nextuple.nsf.service.DeviceService
+import com.nextuple.nsf.service.InfoService
 import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.OrderService
+import com.nextuple.nsf.service.PackTaskService
 import com.nextuple.nsf.service.PickService
-import com.nextuple.nsf.service.PrepService
+import com.nextuple.nsf.service.StageTaskService
 import com.nextuple.nsf.service.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.net.NetworkInterface
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -51,36 +57,88 @@ internal object ServiceModule {
 	)
 
 	@Provides
-	fun provideAppService(
-		appApi: AppApi,
-		deviceService: DeviceService
-	): AppService = AppService(appApi = appApi, deviceService = deviceService)
-
-	@Provides
 	fun provideUserService(
 		userApi: UserApi,
 		logService: LogService,
-		deviceService: DeviceService
+		deviceService: DeviceService,
+		userRepository: UserRepository
 	): UserService = UserService(
 		userApi = userApi,
 		logService = logService,
-		deviceService = deviceService
+		deviceService = deviceService,
+		userRepository = userRepository
 	)
 
 	@Provides
 	fun providePickService(
 		pickApi: PickApi,
-		deviceService: DeviceService
-	): PickService = PickService(pickApi = pickApi, deviceService = deviceService)
+		deviceService: DeviceService,
+		logService: LogService,
+		userRepository: UserRepository
+	): PickService = PickService(
+		pickApi = pickApi,
+		deviceService = deviceService,
+		logService = logService,
+		userRepository = userRepository
+	)
 
 	@Provides
 	fun providePrepService(
-		prepApi: PrepApi
-	): PrepService = PrepService(prepApi = prepApi)
+		packTaskApi: PackTaskApi,
+		logService: LogService,
+		deviceService: DeviceService,
+		userRepository: UserRepository
+	): PackTaskService = PackTaskService(
+		packTaskApi = packTaskApi,
+		logService = logService,
+		deviceService = deviceService,
+		userRepository = userRepository
+	)
+
+	@Provides
+	fun provideAppService(
+		infoApi: InfoApi,
+		deviceService: DeviceService,
+		userRepository: UserRepository
+	): InfoService = InfoService(
+		infoApi = infoApi,
+		deviceService = deviceService,
+		userRepository = userRepository
+	)
 
 	@Provides
 	fun provideOrderService(
 		orderApi: OrderApi,
-		deviceService: DeviceService
-	): OrderService = OrderService(orderApi = orderApi, deviceService = deviceService)
+		deviceService: DeviceService,
+		userRepository: UserRepository
+	): OrderService = OrderService(
+		orderApi = orderApi,
+		deviceService = deviceService,
+		userRepository = userRepository
+	)
+
+	@Provides
+	fun provideStageTaskService(
+		stageTaskApi: StageTaskApi,
+		logService: LogService,
+		userRepository: UserRepository
+	): StageTaskService = StageTaskService(
+		stageTaskApi = stageTaskApi,
+		logService = logService,
+		userRepository = userRepository
+	)
+
+	@Singleton
+	@Provides
+	fun provideConfigService(
+		configApi: ConfigApi,
+		deviceService: DeviceService,
+		logService: LogService,
+		userRepository: UserRepository
+	): ConfigService = ConfigService(
+		configApi = configApi,
+		deviceService = deviceService,
+		logService = logService,
+		userRepository = userRepository
+	)
 }

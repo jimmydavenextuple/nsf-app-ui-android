@@ -3,12 +3,14 @@ package com.nextuple.nsf.ui.screen.home
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,17 +21,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.ButtonState
@@ -37,7 +43,11 @@ import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.TopLabeledTextField
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
+import com.nextuple.nsf.ui.util.Haptics
+import com.nextuple.nsf.ui.util.NoOpScanManager
+import com.nextuple.nsf.ui.util.OnDataScanned
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.ScanManager
 
 @Composable
 fun LoginScreen(
@@ -47,7 +57,10 @@ fun LoginScreen(
 	showProgressBar: Boolean,
 	onSubmitDks: (dks: String) -> Unit,
 	isLoggedIn: Boolean,
-	onLoggedIn: () -> Unit
+	onLoggedIn: () -> Unit,
+	scanManager: ScanManager,
+	haptics: Haptics?,
+	isInValidSymbology: (String) -> Boolean
 ) {
 	if (isLoggedIn) {
 		LaunchedEffect(Unit) { onLoggedIn() }
@@ -58,96 +71,145 @@ fun LoginScreen(
 
 	var dks by remember {
 		mutableStateOf(
-			""
+			if (BuildConfig.DEBUG && BuildConfig.AUTO_FILL_DKS) {
+				BuildConfig.DKS.lowercase()
+			} else {
+				""
+			}
 		)
 	}
 
-	Column {
-		Box(
+	// Awaiting approval to add to production
+	if (BuildConfig.DEBUG) {
+		ScanLoginEffect(
+			scanManager = scanManager,
+			haptics = haptics,
+			isInValidSymbology = isInValidSymbology,
+			onScanLogin = {
+				dks = it.lowercase()
+				onSubmitDks(dks)
+			}
+		)
+	}
+
+	Box(
+		modifier = Modifier.fillMaxSize()
+	) {
+		Column(
 			modifier = Modifier
-				.weight(0.775f)
-				.fillMaxSize()
+				.align(Alignment.Center)
+				.width(IntrinsicSize.Max),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Center
 		) {
-			Box(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(start = 24.dp)
-					.zIndex(Float.MAX_VALUE),
-				contentAlignment = Alignment.BottomStart
-			) {
-				Column(
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					Text(
-						text = "GOAT",
-						modifier = Modifier
-							.align(Alignment.Start)
-							.clickable {
-								Toast
-									.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG)
-									.show()
-							},
-						style = TextStyle(
-// 							fontFamily = FontFamily.SANS,
-							fontFamily = FontFamily.ARCHIVO,
-							fontWeight = FontWeight.Bold,
-							fontStyle = FontStyle.Normal,
-							letterSpacing = 1.5.sp,
-							fontSize = 100.sp,
-							color = BrandColor.BLACK
-						)
-					)
-					TopLabeledTextField(
-						modifier = Modifier
-							.fillMaxWidth(0.45f)
-							.padding(top = 12.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
-							.align(Alignment.Start),
-						labelText = stringResource(id = R.string.dks_number_label),
-						fieldValue = dks,
-						isInvalid = isInvalid,
-						onValueChange = {
-							dks = it
-							if (isInvalid) {
-								resetIsInvalid()
-							}
-						},
-						errorMessage = errorMessage.orEmpty(),
-						keyboardActions = KeyboardActions(onDone = {
-							focusManager.clearFocus()
-							onSubmitDks(dks)
-						})
-					)
-					PrimaryButton(
-						modifier = Modifier
-							.fillMaxWidth(0.45f)
-							.padding(start = 8.dp, end = 8.dp, top = 0.dp, bottom = 24.dp)
-							.align(Alignment.Start),
-						text = stringResource(id = R.string.login_text).uppercase(),
-						enabled = dks.isNotBlank(),
-						buttonState = if (showProgressBar) {
-							ButtonState.LOADING
-						} else {
-							ButtonState.DEFAULT
-						},
-						onButtonClick = {
-							onSubmitDks(dks)
-						}
-					)
+			val annotatedText = buildAnnotatedString {
+				withStyle(style = SpanStyle(color = BrandColor.PINK_NT)) {
+					append("Nextuple")
+				}
+				append("\n")
+				withStyle(style = SpanStyle(color = BrandColor.YELLOW_NT)) {
+					append("Store")
+				}
+				append("\n")
+				withStyle(style = SpanStyle(color = BrandColor.BLUE_300_NT)) {
+					append("Fulfillment")
 				}
 			}
-
-			Box(
-				modifier = Modifier.fillMaxSize(),
-				contentAlignment = Alignment.TopEnd
-			) {
-				Image(
-					modifier = Modifier.fillMaxHeight(),
-					painter = painterResource(R.drawable.phil_login),
-					contentDescription = null,
-					contentScale = ContentScale.FillHeight
+			Text(
+				text = annotatedText,
+				modifier = Modifier
+					.align(Alignment.Start)
+					.clickable {
+						Toast
+							.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG)
+							.show()
+					},
+				style = TextStyle(
+					fontFamily = FontFamily.ARCHIVO,
+					fontWeight = FontWeight.Bold,
+					fontStyle = FontStyle.Normal,
+					letterSpacing = 1.5.sp,
+					fontSize = 50.sp,
+					color = BrandColor.GRAY_900
 				)
-			}
+			)
+			TopLabeledTextField(
+				modifier = Modifier
+					.padding(top = 24.dp),
+				labelText = stringResource(id = R.string.login_text_label),
+				fieldValue = dks,
+				isInvalid = isInvalid,
+				onValueChange = {
+					dks = it.trim()
+					if (isInvalid) {
+						resetIsInvalid()
+					}
+				},
+				errorMessage = errorMessage.orEmpty(),
+				keyboardActions = KeyboardActions(onDone = {
+					focusManager.clearFocus()
+					onSubmitDks(dks)
+				})
+			)
+			PrimaryButton(
+				modifier = Modifier
+					.width(width = 152.dp),
+				text = stringResource(id = R.string.login_text).uppercase(),
+				enabled = dks.isNotBlank(),
+				buttonState = if (showProgressBar) {
+					ButtonState.LOADING
+				} else {
+					ButtonState.DEFAULT
+				},
+				onButtonClick = {
+					onSubmitDks(dks)
+				}
+			)
 		}
+
+		Text(
+			modifier = Modifier
+				.align(Alignment.BottomStart)
+				.padding(24.dp),
+			text = "NSF ${BuildConfig.APP_VERSION}",
+			fontSize = 10.sp,
+			fontFamily = FontFamily.ARCHIVO,
+			fontWeight = FontWeight(700),
+			color = BrandColor.GRAY_900,
+			letterSpacing = 1.5.sp
+		)
+
+		Box(
+			modifier = Modifier.fillMaxSize(),
+			contentAlignment = Alignment.TopEnd
+		) {
+			Image(
+				modifier = Modifier.padding(top = 18.dp, end = 12.dp).height(40.dp),
+				painter = painterResource(R.drawable.nextuple_fulllogo),
+				contentDescription = null,
+				contentScale = ContentScale.FillHeight
+			)
+		}
+	}
+}
+
+@Composable
+private fun ScanLoginEffect(
+	scanManager: ScanManager,
+	haptics: Haptics?,
+	isInValidSymbology: (String) -> Boolean,
+	onScanLogin: (String) -> Unit
+) {
+	val onLoginScan: OnDataScanned = { scannedValue, symbology ->
+		if (symbology == null || isInValidSymbology(symbology)) {
+			haptics?.boop()
+		} else {
+			onScanLogin(scannedValue)
+		}
+	}
+
+	LaunchedEffect(Unit) {
+		scanManager.set(onLoginScan)
 	}
 }
 
@@ -161,6 +223,9 @@ fun PreviewLoginScreen() {
 		showProgressBar = false,
 		onSubmitDks = {},
 		isLoggedIn = false,
-		onLoggedIn = {}
+		onLoggedIn = {},
+		scanManager = NoOpScanManager(),
+		haptics = null,
+		isInValidSymbology = { _ -> false }
 	)
 }

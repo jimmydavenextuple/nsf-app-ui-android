@@ -1,10 +1,9 @@
 package com.nextuple.nsf.ui.screen.prep
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.nextuple.nsf.ui.state.InfoViewModel
+import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.karumi.shot.ScreenshotTest
-import com.nextuple.nsf.retrofit.dto.response.StoreOverviewResponse
-import com.nextuple.nsf.ui.state.AppViewModel
-import com.nextuple.nsf.util.TestData
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,19 +20,20 @@ class PrepScreenTest : ScreenshotTest {
 
 	@Test
 	fun prepScreenWithPrepTasks() {
-		renderPrepScreen(prepTasks = TestData.PREP_TASK_LIST)
+		renderPrepScreen()
 
 		compareScreenshot(composeTestRule)
 	}
 
-	private fun renderPrepScreen(prepTasks: List<StoreOverviewResponse.PrepTask>? = null) {
+	private fun renderPrepScreen() {
 		composeTestRule.setContent {
 			PrepScreen(
-				currentPrepStage = AppViewModel.PrepStage.Landing,
-				navigateToStage1 = {},
-				navigateToStage2 = {},
-				onStartPack = { },
-				prepTasks = prepTasks
+				currentPrepStage = InfoViewModel.PrepStage.Landing,
+				navigateToPrepOrder = {},
+				numPackTasks = 0,
+				scanManager = NoOpScanManager(),
+				onScanGear = {},
+				onClickPackByOrder = {}
 			)
 		}
 	}

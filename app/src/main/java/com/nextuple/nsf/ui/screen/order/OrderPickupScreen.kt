@@ -1,24 +1,29 @@
 package com.nextuple.nsf.ui.screen.order
 
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,62 +31,119 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
+import com.nextuple.nsf.retrofit.dto.response.AthleteCheckInDetail
+import com.nextuple.nsf.retrofit.dto.response.AthleteDetail
 import com.nextuple.nsf.retrofit.dto.response.FulfillmentRequestDetail
-import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
 import com.nextuple.nsf.retrofit.dto.response.athleteFullName
 import com.nextuple.nsf.retrofit.dto.response.athleteProxyFullName
-import com.nextuple.nsf.ui.common.BackButton
-import com.nextuple.nsf.ui.common.CallToAction
-import com.nextuple.nsf.ui.common.CallToActionMode
-import com.nextuple.nsf.ui.common.ImageList
+import com.nextuple.nsf.ui.common.HoldSlip
+import com.nextuple.nsf.ui.common.InfoCard
 import com.nextuple.nsf.ui.common.InfoModal
+import com.nextuple.nsf.ui.common.MultiOptionModal
 import com.nextuple.nsf.ui.common.PrimaryButton
-import com.nextuple.nsf.ui.common.TextInfo
+import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
+import com.nextuple.nsf.ui.common.chip.StatusChip
+import com.nextuple.nsf.ui.component.PrinterModal
+import com.nextuple.nsf.ui.screen.prep.ExpandableStepCard
+import com.nextuple.nsf.ui.state.Printer
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
+import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.ScanManager
+import com.nextuple.nsf.util.StringUtils.toPhoneNumberFormatted
+import com.nextuple.nsf.util.TimeUtils
+import com.nextuple.nsf.util.TimeUtils.formatTime
 
 const val STEP_GET_ORDER: Int = 1
 const val STEP_BRING_TO_ATHLETE: Int = 2
 
 @Composable
-fun PickOrderScreen(
-	completeOrderPickupState: GenericViewState = GenericViewState.Idle,
-	orderDetails: OrderDetailsResponse?,
-	onBackButtonClick: () -> Unit,
-	defaultStep: Int = STEP_GET_ORDER,
-	onOrderPickupClicked: (String) -> Unit,
-	onOrderPickupSuccess: () -> Unit
+fun OrderPickupScreen(
+    scanManager: ScanManager,
+    completeOrderPickupState: GenericViewState = GenericViewState.Idle,
+    orderNumber: String?,
+    athleteDetail: AthleteDetail?,
+    checkInDetail: AthleteCheckInDetail?,
+    frDetail: FulfillmentRequestDetail?,
+    defaultStep: Int = STEP_GET_ORDER,
+    onOrderPickupClicked: (String) -> Unit,
+    scanHoldSlipState: GenericViewState,
+    onScanSuccess: (scanData: String) -> Unit,
+    onOrderPickupSuccess: () -> Unit,
+    onResetHoldSlipScan: () -> Unit,
+    printer: Printer,
+    printerConnectionState: GenericViewState = GenericViewState.Idle,
+    printHoldSlipState: GenericViewState = GenericViewState.Idle,
+    onPrintHoldSlip: (String) -> Unit,
+    holdSlipState: GenericViewState = GenericViewState.Idle,
+    onPrintHoldSlipSuccessCallBack: () -> Unit,
+    onResetPrintHoldSlip: () -> Unit,
+    onConnectPrinter: (Printer, String) -> Unit,
+    onResetPrinter: () -> Unit,
+    ipPrefix: String?
 ) {
 	val currentStep = remember {
 		mutableStateOf(defaultStep)
 	}
-	var showInfoModal by remember { mutableStateOf(false) }
+	val context = LocalContext.current
 
-	fun showCompleteOrderPickInfoModal(visibility: Boolean) {
-		showInfoModal = visibility
-	}
+	var showConfirmPickupModal by remember { mutableStateOf(false) }
+	var showPickupCompleteModal by remember { mutableStateOf(false) }
+	var showPrinterModal by remember { mutableStateOf(false) }
+
+	var scanState: MutableState<DetailedCallToActionMode>
 
 	fun isOrderActive(): Boolean = currentStep.value == STEP_GET_ORDER
 	fun isAthleteActive(): Boolean = currentStep.value == STEP_BRING_TO_ATHLETE
+	fun advanceToAthleteStep() {
+		currentStep.value = STEP_BRING_TO_ATHLETE
+		onResetHoldSlipScan()
+	}
 	LaunchedEffect(Unit) {
 		currentStep.value = defaultStep
 	}
+
+	LaunchedEffect(Unit) {
+		scanManager.set { data, _ ->
+			orderNumber?.let {
+				if (data.isNotEmpty()) {
+					onScanSuccess(data)
+				}
+			}
+		}
+	}
+
+	val pickupTaskId = checkInDetail?.pickupTaskId
+	val athleteName = athleteDetail?.athleteFullName().orEmpty()
+	val proxyName = athleteDetail?.athleteProxyFullName().orEmpty()
+	val phoneNumber = athleteDetail?.athletePhoneNumber.orEmpty()
+	val holdingLocation = frDetail?.containers?.firstOrNull()?.holdingLocation.orEmpty()
+	val pickupLocation = checkInDetail?.athleteLocation.orEmpty()
+	val carInfo = checkInDetail?.athleteVehicle.orEmpty()
+	val checkInTime = checkInDetail?.checkInTime.orEmpty()
 
 	Box(modifier = Modifier.fillMaxSize()) {
 		Column(
@@ -91,48 +153,154 @@ fun PickOrderScreen(
 				.background(BrandColor.GRAY_100)
 				.verticalScroll(rememberScrollState())
 		) {
-			BackButton(
-				modifier = Modifier.padding(top = 22.dp, bottom = 10.dp),
-				onBackButtonClick = onBackButtonClick
-			)
-
-			OrderPickupCardItem(
-				stepNumber = if (isOrderActive()) "1" else null,
-				title = stringResource(id = R.string.get_order_title),
-				subTitle = stringResource(id = R.string.get_order_description),
-				isActive = isOrderActive(),
-				extraContent = {
-					GetOrdersContent(orderDetails) {
-						currentStep.value = STEP_BRING_TO_ATHLETE
+			when (scanHoldSlipState) {
+				GenericViewState.Loading -> {
+					scanState = remember {
+						mutableStateOf(DetailedCallToActionMode.Loading())
 					}
 				}
+				GenericViewState.Success -> {
+					scanState = remember {
+						mutableStateOf(
+							DetailedCallToActionMode.Done(
+								BrandColor.WHITE,
+								BrandColor.GREEN_500
+							)
+						)
+					}
+					Handler(Looper.getMainLooper()).postDelayed({
+						advanceToAthleteStep()
+					}, 1000)
+				}
+				else -> {
+					scanState = remember {
+						mutableStateOf(DetailedCallToActionMode.Scan(""))
+					}
+				}
+			}
+
+			OrderPickupCardItem(
+				stepNumber = "1",
+				title = stringResource(id = R.string.get_order_title),
+				isActive = isOrderActive(),
+				extraContent = {
+					GetOrdersContent(
+						athleteName = athleteName,
+						holdingLocation = holdingLocation,
+						onScanClicked = {
+							if (orderNumber != null) {
+								onScanSuccess(orderNumber)
+							}
+						},
+						holdSlipState = scanState
+					)
+					ClickableText(
+						text = AnnotatedString("Reprint A Hold Slip".uppercase()),
+						style = TextStyle(
+							fontSize = 12.sp,
+							fontFamily = FontFamily.ARCHIVO,
+							fontWeight = FontWeight(700),
+							color = BrandColor.BLACK,
+							textAlign = TextAlign.Center,
+							letterSpacing = 1.5.sp,
+							textDecoration = TextDecoration.Underline
+						),
+						onClick = {
+							if (printer.connectionStatus) {
+								frDetail?.fulfillmentRequestNumber?.let {
+									onPrintHoldSlip(it)
+								}
+							} else {
+								showPrinterModal = true
+							}
+						}
+					)
+				}
 			)
+
 			OrderPickupCardItem(
 				stepNumber = "2",
 				title = stringResource(id = R.string.bring_to_athlete_title),
-				subTitle = stringResource(id = R.string.bring_to_athlete_description),
 				isActive = isAthleteActive(),
-				extraContent = { BringToAthleteContent(orderDetails, onOrderPickupClicked) }
+				extraContent = {
+					BringToAthleteContent(
+						athleteName = athleteName,
+						proxyName = proxyName,
+						phoneNumber = phoneNumber,
+						pickupLocation = pickupLocation,
+						carInfo = carInfo,
+						onOrderPickupClicked = {
+							showConfirmPickupModal = true
+						}
+					)
+					Spacer(modifier = Modifier.size(20.dp))
+				}
 			)
 
-			if (showInfoModal) {
-				InfoModal(
-					modifier = Modifier.fillMaxWidth(0.95f),
-					title = stringResource(id = R.string.info_modal_order_picked_up_title),
-					subTitle = stringResource(id = R.string.info_modal_order_picked_up_message),
-					buttonText = stringResource(id = R.string.ok),
-					buttonClick = {
-						showCompleteOrderPickInfoModal(false)
-						onOrderPickupSuccess()
+			if (showConfirmPickupModal) {
+				ConfirmPickupModal(
+					confirmPickupAction = {
+						showConfirmPickupModal = false
+						pickupTaskId?.let {
+							onOrderPickupClicked(it.toString())
+						}
 					},
-					crossIconClick = {
-						showCompleteOrderPickInfoModal(false)
-						onOrderPickupSuccess()
-					},
-					dismissOnBackPress = false,
-					dismissOnClickOutside = false,
-					onDismissRequest = { }
+					closeModal = {
+						showConfirmPickupModal = false
+					}
 				)
+			}
+
+			if (showPickupCompleteModal) {
+				val completePickup: () -> Unit = {
+					showPickupCompleteModal = false
+					onOrderPickupSuccess()
+				}
+				val deliverySpeed = TimeUtils.calculateTimeDifferenceInSeconds(checkInTime)
+
+				if (deliverySpeed != null) {
+					PickupCompleteModal(
+						deliverySpeed = deliverySpeed.formatTime(),
+						onOrderPickupSuccess = completePickup
+					)
+				} else {
+					completePickup()
+				}
+			}
+
+			if (showPrinterModal) {
+				PrinterModal(
+					ipPrefix = ipPrefix,
+					printer = printer,
+					onReset = onResetPrinter,
+					printerConnectionState = printerConnectionState,
+					toggleModal = { showPrinterModal = it },
+					onConnectPrinter = onConnectPrinter
+				)
+			}
+			if (holdSlipState == GenericViewState.Success) {
+				onPrintHoldSlipSuccessCallBack.invoke()
+			} else if (holdSlipState == GenericViewState.Failure) {
+				Toast.makeText(
+					context,
+					stringResource(R.string.hold_slip_retrieve_error),
+					Toast.LENGTH_SHORT
+				).show()
+			}
+			if (printHoldSlipState == GenericViewState.Success) {
+				Toast.makeText(
+					context,
+					stringResource(R.string.hold_slip_print_success),
+					Toast.LENGTH_SHORT
+				).show()
+				onResetPrintHoldSlip()
+			} else if (printHoldSlipState == GenericViewState.Failure) {
+				Toast.makeText(
+					context,
+					stringResource(R.string.hold_slip_print_error),
+					Toast.LENGTH_SHORT
+				).show()
+				onResetPrintHoldSlip()
 			}
 		}
 		if (completeOrderPickupState == GenericViewState.Loading) {
@@ -143,7 +311,7 @@ fun PickOrderScreen(
 				color = BrandColor.GRAY_900
 			)
 		} else if (completeOrderPickupState == GenericViewState.Success) {
-			showCompleteOrderPickInfoModal(true)
+			showPickupCompleteModal = true
 		}
 	}
 }
@@ -152,221 +320,261 @@ fun PickOrderScreen(
 private fun OrderPickupCardItem(
 	stepNumber: String?,
 	title: String,
-	subTitle: String,
 	isActive: Boolean,
 	extraContent: @Composable () -> Unit = {}
-
 ) {
-	Card(
-		modifier = Modifier
-			.fillMaxWidth()
-			.wrapContentHeight()
-			.padding(horizontal = 24.dp, vertical = 4.dp),
-		shape = RoundedCornerShape(12.dp),
-		colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_50)
-	) {
-		Column(modifier = Modifier.padding(12.dp)) {
-			Row(verticalAlignment = Alignment.CenterVertically) {
-				StepNumberWithCircle(
-					text = stepNumber,
-					circleColor = stepCountCircleColor(isActive),
-					textColor = BrandColor.GRAY_50
-				)
-				Spacer(modifier = Modifier.width(8.dp))
-				Text(
-					text = title,
-					fontFamily = FontFamily.ARCHIVO,
-					fontSize = 20.sp,
-					fontWeight = FontWeight.Bold,
-					letterSpacing = 0.5.sp,
-					color = cardTitleTextColor(isActive)
-				)
-			}
-			if (isActive) {
-				Spacer(modifier = Modifier.height(12.dp))
-				Text(
-					text = subTitle,
-					fontFamily = FontFamily.ARCHIVO,
-					fontSize = 16.sp,
-					fontWeight = FontWeight.Normal,
-					letterSpacing = 0.5.sp,
-					color = BrandColor.BLACK
-				)
-				Spacer(modifier = Modifier.height(8.dp))
-				extraContent()
-			}
-		}
+	ExpandableStepCard(stepNumber = stepNumber, title = title, isActive = isActive, isComplete = !isActive && stepNumber == "1") {
+		extraContent()
 	}
 }
 
 @Composable
-private fun GetOrdersContent(orderDetails: OrderDetailsResponse? = null, onScanClicked: () -> Unit) {
-	Row {
-		TextInfo(
-			modifier = Modifier.weight(0.5f),
-			label = stringResource(id = R.string.athlete_name),
-			value = orderDetails?.athleteDetail?.athleteFullName()
-		)
-		TextInfo(
-			modifier = Modifier.weight(0.5f),
-			label = stringResource(id = R.string.phone_number),
-			value = orderDetails?.athleteDetail?.athletePhoneNumber
-		)
-	}
-
+private fun GetOrdersContent(
+	athleteName: String,
+	holdingLocation: String,
+	holdSlipState: MutableState<DetailedCallToActionMode>,
+	onScanClicked: () -> Unit
+) {
 	Card(
 		modifier = Modifier
 			.fillMaxWidth()
-			.wrapContentHeight()
 			.padding(top = 8.dp, bottom = 8.dp),
 		shape = RoundedCornerShape(12.dp),
 		colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_100)
 	) {
-		Row {
+		Row(
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(12.dp)
+		) {
 			Column(
 				modifier = Modifier
-					.weight(0.5f)
-					.padding(12.dp)
+					.fillMaxHeight()
 					.fillMaxWidth()
+					.weight(1f),
+				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {
-				TextInfo(
-					modifier = Modifier.fillMaxWidth(),
-					label = stringResource(id = R.string.holding_area),
-					value = orderDetails?.fulfillmentRequestDetail?.holdingLocation
-				)
-				Spacer(modifier = Modifier.height(8.dp))
-				val imageList =
-					orderDetails?.fulfillmentRequestDetail?.containers?.firstOrNull()?.packedItems?.map {
-						it.productImageUrls.firstOrNull() ?: ""
-					}?.filter {
-						it.isNotEmpty()
-					}
-				ImageList(
-					images = imageList ?: emptyList()
-				)
-			}
-			Column(
-				modifier = Modifier
-					.weight(0.5f)
-					.padding(12.dp)
-					.fillMaxWidth()
-					.align(Alignment.CenterVertically),
-				verticalArrangement = Arrangement.Center
-			) {
-				CallToAction(
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Image(painter = painterResource(id = R.drawable.ic_package_location), contentDescription = "")
+					Spacer(modifier = Modifier.width(5.dp))
+					Text(
+						text = holdingLocation,
+						style = TextStyle(
+							fontSize = 14.sp,
+							lineHeight = 18.2.sp,
+							fontFamily = FontFamily.ARCHIVO,
+							fontWeight = FontWeight(700),
+							letterSpacing = 0.5.sp
+						)
+					)
+				}
+
+				Row(
 					modifier = Modifier
-						.size(64.dp)
-						.align(Alignment.CenterHorizontally),
-					callToActionMode = CallToActionMode.Scan(),
-
-					onClick = {
-						onScanClicked()
-					}
-				)
-				Spacer(modifier = Modifier.height(8.dp))
-
-				Text(
-					modifier = Modifier.align(Alignment.CenterHorizontally),
-					text = "PACKAGE 1/1",
-					fontFamily = FontFamily.ARCHIVO,
-					fontSize = 12.sp,
-					color = BrandColor.GRAY_500,
-					fontWeight = FontWeight.Bold,
-					letterSpacing = 1.5.sp
-				)
+						.fillMaxWidth()
+						.clickable {
+							if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
+								onScanClicked()
+							}
+						},
+					horizontalArrangement = Arrangement.Center
+				) {
+					val lastName = athleteName.split(" ")
+					HoldSlip(
+						athleteName = athleteName,
+						lastName = lastName[lastName.lastIndex],
+						packageNum = "1",
+						totalPackageNum = "1",
+						isSmallSize = true,
+						isScanable = true,
+						isSelected = false,
+						scanStatus = holdSlipState.value
+					)
+				}
 			}
 		}
 	}
 }
 
 @Composable
-private fun ColumnScope.BringToAthleteContent(
-	orderDetails: OrderDetailsResponse? = null,
-	onOrderPickupClicked: (String) -> Unit
+fun ColumnScope.BringToAthleteContent(
+	athleteName: String,
+	proxyName: String,
+	phoneNumber: String,
+	pickupLocation: String,
+	carInfo: String,
+	onOrderPickupClicked: () -> Unit
 ) {
-	Row {
-		TextInfo(
-			modifier = Modifier.weight(0.5f),
-			label = stringResource(id = R.string.athlete_name),
-			value = orderDetails?.athleteDetail?.athleteFullName()
-		)
+	val labelsToValues = linkedMapOf(
+		stringResource(id = R.string.name) to athleteName,
+		stringResource(id = R.string.phone_number) to toPhoneNumberFormatted(phoneNumber)
+	)
 
-		TextInfo(
-			modifier = Modifier.weight(0.5f),
-			label = stringResource(id = R.string.proxy_name),
-			value = orderDetails?.athleteDetail?.athleteProxyFullName()
-		)
+	if (proxyName.isNotEmpty()) {
+		labelsToValues[stringResource(id = R.string.proxy_name)] = proxyName
 	}
-	Spacer(modifier = Modifier.height(8.dp))
-	Row {
-		TextInfo(
-			modifier = Modifier.weight(0.5f),
-			label = stringResource(id = R.string.phone_number),
-			value = orderDetails?.athleteDetail?.athletePhoneNumber
-		)
-		TextInfo(
-			modifier = Modifier.weight(0.5f),
-			label = stringResource(id = R.string.pickup_location),
-			value = orderDetails?.athleteCheckInDetail?.athleteLocation
-		)
+
+	if (pickupLocation.isNotEmpty()) {
+		labelsToValues[stringResource(id = R.string.pickup_location)] = pickupLocation
 	}
-	Spacer(modifier = Modifier.height(16.dp))
+
+	if (carInfo.isNotEmpty()) {
+		labelsToValues[stringResource(id = R.string.car_info)] = carInfo
+	}
+
+	InfoCard(
+		shape = RectangleShape,
+		internalPadding = 0.dp,
+		internalSpacedBy = 12.dp,
+		labelsToValues = labelsToValues
+	)
+	Spacer(modifier = Modifier.height(24.dp))
 	PrimaryButton(
 		modifier = Modifier
 			.fillMaxWidth(0.8f)
 			.align(Alignment.CenterHorizontally),
-		text = stringResource(id = R.string.confirm_pickup),
-		onButtonClick = {
-			orderDetails?.athleteCheckInDetail?.pickupTaskId?.let {
-				onOrderPickupClicked(it.toString())
-			}
-		}
+		text = stringResource(id = R.string.complete_pickup),
+		onButtonClick = onOrderPickupClicked
+	)
+}
+
+@Preview
+@Composable
+private fun ConfirmPickupModal(
+	confirmPickupAction: () -> Unit = {},
+	closeModal: () -> Unit = {}
+) {
+	MultiOptionModal(
+		title = stringResource(id = R.string.confirm_pickup_modal_title),
+		subTitle = stringResource(id = R.string.confirm_pickup_modal_info),
+		buttons = listOf("CONFIRM", "BACK"),
+		buttonClick = { buttonClicked ->
+			if (buttonClicked == "CONFIRM") confirmPickupAction() else closeModal()
+		},
+		crossIconClick = closeModal,
+		dismissOnBackPress = false,
+		dismissOnClickOutside = false,
+		onDismissRequest = { }
 	)
 }
 
 @Composable
-private fun StepNumberWithCircle(text: String?, circleColor: Color, textColor: Color) {
-	Box(
-		modifier = Modifier
-			.size(32.dp)
-			.clip(CircleShape)
-			.background(color = circleColor),
-		contentAlignment = Alignment.Center
-	) {
-		if (text == null) {
-			Image(
-				modifier = Modifier
-					.padding(6.dp)
-					.wrapContentSize(),
-				painter = painterResource(id = R.drawable.ic_check_white),
-				contentDescription = "Scan Image"
-			)
-		} else {
-			Text(
-				text = text,
-				color = textColor,
-// 				fontFamily = FontFamily.SANS,
-				fontFamily = FontFamily.ARCHIVO,
-				fontSize = 24.sp,
-				fontWeight = FontWeight.Bold
-			)
-		}
-	}
+private fun PickupCompleteModal(
+	modifier: Modifier = Modifier,
+	deliverySpeed: String,
+	onOrderPickupSuccess: () -> Unit = {}
+) {
+	InfoModal(
+		modifier = modifier,
+		title = stringResource(id = R.string.pickup_complete),
+		visualContent = {
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.Center
+			) {
+				StatusChip(
+					modifier = modifier
+						.border(
+							width = 2.dp,
+							color = BrandColor.GREEN_500,
+							shape = RoundedCornerShape(size = 3.dp)
+						)
+						.background(
+							color = BrandColor.TRANSPARENT,
+							shape = RoundedCornerShape(size = 3.dp)
+						),
+					statusText = deliverySpeed,
+					statusColor = BrandColor.GREEN_500,
+					fontSize = 16.sp
+				)
+				Text(
+					modifier = Modifier.padding(top = 8.dp),
+					text = stringResource(id = R.string.delivery_speed).uppercase(),
+					style = TextStyle(
+						fontSize = 12.sp,
+						fontFamily = FontFamily.ARCHIVO,
+						fontWeight = FontWeight(700),
+						color = BrandColor.BLACK,
+						letterSpacing = 1.5.sp
+					)
+				)
+			}
+		},
+		buttonText = stringResource(id = R.string.ok),
+		buttonClick = {
+			onOrderPickupSuccess()
+		},
+		crossIconClick = {
+			onOrderPickupSuccess()
+		},
+		dismissOnBackPress = false,
+		dismissOnClickOutside = false,
+		onDismissRequest = { }
+	)
 }
 
-private fun cardTitleTextColor(isActive: Boolean) =
-	if (isActive) BrandColor.BLACK else BrandColor.GRAY_500
-
-private fun stepCountCircleColor(isActive: Boolean) =
-	if (isActive) BrandColor.BLACK else BrandColor.GRAY_500
+@Preview
+@Composable
+private fun PickupCompleteModalPreview() {
+	PickupCompleteModal(
+		deliverySpeed = "02:26.52"
+	)
+}
 
 @PreviewPdt
 @Composable
 fun PickOrderScreenPreview() {
-	PickOrderScreen(
-		onBackButtonClick = {},
-		orderDetails = OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123")),
+	OrderPickupScreen(
+		scanManager = NoOpScanManager(),
+		orderNumber = "123456",
+		athleteDetail = AthleteDetail(
+			athleteFirstName = "Anna",
+			athleteLastName = "Heisey",
+			athleteProxyFirstName = "Eli",
+			athleteProxyLastName = "Heisey",
+			athletePhoneNumber = "5087695491"
+		),
+		checkInDetail = AthleteCheckInDetail(
+			athleteLocation = "Curbside Spot #2"
+		),
+		frDetail = FulfillmentRequestDetail(
+			fulfillmentRequestNumber = "123456.001",
+			holdingLocation = "Main Holding Area, Bin 10"
+		),
 		onOrderPickupClicked = {},
-		onOrderPickupSuccess = {}
+		onOrderPickupSuccess = {},
+		scanHoldSlipState = GenericViewState.Success,
+		onScanSuccess = {},
+		onResetHoldSlipScan = {},
+		ipPrefix = "",
+		printer = Printer(printerName = "BOPIS", ipAddress = "", connectionStatus = false),
+		onPrintHoldSlip = {},
+		onPrintHoldSlipSuccessCallBack = {},
+		onResetPrintHoldSlip = {},
+		onConnectPrinter = { _, _ -> },
+		onResetPrinter = {}
 	)
+}
+
+@Preview
+@Composable
+private fun BringToAthletePreview() {
+	Column {
+		OrderPickupCardItem(
+			stepNumber = "2",
+			title = stringResource(id = R.string.bring_to_athlete_title),
+			isActive = true,
+			extraContent = {
+				BringToAthleteContent(
+					athleteName = "Thomas Jefferson",
+					proxyName = "George Clinton",
+					phoneNumber = "(412) 123 - 4567",
+					pickupLocation = "Curbside Spot 2",
+					carInfo = "White Ford Sedan",
+					onOrderPickupClicked = {}
+				)
+				Spacer(modifier = Modifier.size(20.dp))
+			}
+		)
+	}
 }

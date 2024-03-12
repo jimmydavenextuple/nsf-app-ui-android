@@ -1,15 +1,14 @@
 package com.nextuple.nsf.ui.common
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.karumi.shot.ScreenshotTest
+import com.nextuple.nsf.ui.common.chip.OrderStatusChip
 import com.nextuple.nsf.ui.theme.BrandColor
+import com.karumi.shot.ScreenshotTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,15 +29,13 @@ class StatusTextTest : ScreenshotTest {
 		val status = "Order Ready"
 		val backgroundColor = BrandColor.GREEN_500
 		val testModifier = Modifier
-		val testShape = RoundedCornerShape(32.dp)
 
 		composeTestRule.apply {
 			setContent {
-				StatusText(
+				OrderStatusChip(
 					modifier = testModifier,
-					status = status,
-					backgroundColor = backgroundColor,
-					shape = testShape
+					statusText = status,
+					backgroundColor = backgroundColor
 				)
 			}
 

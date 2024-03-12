@@ -5,9 +5,9 @@ import com.nextuple.nsf.retrofit.dto.PickTask
 import com.nextuple.nsf.retrofit.dto.StageTask
 
 data class StoreOverviewResponse(
-	val pickOverview: PickOverview,
-	val userOverview: UserOverview,
-	val prepOverview: PrepOverview
+    val pickOverview: PickOverview,
+    val userOverview: UserOverview,
+    val prepOverview: PrepOverview
 ) {
 	data class PickOverview(
 		val tasksWorked: Int,
@@ -28,7 +28,7 @@ data class StoreOverviewResponse(
 	data class PrepOverview(
 		val tasksInProgress: Int,
 		val tasksUnassigned: Int,
-		val prepTasks: List<PrepTask>
+		val prepTasks: List<PrepTask> = emptyList()
 	)
 
 	data class PrepTask(
@@ -37,7 +37,7 @@ data class StoreOverviewResponse(
 		val orderNumber: String,
 		val athleteFirstName: String? = null,
 		val athleteLastName: String? = null,
-		val items: List<PrepTaskItem>
+		val items: List<PrepTaskItem> = emptyList()
 	)
 
 	data class PrepTaskItem(
@@ -47,5 +47,3 @@ data class StoreOverviewResponse(
 		val productImageUrls: List<String>
 	)
 }
-
-fun StoreOverviewResponse.PrepTask.prepTaskAthleteShortName() = "$athleteLastName, ${athleteFirstName?.firstOrNull() ?: ""}."

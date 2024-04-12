@@ -68,6 +68,7 @@
     <string name="received_on">RECEIVED ON</string>
     <string name="packer">PACKER</string>
     <string name="stager">STAGER</string>
+    <string name="dispenser">PICKUP TEAMMATE</string>
     <string name="order_number_or_last_name">Order #, Phone # or Last Name</string>
     <string name="order_search_label">Order Search</string>
     <string name="pack_these_units">Pack These Units</string>
@@ -113,6 +114,10 @@
     <string name="decline_reason_subtitle">Why are you declining this item?</string>
     <string name="unit_locations">Unit Locations</string>
     <string name="unit_locations_subtitle">This product has multiple locations assigned to it. Where did you pick this unit it from?</string>
+    <string name="additional_details">Additional Details</string>
+    <string name="last_received">Last Received</string>
+    <string name="last_returned">Last Returned</string>
+    <string name="locations">Locations</string>
 
     <!-- Prep -->
     <string name="scan_to_pack">SCAN UPC TO PACK</string>
@@ -127,6 +132,10 @@
     <string name="reprint_hold_slip">REPRINT HOLD SLIP</string>
     <string name="print_hold_slips">Print %1$s Hold Slips</string>
     <string name="print_all">PRINT ALL</string>
+    <string name="decline_modal_description">Choose a decline reason. Once confirmed, this action cannot be undone.</string>
+    <string name="confirm_decline">CONFIRM DECLINE</string>
+    <string name="scan_package">Scan Package</string>
+    <string name="scan_place_hold">Scan the packaging, then place the printed hold slip on the front.</string>
 
     <!--  Printer Problems  -->
     <string name="printer_problems">PRINTER PROBLEMS?</string>
@@ -167,4 +176,10 @@
     <string name="empty_in_progress_title">Swish!</string>
     <string name="empty_in_progress_body">There are no in progress orders right now. Keep up the great work!</string>
 
+    <string name="bopis_pick_uph">bopis pick uph</string>
+    <string name="units_worked_in_time">units worked in time</string>
+    <string name="productivity">productivity</string>
+    <string name="fill_rate">fill rate</string>
+    <string name="mm_ss">MM:SS</string>
+    <string name="updated_every_15_minutes">Updated every 15 minutes. This data may not represent final performance results.</string>
 </resources>

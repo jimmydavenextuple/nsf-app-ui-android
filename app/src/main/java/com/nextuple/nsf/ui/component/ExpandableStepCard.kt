@@ -1,4 +1,4 @@
-package com.nextuple.nsf.ui.screen.prep
+package com.nextuple.nsf.ui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -81,7 +81,7 @@ fun ExpandableStepCard(
 					Icon(
 						modifier = Modifier.padding(start = 6.dp),
 						imageVector = ImageVector.vectorResource(id = R.drawable.ic_check),
-						tint = BrandColor.GREEN_500,
+						tint = BrandColor.BLUE_300_NT,
 						contentDescription = "Completed Check"
 					)
 				}

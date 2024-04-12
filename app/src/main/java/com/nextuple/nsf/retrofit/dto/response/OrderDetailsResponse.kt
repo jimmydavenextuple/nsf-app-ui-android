@@ -4,6 +4,9 @@ import com.nextuple.nsf.retrofit.dto.StageTaskContainer
 import com.nextuple.nsf.retrofit.dto.Status
 
 data class OrderDetailsResponse(
+    /*
+        TODO: Revisit mapping once FIT 2.0 is fully ready
+     */
 	val orderNumber: String? = null,
     val orderStatusText: String? = null,
 
@@ -15,6 +18,7 @@ data class OrderDetailsResponse(
     val packedOnDate: String? = null,
     val packedByUserId: String? = null,
     val stagedByUserId: String? = null,
+    val dispensedByUserId: String? = null,
 
     val pickupByDate: String? = null,
 	// If count <=0 show EXTEND_PICKUP

@@ -3,8 +3,10 @@ syntax = "proto3";
 option java_package = "com.nextuple.nsf";
 option java_multiple_files = true;
 
+import "google/protobuf/timestamp.proto";
 message UserData {
     string firstName = 1;
     string lastName = 2;
     string dks = 3;
+    google.protobuf.Timestamp lastActiveTime = 4;
 }

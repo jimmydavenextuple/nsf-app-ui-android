@@ -3,6 +3,7 @@ package com.nextuple.nsf.ui.screen.search
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,9 +28,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -60,8 +65,10 @@ fun SearchResultsScreen(
 	orderResults: List<OrderDetailsResponse>?,
 	getOrderDetails: (String) -> Unit,
 	getOrderDetailsCompletion: () -> Unit,
-	scanManager: ScanManager = NoOpScanManager()
+    scanManager: ScanManager = NoOpScanManager(),
+    newSearch: (String) -> Unit
 ) {
+	val focusManager = LocalFocusManager.current
 	var searchInputText by remember { mutableStateOf(searchInput) }
 	var lastSearch by remember { mutableStateOf("") }
 
@@ -75,12 +82,21 @@ fun SearchResultsScreen(
 			searchInputText = data
 			getOrders(data)
 			lastSearch = data
+			newSearch(lastSearch)
 		}
 	}
 
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
+			.pointerInput(Unit) {
+				detectTapGestures(
+					onTap = {
+						focusManager.clearFocus()
+						searchInputText = lastSearch
+					}
+				)
+			}
 			.background(BrandColor.GRAY_100)
 	) {
 		SearchBar(
@@ -88,8 +104,9 @@ fun SearchResultsScreen(
 			searchInput = searchInputText,
 			onValueChange = { searchInputText = it },
 			getOrders = {
-				getOrders(searchInputText)
 				lastSearch = searchInputText
+				getOrders(searchInputText)
+				newSearch(lastSearch)
 			}
 		)
 
@@ -136,6 +153,7 @@ private fun SearchBar(
 	val keyboardController = LocalSoftwareKeyboardController.current
 
 	var isFocused by remember { mutableStateOf(false) }
+	val focusRequester = remember { FocusRequester() }
 
 	val borderColor = Color(0xFFD5D6D5)
 	val focusedColor = BrandColor.GREEN_500
@@ -152,6 +170,7 @@ private fun SearchBar(
 		OmniTextField(
 			modifier = Modifier
 				.padding(start = 8.dp, end = 8.dp, top = 16.dp)
+				.focusRequester(focusRequester)
 				.onFocusChanged {
 					isFocused = it.isFocused
 				},
@@ -164,7 +183,11 @@ private fun SearchBar(
 				getOrders()
 			}),
 			borderStroke = borderStroke,
-			textFieldShape = RoundedCornerShape(8.dp)
+			textFieldShape = RoundedCornerShape(8.dp),
+			onClear = {
+				isFocused = true
+				focusRequester.requestFocus()
+			}
 		)
 
 		if (isFocused) {
@@ -185,7 +208,7 @@ private fun SearchBar(
 			}
 		}
 
-		Divider(modifier = Modifier.padding(top = 8.dp), thickness = 1.dp, color = borderColor)
+		HorizontalDivider(modifier = Modifier.padding(top = 8.dp), thickness = 1.dp, color = borderColor)
 	}
 }
 
@@ -274,7 +297,8 @@ private fun PreviewSearchResultsScreenLoading() {
 		getOrders = {},
 		orderResults = listOf(),
 		getOrderDetails = {},
-		getOrderDetailsCompletion = {}
+		getOrderDetailsCompletion = {},
+		newSearch = {}
 	)
 }
 
@@ -287,6 +311,7 @@ private fun PreviewSearchResultsScreenNoResults() {
 		getOrders = {},
 		orderResults = listOf(),
 		getOrderDetails = {},
-		getOrderDetailsCompletion = {}
+		getOrderDetailsCompletion = {},
+		newSearch = {}
 	)
 }

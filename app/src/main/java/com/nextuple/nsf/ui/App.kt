@@ -20,12 +20,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.get
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.response.athleteFullName
@@ -46,8 +46,6 @@ import com.nextuple.nsf.ui.screen.order.OrderPickupScreen
 import com.nextuple.nsf.ui.screen.order.OrderScreen
 import com.nextuple.nsf.ui.screen.pick.PickDetailsScreen
 import com.nextuple.nsf.ui.screen.pick.PickScreen
-import com.nextuple.nsf.ui.screen.prep.PackType
-import com.nextuple.nsf.ui.screen.prep.PrepOrderScreen
 import com.nextuple.nsf.ui.screen.prep.PrepScreen
 import com.nextuple.nsf.ui.screen.search.SearchResultsScreen
 import com.nextuple.nsf.ui.screen.settings.SettingsScreen
@@ -55,13 +53,12 @@ import com.nextuple.nsf.ui.state.ConfigViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
-import com.nextuple.nsf.ui.state.PrepViewModel
-import com.nextuple.nsf.ui.state.PrinterName
 import com.nextuple.nsf.ui.state.SettingsViewModel
 import com.nextuple.nsf.ui.state.UserViewModel
 import com.nextuple.nsf.ui.state.UserViewModel.ViewState
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.Haptics
+import com.nextuple.nsf.ui.util.PrinterName
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.StringUtils
 
@@ -99,7 +96,6 @@ fun App(
 	infoVM: InfoViewModel,
 	userVM: UserViewModel,
 	pickVM: PickViewModel,
-	prepVM: PrepViewModel,
 	orderVM: OrderViewModel,
 	settingsVM: SettingsViewModel,
 	configVM: ConfigViewModel,
@@ -110,6 +106,7 @@ fun App(
 ) {
 	val navCtrl = rememberNavController()
 	val backStackEntry by navCtrl.currentBackStackEntryAsState()
+	var lastTabNavRoute: String? by remember { mutableStateOf(null) }
 	var showToolbarSearch by remember { mutableStateOf(false) }
 	var deepLinkUri by remember { mutableStateOf(intentData) }
 	val user by userVM.user.collectAsStateWithLifecycle(User())
@@ -118,19 +115,29 @@ fun App(
 		infoVM.getStoreOverview()
 		infoVM.getDeclineCodes()
 	}
-	val onRefreshApp: (route: String) -> Unit = { route ->
+	val onTabNav: (route: String) -> Unit = { route ->
 		onRefreshData()
+		if (route.startsWith(Screen.ORDERS.route) &&
+			!lastTabNavRoute.orEmpty().startsWith(Screen.ORDERS.route) &&
+			!route.contains("filter=")
+		) {
+			orderVM.resetFilters()
+		}
+		lastTabNavRoute = route
 		navCtrl.navigate(route) {
-			popUpTo(navCtrl.graph.findStartDestination().id) {
+			popUpTo(navCtrl.graph[Screen.PICK.route].id) {
 				saveState = true
 			}
 			launchSingleTop = true
 		}
 	}
 
+	if (settingsVM.bypassPrinter) {
+		Toast.makeText(LocalContext.current, "Printer Bypass Enabled - Skipping print", Toast.LENGTH_LONG).show()
+	}
 	Scaffold(
 		topBar = {
-			if (user.isLoggedIn()) {
+			if (userVM.isLoggedIn()) {
 				val context = LocalContext.current
 
 				AppTopBar(
@@ -179,7 +186,7 @@ fun App(
 			NavHost(
 				modifier = Modifier.padding(paddingValues),
 				navController = navCtrl,
-				startDestination = getStartDestination(user.isLoggedIn(), deepLinkUri)
+				startDestination = getStartDestination(userVM.isLoggedIn(), deepLinkUri)
 			) {
 				composableForLogin(
 					navCtrl = navCtrl,
@@ -208,19 +215,12 @@ fun App(
 					pickVM = pickVM
 				)
 				composableForPrep(
-					navCtrl = navCtrl,
-					infoVM = infoVM,
-					prepVM = prepVM,
-					scanManager = scanManager,
-					onRefreshData = onRefreshData
-				)
-				composableForPrepOrder(
-					navCtrl = navCtrl,
-					settingsVM = settingsVM,
-					prepVM = prepVM,
 					configVM = configVM,
+					infoVM = infoVM,
+					settingsVM = settingsVM,
 					scanManager = scanManager,
-					infoVM = infoVM
+					onTabNav = onTabNav,
+					onRefreshData = onRefreshData
 				)
 				composableForOrders(
 					navCtrl = navCtrl,
@@ -262,13 +262,13 @@ fun App(
 			}
 		},
 		bottomBar = {
-			if (user.isLoggedIn()) {
+			if (userVM.isLoggedIn()) {
 				AppNavBar(
 					items = NAV_ITEMS,
 					isSelected = { route ->
 						isRouteInEntry(route, backStackEntry)
 					},
-					onSelect = onRefreshApp,
+					onSelect = onTabNav,
 					tasksUnassigned = listOf(
 						0, // home tab
 						infoVM.pickTasksUnassigned, // pick tab
@@ -431,71 +431,30 @@ private fun NavGraphBuilder.composableForPickDetails(
 }
 
 private fun NavGraphBuilder.composableForPrep(
-	navCtrl: NavController,
+    configVM: ConfigViewModel,
 	infoVM: InfoViewModel,
-	prepVM: PrepViewModel,
+    settingsVM: SettingsViewModel,
 	scanManager: ScanManager,
+    onTabNav: (route: String) -> Unit,
 	onRefreshData: () -> Unit
 ) {
-	composable(Screen.PREP.route) {
+	composable("${Screen.PREP.route}?frToPack={frToPack}") { navBackStackEntry ->
+		val frToPack = navBackStackEntry.arguments?.getString("frToPack")?.ifEmpty { null }
 		PrepScreen(
-			currentPrepStage = prepVM.currentPrepStage.value,
-			navigateToPrepOrder = {
-				val frNo = prepVM.stageTask?.fulfillmentRequestNumber?.ifEmpty { null }
-					?: prepVM.packTask?.fulfillmentRequestNumber?.ifEmpty { null }
+			configVM = configVM,
+			settingsVM = settingsVM,
+			frToPack = frToPack,
 
-				if (frNo != null) {
-					navCtrl.navigate("${Screen.PREP_ORDER.route}/${PackType.ORDER}/$frNo") {
-						popUpTo(Screen.HOME.route)
-					}
-				}
-			},
 			numPackTasks = infoVM.prepTasksUnassigned,
 			scanManager = scanManager,
-			onScanGear = { upc ->
-				navCtrl.navigate("${Screen.PREP_ORDER.route}/${PackType.GEAR}/$upc") {
-					popUpTo(Screen.HOME.route)
-				}
-			},
 			onClickPackByOrder = {
-				navCtrl.navigate("${Screen.ORDERS.route}?filter=PACK") {
-					popUpTo(Screen.HOME.route)
-				}
+				onTabNav("${Screen.ORDERS.route}?filter=PACK")
 			},
-			resetScreen = {
-				onRefreshData()
-			}
+			resetScreen = onRefreshData
 		)
 	}
 }
 
-private fun NavGraphBuilder.composableForPrepOrder(
-	navCtrl: NavController,
-	settingsVM: SettingsViewModel,
-	prepVM: PrepViewModel,
-	configVM: ConfigViewModel,
-	infoVM: InfoViewModel,
-	scanManager: ScanManager
-) {
-	composable("${Screen.PREP_ORDER.route}/{packType}/{data}") { navBackStackEntry ->
-		val packType = navBackStackEntry.arguments?.getString("packType")?.let {
-			PackType.valueOf(it.trim().uppercase())
-		}!!
-		val data = navBackStackEntry.arguments?.getString("data") ?: ""
-
-		PrepOrderScreen(
-			scanManager = scanManager,
-			settingsVM = settingsVM,
-			infoVM = infoVM,
-			configVM = configVM,
-			navCtrl = navCtrl,
-			packType = packType,
-			data = data
-		) {
-			prepVM.resetPrepStage()
-		}
-	}
-}
 
 private fun NavGraphBuilder.composableForOrders(
 	navCtrl: NavController,
@@ -553,8 +512,6 @@ private fun NavGraphBuilder.composableForOrderDetails(
 		val orderDetailsRes = orderVM.orderDetailResponse
 		val athleteDetail = orderDetailsRes?.athleteDetail
 
-		// TODO: this is a quick fix until the vm gets refactored
-		settingsVM.resetHoldSlipPrintState()
 
 		// TODO: Cleanup params. Order detail response is already being passed in along with its individual properties
 		OrderDetailsScreen(
@@ -569,7 +526,9 @@ private fun NavGraphBuilder.composableForOrderDetails(
 			expectedDate = orderVM.expectedDate,
 			receivedDate = orderVM.receivedDate,
 			packedOnDate = orderVM.packedOnDate,
+			pickedUpOnDate = orderVM.pickedUpOnDate,
 			holdingLocation = orderVM.orderDetailResponse?.fulfillmentRequestDetail?.containers?.firstOrNull()?.holdingLocation ?: "",
+			holdSlipZpl = orderVM.holdSlipZpl,
 			holdingAreas = configVM.getHoldingLocations(),
 			declineModalOptions = infoVM.declineCodes?.pickupDeclineCodes,
 			onStartPickup = { fulfillmentRequestNumber ->
@@ -585,18 +544,12 @@ private fun NavGraphBuilder.composableForOrderDetails(
 				navCtrl.navigate(Screen.ORDERS_PICKUP.route)
 				orderVM.resetStarPickupState()
 			},
-			holdSlipState = orderVM.holdSlipState,
+			holdSlipState = orderVM.getHoldSlipState,
+			resetGetHoldSlipState = orderVM::resetGetHoldSlipState,
 			onPrintHoldSlip = { fulfillmentRequestNumber ->
 				orderVM.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)
 			},
-			printHoldSlipState = settingsVM.holdSlipPrintState,
-			onPrintHoldSlipSuccessCallBack = {
-				orderVM.resetHoldSlipState()
-				settingsVM.printBOPISHoldSlip(orderVM.holdSlipZpl!!)
-			},
-			onResetPrintHoldSlip = {
-				settingsVM.resetHoldSlipPrintState()
-			},
+			bypassPrinter = settingsVM.bypassPrinter,
 			ipPrefix = settingsVM.ipPrefix,
 			printer = settingsVM.findPrinter(PrinterName.BOPIS),
 			printerConnectionState = settingsVM.printerConnectionState,
@@ -626,7 +579,8 @@ private fun NavGraphBuilder.composableForOrderDetails(
 			scanLocationState = orderVM.scanLocationState,
 			resetScanLocationState = orderVM::resetScanLocationState,
 			onPackOrder = { frNo ->
-				navCtrl.navigate("${Screen.PREP_ORDER.route}/${PackType.ORDER}/$frNo") {
+
+				navCtrl.navigate("${Screen.PREP.route}?frToPack=$frNo") {
 					popUpTo(Screen.HOME.route)
 				}
 			},
@@ -635,6 +589,7 @@ private fun NavGraphBuilder.composableForOrderDetails(
 	}
 }
 
+// todo: screen scope OrderViewModel
 private fun NavGraphBuilder.composableForOrderPickup(
 	navCtrl: NavController,
 	orderVM: OrderViewModel,
@@ -649,6 +604,7 @@ private fun NavGraphBuilder.composableForOrderPickup(
 			athleteDetail = orderVM.orderDetailResponse?.athleteDetail,
 			checkInDetail = orderVM.orderDetailResponse?.athleteCheckInDetail,
 			frDetail = orderVM.orderDetailResponse?.fulfillmentRequestDetail,
+			holdSlipZpl = orderVM.holdSlipZpl,
 			onOrderPickupClicked = { taskId ->
 				orderVM.completePickupTask(taskId = taskId)
 			},
@@ -664,22 +620,14 @@ private fun NavGraphBuilder.composableForOrderPickup(
 			onPrintHoldSlip = { fulfillmentRequestNumber ->
 				orderVM.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)
 			},
-			printHoldSlipState = settingsVM.holdSlipPrintState,
-			onPrintHoldSlipSuccessCallBack = {
-				orderVM.resetHoldSlipState()
-				settingsVM.printBOPISHoldSlip(orderVM.holdSlipZpl!!)
-			},
-			holdSlipState = orderVM.holdSlipState,
-			onResetPrintHoldSlip = {
-				settingsVM.resetHoldSlipPrintState()
-			},
+			resetGetHoldSlipState = orderVM::resetGetHoldSlipState,
+			holdSlipState = orderVM.getHoldSlipState,
+			bypassPrinter = settingsVM.bypassPrinter,
 			ipPrefix = settingsVM.ipPrefix,
 			printer = settingsVM.findPrinter(PrinterName.BOPIS),
 			printerConnectionState = settingsVM.printerConnectionState,
 			onConnectPrinter = settingsVM::connectPrinter,
-			onResetPrinter = {
-				settingsVM.resetConnectionState()
-			}
+			onResetPrinter = settingsVM::resetConnectionState
 		)
 	}
 }
@@ -738,7 +686,11 @@ private fun NavGraphBuilder.composableForSearchResults(
 				navCtrl.navigate(Screen.ORDERS_DETAILS.route)
 				orderVM.resetOrderDetailsState()
 			},
-			scanManager = scanManager
+			scanManager = scanManager,
+			newSearch = {
+				navCtrl.popBackStack()
+				navCtrl.navigate("${Screen.SEARCH_RESULTS.route}?$it")
+			}
 		)
 	}
 }

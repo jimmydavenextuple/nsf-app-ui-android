@@ -55,7 +55,8 @@ fun OmniTextField(
     borderStroke: BorderStroke = BorderStroke(
 		width = 0.5.dp,
 		color = BrandColor.WHITE
-	)
+	),
+    onClear: () -> Unit = {}
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 
@@ -140,7 +141,10 @@ fun OmniTextField(
 						.testTag("OmniTextFieldClear")
 						.padding(end = 12.dp)
 						.size(16.dp),
-					onClick = { onValueChange("") }
+					onClick = {
+						onClear.invoke()
+						onValueChange("")
+					}
 				) {
 					Icon(
 						imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
@@ -160,7 +164,8 @@ fun PreviewOmniTextField() {
 		icon = ImageVector.vectorResource(id = R.drawable.ic_search),
 		iconTint = BrandColor.PINK_NT,
 		fieldValue = "Roosevelt",
-		onValueChange = {}
+		onValueChange = {},
+		onClear = {}
 	)
 }
 
@@ -172,7 +177,8 @@ fun PreviewOmniTextFieldHint() {
 		iconTint = BrandColor.PINK_NT,
 		fieldValue = "",
 		hintText = stringResource(id = R.string.search_hint).uppercase(),
-		onValueChange = {}
+		onValueChange = {},
+		onClear = {}
 	)
 }
 
@@ -182,6 +188,7 @@ fun PreviewOmniTextFieldSimple() {
 	OmniTextField(
 		fieldValue = "Roosevelt",
 		hintText = stringResource(id = R.string.search_hint).uppercase(),
-		onValueChange = {}
+		onValueChange = {},
+		onClear = {}
 	)
 }

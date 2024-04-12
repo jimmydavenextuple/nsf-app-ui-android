@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.response.AthleteDetail
 import com.nextuple.nsf.retrofit.dto.response.DeclineCode
@@ -39,12 +40,13 @@ import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.component.EditLocation
 import com.nextuple.nsf.ui.component.PrinterModal
 import com.nextuple.nsf.ui.state.CancelReasonData
-import com.nextuple.nsf.ui.state.Printer
+import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.FRStatus
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.Printer
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.OrderStatus
 import com.nextuple.nsf.util.SubFulfillmentType
@@ -58,6 +60,7 @@ const val BACK = "BACK"
 
 @Composable
 fun OrderDetailsScreen(
+    printViewModel: PrintViewModel = hiltViewModel(),
 	viewState: GenericViewState = GenericViewState.Idle,
 	startPickupViewState: GenericViewState = GenericViewState.Idle,
 	athleteName: String,
@@ -68,9 +71,11 @@ fun OrderDetailsScreen(
 	expectedDate: String,
 	receivedDate: String,
 	packedOnDate: String,
+    pickedUpOnDate: String,
 	holdingLocation: String,
 	holdingAreas: List<String>,
 	orderDetailsResponse: OrderDetailsResponse? = null,
+    holdSlipZpl: MutableList<String>?,
 	declineModalOptions: List<DeclineCode>?,
 	onStartPickup: (String) -> Unit,
 	onPickupExtend: (String) -> Unit,
@@ -80,10 +85,9 @@ fun OrderDetailsScreen(
 	printer: Printer,
 	printerConnectionState: GenericViewState = GenericViewState.Idle,
 	holdSlipState: GenericViewState = GenericViewState.Idle,
-	printHoldSlipState: GenericViewState = GenericViewState.Idle,
+    bypassPrinter: Boolean,
+    resetGetHoldSlipState: () -> Unit,
 	onPrintHoldSlip: (String) -> Unit,
-	onPrintHoldSlipSuccessCallBack: () -> Unit,
-	onResetPrintHoldSlip: () -> Unit,
 	onConnectPrinter: (Printer, String) -> Unit,
 	onResetPrinter: () -> Unit,
 	onCancelOrder: (String, DeclineCode, Boolean) -> Unit,
@@ -176,11 +180,13 @@ fun OrderDetailsScreen(
 	val pickedBy = orderDetailsResponse?.pickedByUserId?.ifEmpty { null }
 	val packedBy = orderDetailsResponse?.packedByUserId?.ifEmpty { null }
 	val stagedBy = orderDetailsResponse?.stagedByUserId?.ifEmpty { null }
+	val dispensedBy = orderDetailsResponse?.dispensedByUserId?.ifEmpty { null }
 	val teammateInfo = when (orderStatus) {
 		OrderStatus.PACK -> pickedBy?.let { stringResource(R.string.picked_by) to it }
 		OrderStatus.STAGE -> packedBy?.let { stringResource(R.string.packed_by) to it }
 		OrderStatus.BEING_PACKED -> packedBy?.let { stringResource(R.string.packer) to it }
 		OrderStatus.BEING_STAGED -> stagedBy?.let { stringResource(R.string.stager) to it }
+		OrderStatus.COMPLETED -> dispensedBy?.let { stringResource(R.string.dispenser) to it }
 		else -> stagedBy?.let { stringResource(R.string.staged_by) to it }
 	}
 
@@ -289,7 +295,10 @@ fun OrderDetailsScreen(
 						add(stringResource(id = R.string.packed_on) to packedOnDate)
 					}
 				}
-				if (currentHoldingLocation.isNotEmpty()) {
+				if (pickedUpOnDate.isNotEmpty()) {
+					add(stringResource(id = R.string.picked_up_on) to pickedUpOnDate)
+				}
+				if (currentHoldingLocation.isNotEmpty() && !OrderStatus.isCompleteStatus(orderStatus)) {
 					add(stringResource(id = R.string.location) to currentHoldingLocation)
 				}
 				if (teammateInfo != null) {
@@ -382,8 +391,10 @@ fun OrderDetailsScreen(
 		onStartPickupCompletion()
 	}
 
+	// Todo: and refactor. Same as OrderPickupScreen
 	if (holdSlipState == GenericViewState.Success) {
-		onPrintHoldSlipSuccessCallBack.invoke()
+		resetGetHoldSlipState()
+		printViewModel.printHoldSlip(holdSlipZpl!!, printer, bypassPrinter)
 	} else if (holdSlipState == GenericViewState.Failure) {
 		Toast.makeText(
 			context,
@@ -392,17 +403,13 @@ fun OrderDetailsScreen(
 		).show()
 	}
 
-	if (printHoldSlipState == GenericViewState.Success) {
-		Toast.makeText(
-			context,
-			stringResource(R.string.hold_slip_print_success),
-			Toast.LENGTH_SHORT
-		).show()
-		onResetPrintHoldSlip()
-	} else if (printHoldSlipState == GenericViewState.Failure) {
+	if (printViewModel.holdSlipPrintState == GenericViewState.Success) {
+		Toast.makeText(context, stringResource(R.string.hold_slip_print_success), Toast.LENGTH_SHORT).show()
+		printViewModel.resetHoldSlipPrintState()
+	} else if (printViewModel.holdSlipPrintState == GenericViewState.Failure) {
 		Toast.makeText(context, stringResource(R.string.hold_slip_print_error), Toast.LENGTH_SHORT)
 			.show()
-		onResetPrintHoldSlip()
+		printViewModel.resetHoldSlipPrintState()
 	}
 
 	if (cancelReasonData.state == GenericViewState.Failure) {
@@ -587,6 +594,7 @@ fun OrderDetailsPreview() {
 		expectedDate = "",
 		receivedDate = "",
 		packedOnDate = "",
+		pickedUpOnDate = "",
 		holdingLocation = "Main Holding Area Bin 7",
 		orderDetailsResponse = OrderDetailsResponse(
 			orderNumber = "10000023",
@@ -615,10 +623,12 @@ fun OrderDetailsPreview() {
 		onPickupRemoveCheckIn = {},
 		onStartPickupCompletion = {},
 		ipPrefix = "",
-		printer = Printer(printerName = "BOPIS", ipAddress = "", connectionStatus = false),
+		printer = Printer(
+			printerName = "BOPIS",
+			ipAddress = "",
+			connectionStatus = false
+		),
 		onPrintHoldSlip = {},
-		onPrintHoldSlipSuccessCallBack = {},
-		onResetPrintHoldSlip = {},
 		onConnectPrinter = { _, _ -> },
 		onResetPrinter = {},
 		onCancelOrder = { _, _, _ -> },
@@ -629,7 +639,10 @@ fun OrderDetailsPreview() {
 		onLocationChange = { _, _ -> },
 		onPackOrder = {},
 		scanManager = null,
-		holdingAreas = emptyList()
+		holdingAreas = emptyList(),
+		resetGetHoldSlipState = {},
+		holdSlipZpl = mutableListOf(),
+		bypassPrinter = false
 	)
 }
 

@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -17,48 +16,48 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.nextuple.nsf.MainActivity;
 import com.nextuple.nsf.R;
-import com.nextuple.nsf.service.LogService;
-
-import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    private final LogService logService;
 
-    public MyFirebaseMessagingService(LogService logService) {
-        this.logService = logService;
-    }
+
 
     @Override
     public void onNewToken(@NonNull String token) {
-        logService.trackEvent("ReceivedNewToken", Map.of("NewToken", token));
+        Log.i("ReceivedNewToken: {}", token);
 
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // FCM registration token to your app server.
-        sendRegistrationToServer(token, logService);
+        sendRegistrationToServer(token);
     }
 
 
-    public static void sendRegistrationToServer(String token, LogService logService) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("/fcm_tokens");
-        String user = "User_NT3"; // Replace with the user's identifier
+    public static void sendRegistrationToServer(String token) {
+//        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("/fcm_tokens");
+//        String user = "User_NT3"; // Replace with the user's identifier
+//
+//        // Write the FCM registration token to the database under the user's ID.
+//        databaseReference.child(user).setValue(token)
+//                .addOnSuccessListener(unused -> logService.trackEvent(
+//                        "TokenSavedInFirebaseDb",
+//                        Map.of("token", token)))
+//                .addOnFailureListener(e -> logService.trackError(
+//                        "TokenNotSaveInFirebaseDb",
+//                        e,
+//                        Map.of("token", token)));
 
-        // Write the FCM registration token to the database under the user's ID.
-        databaseReference.child(user).setValue(token)
-                .addOnSuccessListener(unused -> logService.trackEvent(
-                        "TokenSavedInFirebaseDb",
-                        Map.of("token", token)))
-                .addOnFailureListener(e -> logService.trackError(
-                        "TokenNotSaveInFirebaseDb",
-                        e,
-                        Map.of("token", token)));
+        try {
+            FirebaseMessaging.getInstance().subscribeToTopic("1234_notification_topic");
+            Log.i("DeviceRegistered", "Done");
+        } catch (Exception ex) {
+            Log.e("Exceptions while subscribing: {}", token, ex);;
+        }
 
     }
 
@@ -67,13 +66,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             RemoteMessage.Notification notification = remoteMessage.getNotification();
-            logService.trackEvent("MessageReceived",
-                    Map.of("MessageId", remoteMessage.getMessageId()==null?"":remoteMessage.getMessageId(),
-                            "Title", notification.getTitle()==null?"":notification.getTitle(),
-                            "From", remoteMessage.getFrom()==null?"":remoteMessage.getFrom(),
-                            "Body", notification.getBody()==null?"":notification.getBody()
-                    )
-            );
+//            logService.trackEvent("MessageReceived",
+//                    Map.of("MessageId", remoteMessage.getMessageId()==null?"":remoteMessage.getMessageId(),
+//                            "Title", notification.getTitle()==null?"":notification.getTitle(),
+//                            "From", remoteMessage.getFrom()==null?"":remoteMessage.getFrom(),
+//                            "Body", notification.getBody()==null?"":notification.getBody()
+//                    )
+//            );
             // Also if you intend on generating your own notifications as a result of a received FCM
             // message, here is where that should be initiated. See sendNotification method below.
             sendNotification(remoteMessage.getFrom(), remoteMessage.getNotification().getBody());

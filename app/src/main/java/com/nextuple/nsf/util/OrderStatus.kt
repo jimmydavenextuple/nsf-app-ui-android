@@ -15,10 +15,10 @@ enum class OrderStatus(
 ) {
 	READY(statusText = "Ready", statusColor = BrandColor.BLUE_300_NT, iconDrawable = R.drawable.ic_check),
 	COMPLETED(statusText = "Completed", statusColor = BrandColor.BLUE_300_NT, iconDrawable = R.drawable.ic_check),
-	EXTENDED(statusText = "Extended", statusColor = BrandColor.BLUE_300_NT, iconDrawable = R.drawable.ic_status_plus),
+	EXTENDED(statusText = "Extended", statusColor = BrandColor.BLUE_300_NT, iconDrawable = R.drawable.ic_extended),
 
-	CANCELED(statusText = "Canceled", statusColor = BrandColor.GRAY_650, iconDrawable = R.drawable.ic_minus),
-	DECLINED(statusText = "Declined", statusColor = BrandColor.GRAY_650, iconDrawable = R.drawable.ic_minus),
+	CANCELED(statusText = "Canceled", statusColor = BrandColor.GRAY_650, iconDrawable = R.drawable.ic_canceled),
+	DECLINED(statusText = "Declined", statusColor = BrandColor.GRAY_650, iconDrawable = R.drawable.ic_declined_cart),
 	AGED(statusText = "Aged", statusColor = BrandColor.GRAY_650, iconDrawable = R.drawable.ic_aged),
 
 	INCOMING(statusText = "Incoming", statusColor = BrandColor.BLUE_300_NT, iconDrawable = R.drawable.ic_incoming),

@@ -7,7 +7,7 @@ import com.nextuple.nsf.retrofit.dto.ApiResponse
 import com.nextuple.nsf.retrofit.dto.LoginData
 import com.nextuple.nsf.retrofit.dto.LoginRequest
 import com.nextuple.nsf.service.LogService.Companion.EVENT_LOGOUT
-import com.nextuple.nsf.service.dto.Brand.NT
+import com.nextuple.nsf.service.dto.Brand.NT_BRAND_A
 import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.dto.Store
 import io.mockk.MockKAnnotations
@@ -56,7 +56,7 @@ class UserServiceTest {
 		val dks = "dks123"
 		val firstName = "firstname"
 		val lastName = "lastName"
-		val store = Store(id = "456", brand = NT)
+		val store = Store(id = "456", brand = NT_BRAND_A)
 
 		every { runBlocking { userApi.login(any()) } } returns ApiResponse.Success(
 			data = LoginData(firstName = firstName, lastName = lastName)
@@ -76,7 +76,7 @@ class UserServiceTest {
 	@Test
 	fun `login should return general error on api success response having null data`() = runTest {
 		every { runBlocking { userApi.login(any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = NT_BRAND_A)
 
 		val res = service.login(dks = "anyDks")
 		advanceUntilIdle()

@@ -5,13 +5,13 @@ import com.nextuple.nsf.retrofit.api.PickApi
 import com.nextuple.nsf.retrofit.dto.DeclineItemRequest
 import com.nextuple.nsf.retrofit.dto.PickItemRequest
 import com.nextuple.nsf.retrofit.dto.PickTask
-import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_DECLINE
 import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_DECLINE_RES
 import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_ITEM
 import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_ITEM_RES
 import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_START
 import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_START_RES
+import com.nextuple.nsf.service.dto.Result
 
 class PickService(
     private val pickApi: PickApi,

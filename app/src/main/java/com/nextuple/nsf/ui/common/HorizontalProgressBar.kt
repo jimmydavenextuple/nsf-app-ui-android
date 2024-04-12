@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,12 +34,14 @@ import com.nextuple.nsf.ui.theme.FontFamily
 fun HorizontalProgressBar(
 	modifier: Modifier = Modifier,
 	title: String,
-	workedCount: Int,
-	totalCount: Int
+	workedCount: Int?,
+	totalCount: Int?,
+	percent: String? = null,
+	completedColor: Color = BrandColor.BLUE_300_NT
 ) {
 	var progress by remember { mutableStateOf(0f) }
 
-	progress = workedCount.toFloat() / totalCount.toFloat()
+	progress = percent?.toFloat() ?: ((workedCount?.toFloat() ?: 1f) / (totalCount?.toFloat() ?: 1f))
 
 	Row(
 		modifier = modifier,
@@ -57,7 +60,7 @@ fun HorizontalProgressBar(
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
-				.height(17.dp),
+				.fillMaxHeight(),
 			contentAlignment = Alignment.CenterStart
 		) {
 			// Background of the bar
@@ -72,7 +75,7 @@ fun HorizontalProgressBar(
 						modifier = Modifier
 							.testTag("HorizontalProgressBar_Progress_Empty")
 							.fillMaxHeight()
-							.padding(start = 8.dp),
+							.padding(top = 2.dp, start = 8.dp),
 						text = "0/$totalCount",
 						textAlign = TextAlign.Center,
 						color = BrandColor.BLACK,
@@ -89,15 +92,15 @@ fun HorizontalProgressBar(
 					.fillMaxWidth(progress)
 					.fillMaxHeight()
 					.clip(RoundedCornerShape(8.dp))
-					.background(BrandColor.BLUE_300_NT)
+					.background(completedColor)
 					.animateContentSize()
 			) {
-				if (workedCount > 0) {
+				if ((workedCount ?: 0) > 0) {
 					Text(
 						modifier = Modifier
 							.testTag("HorizontalProgressBar_Progress")
 							.fillMaxHeight()
-							.padding(end = 8.dp)
+							.padding(top = 2.dp, end = 8.dp)
 							.align(Alignment.CenterEnd),
 						text = "$workedCount/$totalCount",
 						textAlign = TextAlign.Center,
@@ -117,7 +120,7 @@ fun HorizontalProgressBar(
 @Composable
 fun HorizontalProgressBarEmptyPreview() {
 	HorizontalProgressBar(
-		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
+		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp).height(17.dp),
 		title = "Units",
 		workedCount = 0,
 		totalCount = 5
@@ -128,7 +131,7 @@ fun HorizontalProgressBarEmptyPreview() {
 @Composable
 fun HorizontalProgressBarPartialPreview() {
 	HorizontalProgressBar(
-		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
+		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp).height(17.dp),
 		title = "Units",
 		workedCount = 3,
 		totalCount = 5
@@ -139,7 +142,7 @@ fun HorizontalProgressBarPartialPreview() {
 @Composable
 fun HorizontalProgressBarCompletePreview() {
 	HorizontalProgressBar(
-		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
+		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp).height(17.dp),
 		title = "Units",
 		workedCount = 5,
 		totalCount = 5

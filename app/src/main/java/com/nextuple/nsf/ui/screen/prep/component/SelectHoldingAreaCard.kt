@@ -1,4 +1,4 @@
-package com.nextuple.nsf.ui.screen.prep
+package com.nextuple.nsf.ui.screen.prep.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.TertiaryButton
+import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 
@@ -110,7 +111,7 @@ fun SelectHoldingAreaCard(
 								interactionSource = interactionSource,
 								trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
 								colors = OutlinedTextFieldDefaults.colors(
-									focusedBorderColor = BrandColor.PINK_NT
+									focusedBorderColor = BrandColor.ORANGE_700
 								),
 								contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
 									start = 12.dp,

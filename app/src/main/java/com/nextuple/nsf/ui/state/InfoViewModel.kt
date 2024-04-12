@@ -6,11 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.nextuple.nsf.service.dto.Result
 import androidx.lifecycle.viewModelScope
 import com.nextuple.nsf.retrofit.dto.response.GetDeclineCodesResponse
 import com.nextuple.nsf.retrofit.dto.response.StoreOverviewResponse
 import com.nextuple.nsf.service.InfoService
+import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.ui.util.GenericViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -59,7 +59,6 @@ open class InfoViewModel @Inject constructor(
 
 	private var callbacks: List<(StoreOverviewResponse?) -> Unit> = emptyList()
 
-	var notificationRoute: String? by mutableStateOf(null)
 
 	fun setOnStoreOverviewCallbacks(vararg callbacks: (StoreOverviewResponse?) -> Unit) {
 		this.callbacks = callbacks.toList()
@@ -110,9 +109,4 @@ open class InfoViewModel @Inject constructor(
 		storeOverview = null
 	}
 
-	sealed class PrepStage {
-		data object Landing : PrepStage()
-		data object PrepOrder : PrepStage()
-		data object StageOrder : PrepStage()
-	}
 }

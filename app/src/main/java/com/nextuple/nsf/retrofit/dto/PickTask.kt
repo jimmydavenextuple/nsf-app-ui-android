@@ -19,6 +19,7 @@ data class PickTask(
 data class PickTaskItem(
     val sku: String,
     val upcs: List<String>,
+    val style: String?,
     val primaryAttr: ProductAttribute? = null,
     val secondaryAttr: ProductAttribute? = null,
     val tertiaryAttr: ProductAttribute? = null,

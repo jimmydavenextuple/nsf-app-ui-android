@@ -1,50 +1,24 @@
 package com.nextuple.nsf.ui.screen.prep
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.nextuple.nsf.BuildConfig
-import com.nextuple.nsf.R
-import com.nextuple.nsf.ui.common.Tab
-import com.nextuple.nsf.ui.component.EmptyStateScreen
-import com.nextuple.nsf.ui.component.EnterUpcDialog
-import com.nextuple.nsf.ui.state.InfoViewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nextuple.nsf.ui.state.ConfigViewModel
+import com.nextuple.nsf.ui.state.PrepViewModel
+import com.nextuple.nsf.ui.state.PrintViewModel
+import com.nextuple.nsf.ui.state.SettingsViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
-import com.nextuple.nsf.ui.util.NoOpScanManager
-import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.GenericViewState
+import com.nextuple.nsf.ui.util.PrinterName
 import com.nextuple.nsf.ui.util.ScanManager
+import com.nextuple.nsf.util.SubFulfillmentType
 
 enum class PrepScreenTab(val displayName: String) {
 	PACK("PACK"),
@@ -53,172 +27,182 @@ enum class PrepScreenTab(val displayName: String) {
 
 @Composable
 fun PrepScreen(
-	currentPrepStage: InfoViewModel.PrepStage,
-	navigateToPrepOrder: () -> Unit,
-	numPackTasks: Int,
+    prepViewModel: PrepViewModel = hiltViewModel(),
+    printViewModel: PrintViewModel = hiltViewModel(),
+    configVM: ConfigViewModel,
+    settingsVM: SettingsViewModel,
 	scanManager: ScanManager,
-	onScanGear: (String) -> Unit,
+    frToPack: String?,
+    numPackTasks: Int,
 	onClickPackByOrder: () -> Unit,
-	resetScreen: () -> Unit = {}
+    resetScreen: () -> Unit
 ) {
-	LaunchedEffect(Unit) {
-		when (currentPrepStage) {
-			InfoViewModel.PrepStage.PrepOrder,
-			InfoViewModel.PrepStage.StageOrder -> navigateToPrepOrder.invoke()
+	val ctx = LocalContext.current
+	val prepOrder = prepViewModel.prepOrder
 
-			InfoViewModel.PrepStage.Landing -> Unit
+	fun onScanGear(upc: String) {
+		prepViewModel.fetchPrepOrder(packType = PackType.GEAR, upcOrFrNo = upc)
 		}
+	fun onPrintHoldSlip(printerName: PrinterName) {
+		prepViewModel.stageTask?.holdSlipZPL?.let {
+			val printer = settingsVM.findPrinter(printerName)
+			printViewModel.printHoldSlip(it, printer, settingsVM.bypassPrinter)
 	}
 
-	var selectedTab by rememberSaveable { mutableStateOf(PrepScreenTab.PACK) }
 
-	fun onItemScan(upc: String, @Suppress("UNUSED_PARAMETER") symbology: String?) {
-		onScanGear(upc)
 	}
 
-	LaunchedEffect(Unit) {
-		scanManager.set(::onItemScan)
+	fun recordHoldLocation(holdingLocation: String) {
+		prepViewModel.stageTask?.containers?.firstOrNull()?.id?.let {
+			prepViewModel.recordHoldingLocation(it, holdingLocation)
 	}
 
-	Column {
-		Row(
-			modifier = Modifier
-				.fillMaxWidth()
-				.height(40.dp)
-		) {
-			Tab(
-				modifier = Modifier.weight(1f),
-				title = PrepScreenTab.PACK.displayName,
-				count = numPackTasks,
-				isSelected = selectedTab == PrepScreenTab.PACK
-			) {
-				selectedTab = PrepScreenTab.PACK
+			}
+
+	fun onStageCompletionCallBack() {
+		prepViewModel.resetHoldLocationState()
+		prepViewModel.resetHoldSlipState()
+		prepViewModel.resetPrepState()
 				resetScreen()
 			}
-			Tab(
-				modifier = Modifier.weight(1f),
-				title = PrepScreenTab.STAGE.displayName,
-				count = 0, // TODO: Undo hardcoding when implemented
-				isSelected = selectedTab == PrepScreenTab.STAGE
-			) {
-				selectedTab = PrepScreenTab.STAGE
-				resetScreen()
-			}
+	fun onFailure() {
+		prepViewModel.resetPrepState()
 		}
-		if (selectedTab == PrepScreenTab.PACK) {
-			PackTabContainer(
-				onClickPackByOrder = { onClickPackByOrder() },
-				onScanGear = { upc -> onScanGear(upc) }
-			)
+
+	LaunchedEffect(Unit) {
+		if (!frToPack.isNullOrEmpty()) {
+			prepViewModel.fetchPrepOrder(packType = PackType.ORDER, upcOrFrNo = frToPack)
 		} else {
-			StageTabContainer()
+			prepViewModel.fetchPrepStage()
 		}
 	}
-}
 
-@Composable
-private fun PackTabContainer(
-	onClickPackByOrder: () -> Unit = {},
-	onScanGear: (String) -> Unit
+	when (prepViewModel.viewState) {
+		GenericViewState.Loading -> {
 
-) {
-	var showTestScan by remember { mutableStateOf(false) }
-	if (showTestScan) {
-		EnterUpcDialog(onDismissRequest = { showTestScan = false }, onUpcSubmit = onScanGear)
-	}
 	Box(
-		modifier = Modifier
-			.fillMaxHeight()
-			.background(BrandColor.WHITE),
+				modifier = Modifier.fillMaxSize(),
 		contentAlignment = Alignment.Center
 	) {
-		Column(horizontalAlignment = Alignment.CenterHorizontally) {
-			Image(
-				painter = painterResource(id = R.drawable.scan_box),
-				contentDescription = ""
-			)
+				CircularProgressIndicator(color = BrandColor.GRAY_900)
+			}
+		}
 
-			Spacer(modifier = Modifier.height(16.dp))
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier
-					.padding(horizontal = 68.dp)
-					.clickable {
-						if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
-							showTestScan = true
+		GenericViewState.Failure -> {
+			LaunchedEffect(Unit) {
+				Toast.makeText(
+					ctx,
+					"Failure retrieving user prep tasks.",
+					Toast.LENGTH_SHORT
+				).show()
+				onFailure()
 						}
 					}
-					.fillMaxWidth()
-			) {
-				Image(
-					painter = painterResource(id = R.drawable.ic_scan_orange),
-					contentDescription = "",
-					modifier = Modifier
-						.width(36.dp)
-						.height(32.dp)
+
+		else -> {
+			when (prepViewModel.currentStep) {
+				PrepViewModel.Step.Landing -> {
+					PrepLandingScreen(
+						numPackTasks = numPackTasks,
+						scanManager = scanManager,
+						onScanGear = ::onScanGear,
+						onClickPackByOrder = onClickPackByOrder,
+						resetScreen = resetScreen
 				)
-				Text(
-					text = stringResource(R.string.scan_to_pack),
-					color = BrandColor.PINK_NT,
-					style = TextStyle(
-						fontSize = 18.sp,
-						lineHeight = 23.4.sp,
-						fontFamily = FontFamily.ARCHIVO,
-						fontWeight = FontWeight(700),
-						letterSpacing = 0.5.sp
+				}
+
+				else -> {
+					when (prepOrder?.subFulfillmentType) {
+						SubFulfillmentType.BOPL.name -> {
+							BOPLPrepDetailsScreen(
+								prepOrder = prepOrder,
+								printer = settingsVM.findPrinter(PrinterName.BOPL),
+								startPack = prepViewModel::startPack,
+								completePackAndGetHoldSlip = prepViewModel::completePackAndGetHoldSlip,
+								onDisConnectPrinter = settingsVM::disConnectPrinter,
+								resetScreen = prepViewModel::resetHoldSlipState,
+								holdSlipState = prepViewModel.holdSlipState,
+								currentPrepStage = prepViewModel.currentStep,
+								onRecordHoldingLocation = ::recordHoldLocation,
+								ipPrefix = settingsVM.ipPrefix,
+								printerConnectionState = settingsVM.printerConnectionState,
+								onConnectPrinter = settingsVM::connectPrinter,
+								onResetPrinter = settingsVM::resetConnectionState,
+								onStageCompletionCallBack = ::onStageCompletionCallBack,
+								holdingAreas = configVM.getHoldingLocations(),
+								printerList = settingsVM.printersList,
+								onPrintHoldSlip = { onPrintHoldSlip(PrinterName.BOPL) },
+								scanManager = scanManager,
+								onPackItem = prepViewModel::packItem
 					)
+						}
+						SubFulfillmentType.BOPIS.name -> {
+							BOPISPrepDetailScreen(
+								scanManager = scanManager,
+								isOrderAssembled = false,
+								prepOrder = prepOrder,
+								holdingAreas = configVM.getHoldingLocations(),
+								currentPrepStage = prepViewModel.currentStep,
+								holdSlipState = prepViewModel.holdSlipState,
+								holdLocationState = prepViewModel.holdLocationState,
+								onPackItem = prepViewModel::packItem,
+								onPackOrder = prepViewModel::packAndGetHoldSlip,
+								onRecordHoldingLocation = ::recordHoldLocation,
+								ipPrefix = settingsVM.ipPrefix,
+								printer = settingsVM.findPrinter(PrinterName.BOPIS),
+								printerConnectionState = settingsVM.printerConnectionState,
+								onConnectPrinter = settingsVM::connectPrinter,
+								onResetPrinter = settingsVM::resetConnectionState,
+								onPrintHoldSlip = { onPrintHoldSlip(PrinterName.BOPIS) },
+								onStageCompletionCallBack = ::onStageCompletionCallBack,
+								onConfirmDecline = { declineReason, index, itemToDecline ->
+									prepViewModel.declinePackItem(declineReason, index, itemToDecline)
+								}
 				)
 			}
 
-			Spacer(modifier = Modifier.height(60.dp))
-
-			Row(modifier = Modifier.padding(horizontal = 56.dp)) {
-				ClickableText(
-					text = AnnotatedString(stringResource(R.string.pack_by_order)),
-					style = TextStyle(
-						fontSize = 14.sp,
-						fontFamily = FontFamily.ARCHIVO,
-						fontWeight = FontWeight(700),
-						color = BrandColor.GRAY_900,
-						textAlign = TextAlign.Center,
-						letterSpacing = 1.5.sp,
-						textDecoration = TextDecoration.Underline
-					),
-					onClick = {
-						onClickPackByOrder()
+						SubFulfillmentType.SAME_DAY.name -> {
+							SDDPrepDetailsScreen(
+								scanManager = scanManager,
+								prepOrder = prepOrder,
+								holdingAreas = configVM.getHoldingLocations(),
+								currentPrepStage = prepViewModel.currentStep,
+								holdSlipState = prepViewModel.holdSlipState,
+								holdLocationState = prepViewModel.holdLocationState,
+								onPackItem = prepViewModel::packItem,
+								onPackOrder = {
+									// Print placeholder for passing through package data
+									println("aaa PackageData: $it")
+									prepViewModel.packAndGetHoldSlip()
+								},
+								onRecordHoldingLocation = ::recordHoldLocation,
+								ipPrefix = settingsVM.ipPrefix,
+								printer = settingsVM.findPrinter(PrinterName.SDD),
+								printerConnectionState = settingsVM.printerConnectionState,
+								onConnectPrinter = settingsVM::connectPrinter,
+								onResetPrinter = settingsVM::resetConnectionState,
+								onPrintHoldSlip = { onPrintHoldSlip(PrinterName.SDD) },
+								onStageCompletionCallBack = ::onStageCompletionCallBack,
+								onConfirmDecline = { declineReason, index, itemToDecline ->
+									prepViewModel.declinePackItem(declineReason, index, itemToDecline)
 					}
 				)
 			}
+						else -> {
+							LaunchedEffect(Unit) {
+								Toast.makeText(
+									ctx,
+									"Failure retrieving order to prep.",
+									Toast.LENGTH_SHORT
+								).show()
+								onFailure()
 		}
 	}
 }
 
-@Composable
-private fun StageTabContainer() {
-	Box(
-		modifier = Modifier
-			.fillMaxHeight()
-			.background(BrandColor.WHITE),
-		contentAlignment = Alignment.Center
-	) {
-		EmptyStateScreen(
-			title = stringResource(id = R.string.prep_under_construction_title),
-			body = stringResource(id = R.string.prep_under_construction_body),
-			imageVector = ImageVector.vectorResource(id = R.drawable.under_construction)
-		)
+				}
 	}
 }
 
-@Composable
-@PreviewPdt
-fun PreviewPrepScreen() {
-	PrepScreen(
-		currentPrepStage = InfoViewModel.PrepStage.Landing,
-		navigateToPrepOrder = {},
-		numPackTasks = 0,
-		scanManager = NoOpScanManager(),
-		onScanGear = {},
-		onClickPackByOrder = {}
-	)
+	}
 }

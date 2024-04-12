@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.nextuple.nsf.service.dto.Result
 import androidx.lifecycle.viewModelScope
 import com.nextuple.nsf.retrofit.api.StoreConfig
 import com.nextuple.nsf.retrofit.api.StoreConfig.Companion.DEFAULT_HOLDING_LOCATIONS
 import com.nextuple.nsf.retrofit.api.StoreConfig.Companion.PICK_ITEM_SYMBOLOGY_PREFIXES
 import com.nextuple.nsf.service.ConfigService
 import com.nextuple.nsf.service.LogService
+import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.ui.util.GenericViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

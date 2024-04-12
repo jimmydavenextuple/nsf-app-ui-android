@@ -8,7 +8,7 @@ import com.nextuple.nsf.retrofit.dto.DeclineItemRequest
 import com.nextuple.nsf.retrofit.dto.PickItemRequest
 import com.nextuple.nsf.retrofit.dto.PickTask
 import com.nextuple.nsf.service.dto.Brand
-import com.nextuple.nsf.service.dto.Brand.NT
+import com.nextuple.nsf.service.dto.Brand.NT_BRAND_A
 import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.dto.Store
 import com.nextuple.nsf.util.FulfillmentType.BOPIS
@@ -56,7 +56,7 @@ class PickServiceTest {
 	@Test
 	fun `startPick should call pick api with the expected dks and store`() = runTest {
 		val dks = "dks123"
-		val store = Store(id = "456", brand = NT)
+		val store = Store(id = "456", brand = NT_BRAND_A)
 
 		every { runBlocking { pickApi.startPick(any(), any()) } } returns ApiResponse.Success(
 			data = PickTask(
@@ -84,7 +84,7 @@ class PickServiceTest {
 	fun `startPick should return general error on api success response having null data`() =
 		runTest {
 			every { runBlocking { pickApi.startPick(any(), any()) } } returns ApiResponse.Success()
-			every { deviceService.getStore() } returns Store(id = "0", brand = NT)
+			every { deviceService.getStore() } returns Store(id = "0", brand = NT_BRAND_A)
 			every { runBlocking { userRepository.getDks() } } returns "dks"
 
 			val res = service.startPick()
@@ -105,7 +105,7 @@ class PickServiceTest {
 
 	@Test
 	fun `startPick should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns null
 
 		val res = service.startPick()

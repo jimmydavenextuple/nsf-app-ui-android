@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import com.nextuple.nsf.UserData
 import com.nextuple.nsf.service.dto.User
 import com.nextuple.nsf.service.dto.toUser
+import com.nextuple.nsf.util.TimeUtils.getProtoTimestamp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -20,6 +21,14 @@ class UserRepository @Inject constructor(
 				.setFirstName(firstName)
 				.setLastName(lastName)
 				.setDks(dks)
+				.setLastActiveTime(getProtoTimestamp())
+				.build()
+		}
+	}
+	suspend fun updateLastActiveTime() {
+		userDataStore.updateData {
+			it.toBuilder()
+				.setLastActiveTime(getProtoTimestamp())
 				.build()
 		}
 	}

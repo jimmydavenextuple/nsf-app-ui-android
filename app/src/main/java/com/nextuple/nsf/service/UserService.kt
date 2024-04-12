@@ -6,10 +6,10 @@ import com.nextuple.nsf.retrofit.dto.LoginRequest
 import com.nextuple.nsf.service.LogService.Companion.EVENT_LOGIN
 import com.nextuple.nsf.service.LogService.Companion.EVENT_LOGIN_RES
 import com.nextuple.nsf.service.LogService.Companion.EVENT_LOGOUT
+import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.dto.Result.Companion.fromApiResponse
 import com.nextuple.nsf.service.dto.Result.Companion.generalError
 import com.nextuple.nsf.service.dto.User
-import com.nextuple.nsf.service.dto.Result
 
 class UserService(
     private val userApi: UserApi,

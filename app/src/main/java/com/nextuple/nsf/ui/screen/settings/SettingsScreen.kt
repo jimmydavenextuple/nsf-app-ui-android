@@ -33,11 +33,11 @@ import com.nextuple.nsf.ui.common.InfoModal
 import com.nextuple.nsf.ui.common.MultiOptionModal
 import com.nextuple.nsf.ui.common.TertiaryButton
 import com.nextuple.nsf.ui.component.PrinterModal
-import com.nextuple.nsf.ui.state.Printer
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.Printer
 
 @Composable
 fun SettingsScreen(
@@ -208,6 +208,7 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 				showDisconnectModal = false
 				if (optionSelected == yesOption) {
 					onDisConnectPrinter(printer)
+					onReset()
 				}
 			},
 			crossIconClick = { showDisconnectModal = false }
@@ -232,8 +233,7 @@ private fun PrinterProblem(
 				.padding()
 				.clickable { toggleDialog(true) },
 			painter = painterResource(id = R.drawable.ic_info),
-			contentDescription = "back button",
-			tint = BrandColor.BLUE_300_NT
+			contentDescription = "back button"
 		)
 
 		TertiaryButton(text = stringResource(id = R.string.printer_problems)) {

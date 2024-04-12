@@ -38,9 +38,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.PrimaryButton
-import com.nextuple.nsf.ui.state.Printer
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
+import com.nextuple.nsf.ui.util.Printer
 
 @Composable
 fun PrinterBOPLModal(

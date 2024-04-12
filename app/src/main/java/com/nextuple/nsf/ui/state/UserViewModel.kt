@@ -6,17 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.datastore.UserRepository
 import com.nextuple.nsf.service.ConfigService
 import com.nextuple.nsf.service.UserService
-import com.nextuple.nsf.service.dto.Brand
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 import com.nextuple.nsf.service.dto.Result
-import com.nextuple.nsf.service.dto.Store
-import com.nextuple.nsf.service.dto.User
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.time.Instant
+import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
@@ -96,6 +94,22 @@ class UserViewModel @Inject constructor(
 		onLogoutCallbacks.forEach { callback -> callback() }
 	}
 
+	fun updateUserActivity() = viewModelScope.launch {
+		if (isLoggedIn()) {
+			userRepository.updateLastActiveTime()
+		}
+	}
+	fun handleTimeoutLogout(timeoutDuration: Long) = viewModelScope.launch {
+		if (!isLoggedIn()) return@launch
+		val lastActiveTime = Instant.ofEpochSecond(user.first().lastActiveTime.seconds)
+		if (lastActiveTime.plusMillis(timeoutDuration) <= Instant.now()) {
+			logout()
+		}
+	}
+	fun updateViewState(viewState: ViewState) {
+		this.viewState = viewState
+	}
+	fun isLoggedIn() = viewState == ViewState.LoggedIn
 	private fun appendDksPrefixIfNeeded(dks: String): String =
 		if (!dks.lowercase().startsWith("dks") && dks.all { it.isDigit() }) {
 			"dks$dks"

@@ -15,6 +15,7 @@ import com.nextuple.nsf.service.LogService.Companion.EVENT_AGED_ORDER_CANCEL
 import com.nextuple.nsf.service.LogService.Companion.EVENT_ORDER_CANCEL
 import com.nextuple.nsf.service.OrderService
 import com.nextuple.nsf.service.StageTaskService
+import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.ui.component.filter.Filter
 import com.nextuple.nsf.ui.component.filter.toSelectedValues
 import com.nextuple.nsf.ui.component.filter.toUpdated
@@ -24,7 +25,6 @@ import com.nextuple.nsf.ui.util.DeclineAction
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.util.OrderStatus
 import com.nextuple.nsf.util.TimeUtils
-import com.nextuple.nsf.service.dto.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -70,7 +70,7 @@ class OrderViewModel @Inject constructor(
 	var startPickupState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 
-	var holdSlipState: GenericViewState by mutableStateOf(GenericViewState.Idle)
+	var getHoldSlipState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 
 	var holdSlipScanState: GenericViewState by mutableStateOf(GenericViewState.Idle)
@@ -110,6 +110,12 @@ class OrderViewModel @Inject constructor(
 		formatTimeStamp(
 			timestamp = orderDetailResponse?.packedOnDate,
 			errorName = "OrderDetailResponse_PackedOnDate"
+		)
+	}
+	val pickedUpOnDate: String by derivedStateOf {
+		formatTimeStamp(
+			timestamp = orderDetailResponse?.pickedUpDate,
+			errorName = "OrderDetailResponse_PickedUpOnDate"
 		)
 	}
 
@@ -316,18 +322,18 @@ class OrderViewModel @Inject constructor(
 	}
 
 	fun getHoldSlip(fulfillmentRequestNumber: String) = viewModelScope.launch {
-		holdSlipState = GenericViewState.Loading
+		getHoldSlipState = GenericViewState.Loading
 		holdSlipZpl =
 			when (val res = stageTaskService.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)) {
 				is Result.Success -> {
 					errMsg = null
-					holdSlipState = GenericViewState.Success
+					getHoldSlipState = GenericViewState.Success
 					res.data?.holdSlipZPL
 				}
 
 				is Result.Error -> {
 					errMsg = res.msg
-					holdSlipState = GenericViewState.Failure
+					getHoldSlipState = GenericViewState.Failure
 					null
 				}
 			}
@@ -402,8 +408,8 @@ class OrderViewModel @Inject constructor(
 	/**
 	 * Removing existing holdSlip state and default to default state.
 	 */
-	fun resetHoldSlipState() {
-		holdSlipState = GenericViewState.Idle
+	fun resetGetHoldSlipState() {
+		getHoldSlipState = GenericViewState.Idle
 	}
 
 	/**

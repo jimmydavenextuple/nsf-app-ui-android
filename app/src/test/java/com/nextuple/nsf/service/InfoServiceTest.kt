@@ -50,7 +50,7 @@ class InfoServiceTest {
 	@Test
 	fun `getStoreOverview should call api with the expected values`() = runTest {
 		val dks = "dks123"
-		val store = Store(id = "456", brand = Brand.NT)
+		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 		val storeOverview = StoreOverviewResponse(
 			userOverview = StoreOverviewResponse.UserOverview(),
 			pickOverview = StoreOverviewResponse.PickOverview(
@@ -86,7 +86,7 @@ class InfoServiceTest {
 	@Test
 	fun `getStoreOverview should return general error on api success response having null data`() = runTest {
 		every { runBlocking { infoApi.getStoreOverview(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.getStoreOverview()
@@ -107,7 +107,7 @@ class InfoServiceTest {
 
 	@Test
 	fun `getStoreOverview should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns null
 
 		val res = service.getStoreOverview()
@@ -120,12 +120,12 @@ class InfoServiceTest {
 	fun `getDeclineCodes should return general error on api success response having null data`() =
 		runTest {
 			val dks = "dks123"
-			val store = Store(id = "456", brand = Brand.NT)
+			val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 			every {
 				runBlocking {
 					infoApi.getDeclineCodes(
 						userId = dks,
-						brand = Brand.NT.name,
+						brand = Brand.NT_BRAND_A.name,
 						store = "456",
 						fulfillmentType = "BOPIS",
 						subFulfillmentType = "BOPIS"
@@ -144,7 +144,7 @@ class InfoServiceTest {
 	@Test
 	fun `getDeclineCodes should call get decline codes api with the expected values`() = runTest {
 		val dks = "dks123"
-		val store = Store(id = "456", brand = Brand.NT)
+		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 		val declineCodes = GetDeclineCodesResponse(
 			pickDeclineCodes = listOf(
 				DeclineCode(id = "", displayName = ""),
@@ -162,7 +162,7 @@ class InfoServiceTest {
 			runBlocking {
 				infoApi.getDeclineCodes(
 					userId = dks,
-					brand = Brand.NT.name,
+					brand = Brand.NT_BRAND_A.name,
 					store = "456",
 					fulfillmentType = "BOPIS",
 					subFulfillmentType = "BOPIS"
@@ -182,7 +182,7 @@ class InfoServiceTest {
 			runBlocking {
 				infoApi.getDeclineCodes(
 					userId = dks,
-					brand = Brand.NT.name,
+					brand = Brand.NT_BRAND_A.name,
 					store = "456",
 					fulfillmentType = "BOPIS",
 					subFulfillmentType = "BOPIS"
@@ -203,7 +203,7 @@ class InfoServiceTest {
 
 	@Test
 	fun `getDeclineCodes should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns null
 
 		val res = service.getDeclineCodes()

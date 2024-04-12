@@ -14,7 +14,6 @@ enum class Screen(
 	ORDERS_DETAILS(title = "Order Details", route = "${ORDERS.route}_order_details", isBackEnabled = true),
 	ORDERS_PICKUP(title = "Pickup", route = "${ORDERS.route}_pickup", isBackEnabled = true),
 	PICK_DETAILS(title = "Pick", route = "${PICK.route}_details"),
-	PREP_ORDER(title = "Prep", route = "${PREP.route}_pack_order"),
 	SEARCH_RESULTS(title = "Search Results", route = "search_order", isBackEnabled = true),
 	SETTINGS(title = "Settings", route = "settings", isBackEnabled = true);
 

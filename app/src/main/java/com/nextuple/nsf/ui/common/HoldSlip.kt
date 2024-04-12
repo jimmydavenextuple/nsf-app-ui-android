@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -112,7 +112,7 @@ fun HoldSlip(
 							color = BrandColor.BLACK
 						)
 					)
-					Divider(
+					HorizontalDivider(
 						modifier = Modifier
 							.fillMaxWidth(.9f)
 							.padding(top = 3.dp),
@@ -123,7 +123,7 @@ fun HoldSlip(
 
 				Image(modifier = Modifier.padding(top = 3.dp), painter = painterResource(id = R.drawable.ic_hold_slip_rect), contentDescription = "")
 			}
-			Divider(
+			HorizontalDivider(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(top = 3.dp),

@@ -7,7 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.nextuple.nsf.R.string
 import com.nextuple.nsf.ui.common.ActionsCard
 import com.nextuple.nsf.ui.common.ActionsCardAction
-import com.nextuple.nsf.ui.state.Printer
+import com.nextuple.nsf.ui.util.Printer
 import com.nextuple.nsf.util.OrderStatus
 import com.nextuple.nsf.util.OrderStatus.PACK
 import com.nextuple.nsf.util.OrderStatus.READY

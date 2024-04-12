@@ -1,5 +1,6 @@
 package com.nextuple.nsf.util
 
+import com.google.protobuf.Timestamp
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -43,4 +44,6 @@ object TimeUtils {
 		val dateTime = LocalDateTime.ofInstant(timeStamp, ZoneId.systemDefault())
 		return dateTime.format(outputFormatter)
 	}
+	fun getProtoTimestamp(instant: Instant = Instant.now()): Timestamp =
+		Timestamp.newBuilder().setSeconds(instant.epochSecond).setNanos(instant.nano).build()
 }

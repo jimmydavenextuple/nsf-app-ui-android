@@ -1,7 +1,5 @@
 package com.nextuple.nsf.ui.screen.prep
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,21 +13,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,25 +48,33 @@ import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
-import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.common.HoldSlip
 import com.nextuple.nsf.ui.common.InfoModal
 import com.nextuple.nsf.ui.common.MultiOptionModal
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
+import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PrinterBOPLModal
 import com.nextuple.nsf.ui.component.PrinterModal
+import com.nextuple.nsf.ui.screen.prep.BOPLPrepStep.PLACE_HOLD_SLIP
+import com.nextuple.nsf.ui.screen.prep.BOPLPrepStep.PRINT_HOLD_SLIP
+import com.nextuple.nsf.ui.screen.prep.BOPLPrepStep.SELECT_HOLDING
+import com.nextuple.nsf.ui.screen.prep.component.PrepDetailScaffold
+import com.nextuple.nsf.ui.screen.prep.component.SelectHoldingAreaCard
 import com.nextuple.nsf.ui.screen.settings.getPrinterConnectIcon
 import com.nextuple.nsf.ui.screen.settings.getPrinterIcon
-import com.nextuple.nsf.ui.state.InfoViewModel
-import com.nextuple.nsf.ui.state.PrepOrder
-import com.nextuple.nsf.ui.state.Printer
+import com.nextuple.nsf.ui.state.PrepViewModel
+import com.nextuple.nsf.ui.state.PrepViewModel.PrepOrder
+import com.nextuple.nsf.ui.state.PrepViewModel.Step.Pack
+import com.nextuple.nsf.ui.state.PrepViewModel.Step.Stage
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.Printer
 import com.nextuple.nsf.ui.util.ScanManager
+import kotlinx.coroutines.delay
 
 enum class BOPLPrepStep {
 	PRINT_HOLD_SLIP, PLACE_HOLD_SLIP, SELECT_HOLDING
@@ -84,11 +87,12 @@ fun BOPLPrepDetailsScreen(
 	printer: Printer,
 	printerList: List<Printer>?,
 	onConnectPrinter: (Printer, String) -> Unit,
-	currentPrepStage: InfoViewModel.PrepStage,
+    currentPrepStage: PrepViewModel.Step,
 	printerConnectionState: GenericViewState = GenericViewState.Idle,
 	onResetPrinter: () -> Unit,
 	holdSlipState: GenericViewState = GenericViewState.Idle,
-	onPackAndGetHoldSlip: () -> Unit,
+    startPack: () -> Unit,
+    completePackAndGetHoldSlip: () -> Unit,
 	onPrintHoldSlip: () -> Unit,
 	onDisConnectPrinter: (Printer) -> Unit,
 	resetScreen: () -> Unit,
@@ -104,16 +108,16 @@ fun BOPLPrepDetailsScreen(
 	val isMultiUnit = (prepOrder.packItems.size) > 1
 	var currentStep by remember {
 		mutableStateOf(
-			if (currentPrepStage == InfoViewModel.PrepStage.StageOrder) {
-                BOPLPrepStep.PLACE_HOLD_SLIP
-			} else {
-                BOPLPrepStep.PRINT_HOLD_SLIP
+			when (currentPrepStage) {
+				Stage -> SELECT_HOLDING
+				Pack -> PLACE_HOLD_SLIP
+				else -> PRINT_HOLD_SLIP
 			}
 		)
 	}
-	fun isPrintActive(): Boolean = currentStep == BOPLPrepStep.PRINT_HOLD_SLIP
-	fun isPlaceActive(): Boolean = currentStep == BOPLPrepStep.PLACE_HOLD_SLIP
-	fun isSelectActive(): Boolean = currentStep == BOPLPrepStep.SELECT_HOLDING
+	fun isPrintActive(): Boolean = currentStep == PRINT_HOLD_SLIP
+	fun isPlaceActive(): Boolean = currentStep == PLACE_HOLD_SLIP
+	fun isSelectActive(): Boolean = currentStep == SELECT_HOLDING
 
 	fun updateStep(prepStep: BOPLPrepStep) {
 		currentStep = prepStep
@@ -131,7 +135,7 @@ fun BOPLPrepDetailsScreen(
 		}
 	}
 
-	LaunchedEffect(Unit) {
+	DisposableEffect(Unit) {
 		scanManager.set { data, _ ->
 			if (isPlaceActive() && isMultiUnit && !showMultiUnitModal) {
 				isStepNextActive = false
@@ -142,30 +146,22 @@ fun BOPLPrepDetailsScreen(
 				}
 			}
 		}
+		onDispose {
+			scanManager.set { _, _ -> }
+		}
 	}
 
 	if (!showAcceptedScreen) {
-		Column(
-			Modifier
-				.background(BrandColor.GRAY_100)
-				.verticalScroll(rememberScrollState())
+		PrepDetailScaffold(
+			athleteName = prepOrder.athleteName,
+			orderNumber = prepOrder.orderNumber
 		) {
-			PrepHeader(
-				modifier = Modifier
-					.fillMaxWidth()
-					.background(BrandColor.GRAY_50),
-				athlete = prepOrder.athleteName,
-				orderNum = prepOrder.orderNumber
-			)
-			Divider(thickness = 1.dp, color = BrandColor.BORDER_DEFAULT)
-			Spacer(modifier = Modifier.height(6.dp))
-
 			PrintHoldSlipCard(
 				isActive = isPrintActive(),
 				printer = printer,
 				onPrintHoldSlipEvent = {
-					onPackAndGetHoldSlip()
-					updateStep(BOPLPrepStep.PLACE_HOLD_SLIP)
+					startPack()
+					updateStep(PLACE_HOLD_SLIP)
 				},
 				showPrinterModalEvent = {
 					showConnectBOPLModal = true
@@ -182,7 +178,10 @@ fun BOPLPrepDetailsScreen(
 					isActive = isPlaceActive(),
 					isNextStepActive = isSelectActive(),
 					onReprintHoldSlip = { handlePrintHoldSlip() },
-					updateStep = { updateStep(BOPLPrepStep.SELECT_HOLDING) },
+					updateStep = {
+						completePackAndGetHoldSlip()
+						updateStep(SELECT_HOLDING)
+					},
 					packItems = prepOrder.packItems,
 					athlete = prepOrder.athleteName,
 					toggleMultiUnitModal = {
@@ -195,7 +194,10 @@ fun BOPLPrepDetailsScreen(
 					isActive = isPlaceActive(),
 					isNextStepActive = isSelectActive(),
 					onReprintHoldSlip = { handlePrintHoldSlip() },
-					updateStep = { updateStep(BOPLPrepStep.SELECT_HOLDING) }
+					updateStep = {
+						completePackAndGetHoldSlip()
+						updateStep(SELECT_HOLDING)
+					}
 				)
 			}
 
@@ -216,9 +218,10 @@ fun BOPLPrepDetailsScreen(
 		}
 	} else {
 		HoldingLocation(holdingArea = selectedHoldingArea)
-		Handler(Looper.getMainLooper()).postDelayed({
+		LaunchedEffect(Unit) {
+			delay(1000)
 			onStageCompletionCallBack()
-		}, 1000)
+		}
 	}
 	if (showConnectBOPLModal) {
 		PrinterBOPLModal(
@@ -446,7 +449,7 @@ private fun PrintHoldSlipCard(
 			annotatedTitle = if (isActive) {
 				buildAnnotatedString {
 					append("Print ")
-					withStyle(style = SpanStyle(color = BrandColor.ORANGE_700)) {
+					withStyle(style = SpanStyle(color = BrandColor.PINK_NT)) {
 						append(packItems.size.toString())
 					}
 					append(" Hold Slips")
@@ -480,7 +483,7 @@ private fun PlaceHoldCard(
 		extraContent = {
 			BOPLExtra(
 				onReprintHoldSlip = onReprintHoldSlip,
-				goToNextScreen = { updateStep(BOPLPrepStep.SELECT_HOLDING) }
+				goToNextScreen = { updateStep(SELECT_HOLDING) }
 			)
 		}
 	)
@@ -504,7 +507,7 @@ private fun PlaceMultiUnitsCard(
 		extraContent = {
 			BOPLMultiUnitExtra(
 				onReprintHoldSlip = { onReprintHoldSlip() },
-				goToNextScreen = { updateStep(BOPLPrepStep.SELECT_HOLDING) },
+				goToNextScreen = { updateStep(SELECT_HOLDING) },
 				athlete = athlete,
 				packItems = packItems ?: emptyList(),
 				toggleMultiUnitModal = { toggleMultiUnitModal() }
@@ -628,7 +631,7 @@ fun BOPLMultiUnitExtra(
 fun HoldingLocation(holdingArea: String) {
 	Column(
 		Modifier
-			.background(BrandColor.GREEN_500)
+			.background(BrandColor.BLUE_800_NT)
 			.fillMaxHeight()
 			.fillMaxWidth(),
 		verticalArrangement = Arrangement.Center,
@@ -672,16 +675,17 @@ fun PreviewBOPLPackScreen() {
 			orderNumber = "12345678",
 			pickedBy = "Picker",
 			subFulfillmentType = "",
-			packItems = listOf(PACK_TASK_ITEM, PACK_TASK_ITEM)
+			packItems = listOf(packTaskItem, packTaskItem)
 		),
 		printer = Printer("BOPL", "123", connectionStatus = true),
-		onPackAndGetHoldSlip = {},
+		startPack = {},
+		completePackAndGetHoldSlip = {},
 		onDisConnectPrinter = {},
 		resetScreen = {},
 		holdingAreas = emptyList(),
 		onRecordHoldingLocation = { _ -> },
 		onStageCompletionCallBack = {},
-		currentPrepStage = InfoViewModel.PrepStage.PrepOrder,
+		currentPrepStage = Pack,
 		ipPrefix = "",
 		onConnectPrinter = { _, _ -> },
 		onResetPrinter = {},
@@ -698,19 +702,3 @@ fun PreviewHoldingLocationScreen() {
 	HoldingLocation(holdingArea = "Main Holding Location")
 }
 
-private val PACK_TASK_ITEM = PackTaskItem(
-	id = 1,
-	sku = "2345",
-	primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
-	secondaryAttr = ProductAttribute(name = "Size", value = "7.5"),
-	tertiaryAttr = ProductAttribute(name = "Style", value = "12345"),
-	qty = 1,
-	packedQty = 2,
-	declinedQty = 2,
-	productName = "Hoka Women’s Clifton 9 Running Shoes",
-	productImageUrls = listOf(
-		"https://picsum.photos/1705",
-		"https://picsum.photos/1726",
-		"https://picsum.photos/1701"
-	)
-)

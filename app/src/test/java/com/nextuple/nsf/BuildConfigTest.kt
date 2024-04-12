@@ -1,7 +1,5 @@
 package com.nextuple.nsf
 
-import com.nextuple.nsf.service.dto.Brand.NT
-import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import org.junit.Test
 

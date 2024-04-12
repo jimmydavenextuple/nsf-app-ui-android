@@ -10,7 +10,7 @@ class BrandTest {
 	@Test
 	fun `toBrand should be case insensitive`() {
 		val nextuple = "NextUple"
-		assertEquals(Brand.NT, toBrand(nextuple))
+		assertEquals(Brand.NT_BRAND_A, toBrand(nextuple))
 	}
 
 	@Test

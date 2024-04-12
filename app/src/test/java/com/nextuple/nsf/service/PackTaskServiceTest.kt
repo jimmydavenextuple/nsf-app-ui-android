@@ -189,7 +189,7 @@ class PackTaskServiceTest {
 			fulfillmentRequestNumber = "xx90000000",
 			items = emptyList()
 		)
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 		every { runBlocking { packTaskApi.packByGear(any(), any()) } } returns ApiResponse.Success(
 			data = prepDetail
@@ -206,7 +206,7 @@ class PackTaskServiceTest {
 	@Test
 	fun `packByGear should return general error on api success response having null data`() = runTest {
 		every { runBlocking { packTaskApi.getPrepDetails(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.packByGear(upc = "upc")
@@ -227,7 +227,7 @@ class PackTaskServiceTest {
 
 	@Test
 	fun `packByGear should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns null
 
 		val res = service.packByGear(upc = "upc")

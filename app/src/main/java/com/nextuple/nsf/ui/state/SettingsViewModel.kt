@@ -7,18 +7,19 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.datastore.PrintersRepository
 import com.nextuple.nsf.hilt.IoDispatcher
 import com.nextuple.nsf.service.WifiService
 import com.nextuple.nsf.ui.util.GenericViewState
+import com.nextuple.nsf.ui.util.PrintUtil.Companion.PRINTER_PORT
+import com.nextuple.nsf.ui.util.Printer
+import com.nextuple.nsf.ui.util.PrinterName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.security.SecureRandom
@@ -36,7 +37,6 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
 	companion object {
-		private const val PRINTER_PORT = 6101
 		private const val PLACEHOLDER_IP_PREFIX = "192.0.1."
 	}
 
@@ -46,7 +46,7 @@ class SettingsViewModel @Inject constructor(
 	var printerConnectionState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 
-	private var bypassPrinter: Boolean by mutableStateOf(BuildConfig.BYPASS_PRINTER)
+	var bypassPrinter: Boolean by mutableStateOf(isDebug)
 		private set
 
 	private val defaultPrinter = Printer(
@@ -54,8 +54,6 @@ class SettingsViewModel @Inject constructor(
 		connectionStatus = false
 	)
 
-	var holdSlipPrintState: GenericViewState by mutableStateOf(GenericViewState.Idle)
-		private set
 
 	private var _printersList = mutableListOf(
 		defaultPrinter,
@@ -77,7 +75,7 @@ class SettingsViewModel @Inject constructor(
 
 	init {
 		if (isDebug) {
-			setupFakePrinters()
+			setupDebugPrinters()
 		}
 	}
 
@@ -86,13 +84,17 @@ class SettingsViewModel @Inject constructor(
 		ipPrefix = wifiIp.substring(0, wifiIp.lastIndexOf(".") + 1)
 	}
 
-	private fun setupFakePrinters() {
+	private fun setupDebugPrinters() {
 		findPrinter(PrinterName.SFS).apply {
 			ipAddress = getIpAddress()
 			connectionStatus = true
 		}
 
 		findPrinter(PrinterName.BOPIS).apply {
+			ipAddress = getIpAddress()
+			connectionStatus = true
+		}
+		findPrinter(PrinterName.SDD).apply {
 			ipAddress = getIpAddress()
 			connectionStatus = true
 		}
@@ -143,36 +145,6 @@ class SettingsViewModel @Inject constructor(
 		}
 	}
 
-	fun printBOPISHoldSlip(holdSlipZPL: MutableList<String>) {
-		holdSlipPrintState = GenericViewState.Loading
-		CoroutineScope(ioDispatcher).launch {
-			runCatching {
-				if (holdSlipZPL.isEmpty()) { throw Exception() }
-				connectToSocket(findPrinter(PrinterName.BOPIS).ipAddress)?.use { socket ->
-					if (bypassPrinter) {
-						holdSlipZPL.forEach { pageZPL ->
-							Log.i("HoldSlipZPL Printout", "pageZPL = $pageZPL")
-						}
-					} else {
-						PrintWriter(socket.getOutputStream(), true).use {
-							holdSlipZPL.forEach { pageZPL ->
-								it.write(pageZPL)
-							}
-						}
-					}
-				} ?: {
-					Log.e("holdSlipPrintError", "Issue Connecting to Printer")
-					holdSlipPrintState = GenericViewState.Failure
-				}
-			}.onSuccess {
-				Log.i("holdSlipPrintSuccess", "Successfully printed BOPIS Hold Slip")
-				holdSlipPrintState = GenericViewState.Success
-			}.onFailure {
-				Log.e("nullHoldSlip", "Hold Slip not Printed: hold slip info not found", it)
-				holdSlipPrintState = GenericViewState.Failure
-			}
-		}
-	}
 
 	fun disConnectPrinter(printer: Printer) {
 		printerConnectionState = GenericViewState.Loading
@@ -191,12 +163,6 @@ class SettingsViewModel @Inject constructor(
 		printerConnectionState = GenericViewState.Idle
 	}
 
-	/**
-	 * Removing existing holdSlipPrint state and default to default state.
-	 */
-	fun resetHoldSlipPrintState() {
-		holdSlipPrintState = GenericViewState.Idle
-	}
 
 	fun toggleBypassPrinter(): Boolean {
 		bypassPrinter = !bypassPrinter
@@ -204,19 +170,7 @@ class SettingsViewModel @Inject constructor(
 		return bypassPrinter
 	}
 
-	private fun connectToSocket(ipAddress: String): Socket? {
-		var socket: Socket? = null
 
-		try {
-			socket = Socket()
-			socket.connect(InetSocketAddress(ipAddress, PRINTER_PORT), 1000)
-		} catch (ignore: Exception) {
-			try {
-				socket?.close()
-			} catch (ignored: Exception) { }
-		}
-		return socket
-	}
 
 	fun retrieveSavedPrinters() = viewModelScope.launch {
 		val savedPrinterList: MutableList<com.nextuple.nsf.Printers> = mutableListOf()
@@ -257,12 +211,3 @@ class SettingsViewModel @Inject constructor(
 	}
 }
 
-// todo: cleanup, only use one printer class
-data class Printer(
-	val printerName: String,
-	var ipAddress: String = "",
-	var connectionStatus: Boolean = false
-)
-enum class PrinterName {
-	SFS, BOPIS, SDD, BOPL
-}

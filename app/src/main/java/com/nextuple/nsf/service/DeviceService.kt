@@ -13,7 +13,7 @@ class DeviceService(
 	fun getStore(): Store? = runCatching {
 		return Store(
 			id = "1234",
-			brand = Brand.NT
+			brand = Brand.NT_BRAND_A
 		)
 	}.onFailure {
 		logService.trackError("getStore", it)

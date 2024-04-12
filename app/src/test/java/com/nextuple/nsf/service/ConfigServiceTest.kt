@@ -50,7 +50,7 @@ class ConfigServiceTest {
 	@Test
 	fun `getStoreConfig should call config api with the expected dks and store`() = runTest {
 		val dks = "dks123"
-		val store = Store(id = "456", brand = Brand.NT)
+		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
 		every {
 			runBlocking {
@@ -73,7 +73,7 @@ class ConfigServiceTest {
 	@Test
 	fun `getStoreConfig should only call configApi once if config is not reset`() = runTest {
 		val dks = "dks123"
-		val store = Store(id = "456", brand = Brand.NT)
+		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
 		every {
 			runBlocking {
@@ -99,7 +99,7 @@ class ConfigServiceTest {
 	@Test
 	fun `getStoreConfig should only call configApi a second time if config is reset`() = runTest {
 		val dks = "dks123"
-		val store = Store(id = "456", brand = Brand.NT)
+		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
 		every {
 			runBlocking {
@@ -136,7 +136,7 @@ class ConfigServiceTest {
 
 	@Test
 	fun `getStoreConfig should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns null
 
 		val res = service.getStoreConfig()
@@ -152,7 +152,7 @@ class ConfigServiceTest {
 				configApi.getStoreConfig(any(), any())
 			}
 		} returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.getStoreConfig()

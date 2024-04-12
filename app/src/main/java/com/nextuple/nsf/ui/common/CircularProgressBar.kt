@@ -68,6 +68,7 @@ fun CircularProgressBar(
     centerText: String? = null,
     showCenterImage: Boolean = true,
     roundBorder: Boolean = true,
+    percent: Float? = null,
     centerIconModifier: Modifier = Modifier.clickable { },
     centerProgressTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.Bold,
@@ -112,8 +113,12 @@ fun CircularProgressBar(
 		)
 	)
 	SideEffect {
+		if (percent != null) {
+			completedProgressRemember = percent.toFloat()
+		} else {
 		completedProgressRemember = if (totalUnits == 0) 0f else completedUnits * 100f / totalUnits
 		inProgressRemember = if (totalUnits == 0) 0f else (inProgressUnits + completedUnits) * 100f / totalUnits
+		}
 	}
 	Column(
 		modifier = modifier,
@@ -176,7 +181,8 @@ fun CircularProgressBar(
 				centerTextStyle = centerTextStyle,
 				centerText = centerText,
 				showCenterImage = showCenterImage,
-				modifier = centerIconModifier
+				modifier = centerIconModifier,
+				percent = percent
 
 			)
 		}
@@ -203,6 +209,7 @@ private fun DisplayText(
 	centerTextStyle: TextStyle,
 	centerText: String?,
 	showCenterImage: Boolean,
+	percent: Float?,
 	modifier: Modifier
 ) {
 	Column(
@@ -210,7 +217,22 @@ private fun DisplayText(
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		// Text that shows the number inside the circle
+		if (percent != null) {
+			if (percent <= 0) {
 		Text(
+					text = "--%",
+					style = centerProgressTextStyle,
+					fontFamily = FontFamily.SANS
+				)
+			} else {
+				Text(
+					text = String.format("%.1f", percent * 100) + "%",
+					style = centerProgressTextStyle,
+					fontFamily = FontFamily.SANS
+				)
+			}
+		} else {
+			Text(
 			text = "$completedUnits/$totalUnits",
 			style = centerProgressTextStyle,
 			fontFamily = FontFamily.SANS
@@ -228,6 +250,7 @@ private fun DisplayText(
 		if (showCenterImage) {
 			Spacer(modifier = Modifier.height(3.dp))
 			DisplayImage(modifier = modifier)
+			}
 		}
 	}
 }

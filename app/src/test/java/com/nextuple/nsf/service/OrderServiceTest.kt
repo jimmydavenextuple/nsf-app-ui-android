@@ -50,7 +50,7 @@ class OrderServiceTest {
 	@Test
 	fun `getOrders should return general error on api success response having null data`() = runTest {
 		every { runBlocking { orderApi.getOrders(any(), any(), any(), any(), any(), any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.getOrders(query = null)
@@ -64,7 +64,7 @@ class OrderServiceTest {
 		every { runBlocking { orderApi.getOrders(any(), any(), any(), any(), any(), any(), any()) } } returns ApiResponse.Success(
 			data = listOf(OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123")))
 		)
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		service.getOrders(query = "any")
@@ -87,7 +87,7 @@ class OrderServiceTest {
 
 	@Test
 	fun `getOrders should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns null
 
 		val res = service.getOrders(query = "any")
@@ -99,7 +99,7 @@ class OrderServiceTest {
 	@Test
 	fun `getOrderDetails should return general error on api success response having null data`() = runTest {
 		every { runBlocking { orderApi.orderDetails(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.getOrderDetails(fulfillmentRequestNumber = "anyNumber")
@@ -136,7 +136,7 @@ class OrderServiceTest {
 	@Test
 	fun `startPickup should return general error on api success response having null data`() = runTest {
 		every { runBlocking { orderApi.startPickupTask(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.startPickupTask(fulfillmentRequestNumber = "anyNumber")
@@ -173,7 +173,7 @@ class OrderServiceTest {
 	@Test
 	fun `extendPickup should return general error on api success response having null data`() = runTest {
 		every { runBlocking { orderApi.pickupExtend(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.pickupExtend(fulfillmentRequestNumber = "anyNumber")
@@ -210,7 +210,7 @@ class OrderServiceTest {
 	@Test
 	fun `removeCheckIn should return general error on api success response having null data`() = runTest {
 		every { runBlocking { orderApi.pickupRemoveCheckIn(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.pickupRemoveCheckIn(taskId = "anyNumber")
@@ -247,7 +247,7 @@ class OrderServiceTest {
 	@Test
 	fun `completePickupTask should return general error on api success response having null data`() = runTest {
 		every { runBlocking { orderApi.completePickupTask(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
 
 		val res = service.completePickupTask(taskId = "anyNumber")

@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -164,15 +164,15 @@ private fun ScreenTitle(
 
 	val title = if (screen == Screen.PICK_DETAILS) {
 		screen.title + when (orderType) {
-			SubFulfillmentType.BOPIS -> " Pickup"
+			SubFulfillmentType.BOPIS -> " Products"
 			SubFulfillmentType.BOPL -> " BOPL"
 			else -> ""
 		}
-	} else if (screen == Screen.PREP_ORDER) {
-		screen.title + when (orderType) {
-			SubFulfillmentType.BOPL -> " BOPL"
-			else -> ""
-		}
+// 	} else if (screen == Screen.PREP) {
+// 		screen.title + when (orderType) {
+// 			SubFulfillmentType.BOPL -> " BOPL"
+// 			else -> ""
+// 		}
 	} else {
 		screen.title
 	}
@@ -188,7 +188,7 @@ private fun ScreenTitle(
 				Icon(
 					modifier = Modifier
 						.padding(end = 4.dp),
-					imageVector = Icons.Default.ArrowBack,
+					imageVector = Icons.AutoMirrored.Filled.ArrowBack,
 					tint = BrandColor.GRAY_50,
 					contentDescription = null
 				)

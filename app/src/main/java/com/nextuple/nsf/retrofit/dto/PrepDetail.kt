@@ -14,13 +14,29 @@ data class PrepDetail(
     val assembleTask: FITTask? = null,
     val packTask: FITTask? = null,
     val stageTask: FITTask? = null
-) {
-	fun isInProgress() = packTask?.isInProgress() == true || stageTask?.isInProgress() == true
-}
+)
+
+data class PackTaskItem(
+    val sku: String,
+    val primaryAttr: ProductAttribute? = null,
+    val secondaryAttr: ProductAttribute? = null,
+    val tertiaryAttr: ProductAttribute? = null,
+    val qty: Int,
+    val declinedQty: Int = 0,
+    val productName: String,
+    val productImageUrls: List<String>,
+    val scannedBarcode: String? = null,
+    @Transient
+	var isScanned: Boolean = false,
+    @Transient
+	var isDeclined: Boolean = false
+)
 
 data class FITTask(
 	val taskId: Long? = null,
 	val status: Status
 ) {
-	fun isInProgress() = status.code in setOf("1005", "1010")
+	companion object {
+		fun isInProgress(code: String): Boolean = code in setOf("1005", "1010")
+	}
 }

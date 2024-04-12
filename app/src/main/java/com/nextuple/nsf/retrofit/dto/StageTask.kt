@@ -1,26 +1,17 @@
 package com.nextuple.nsf.retrofit.dto
 
+/**
+ * TODO: Refactor away the need for this class.
+ */
 data class StageTask(
     val id: Long,
     val status: Status? = null,
-    val assignedUserId: String? = null, // INFO: Future-proofing
 
-	// INFO: UI needs this to Reprint Hold Slip
     val fulfillmentRequestNumber: String,
-    val brand: String? = null,
-    val store: String? = null,
-    val fulfillmentType: String? = null,
-    val subFulfillmentType: String? = null,
 
-    val orderNumber: String? = null,
-    val orderDate: String? = null,
-    val orderInputSource: String? = null,
-    val athleteFirstName: String? = null,
-    val athleteLastName: String? = null,
 
     val holdSlipZPL: MutableList<String> = mutableListOf(),
 
-    var totalContainerCount: Int? = null,
     val containers: List<StageTaskContainer> = emptyList()
 )
 

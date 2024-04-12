@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,6 +39,8 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.common.PrimaryButton
+import com.nextuple.nsf.ui.screen.prep.component.HeaderText
+import com.nextuple.nsf.ui.screen.prep.component.PackTaskItemCard
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.util.StringUtils
@@ -107,7 +109,7 @@ fun BOPLMultiUnitModal(
 							)
 							HeaderText(title = "Order Number", value = orderNum)
 						}
-						Divider(
+						HorizontalDivider(
 							modifier = Modifier.padding(horizontal = 20.dp),
 							thickness = 1.dp,
 							color = BrandColor.GRAY_350
@@ -127,7 +129,8 @@ fun BOPLMultiUnitModal(
 											toggleStep2()
 										}
 									},
-								packTaskItem = prepTaskItem
+								packTaskItem = prepTaskItem,
+								declineEnabled = false
 							)
 							Spacer(modifier = Modifier.size(5.dp))
 						}
@@ -196,7 +199,7 @@ fun BOPLMultiUnitModal(
 fun PreviewBoplMultiUnitModal() {
 	BOPLMultiUnitModal(
 		onDismissRequest = {},
-		packItems = listOf(PACK_TASK_ITEM, PACK_TASK_ITEM),
+		packItems = listOf(packTaskItem, packTaskItem),
 		athlete = "Yuji Itadori",
 		orderNum = "000000000000",
 		isStep2Active = false,
@@ -205,14 +208,11 @@ fun PreviewBoplMultiUnitModal() {
 }
 
 private val PACK_TASK_ITEM = PackTaskItem(
-	id = 1,
 	sku = "2345",
 	primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
 	secondaryAttr = ProductAttribute(name = "Size", value = "7.5"),
 	tertiaryAttr = ProductAttribute(name = "Style", value = "12345"),
 	qty = 1,
-	packedQty = 2,
-	declinedQty = 2,
 	productName = "Hoka Women’s Clifton 9 Running Shoes",
 	productImageUrls = listOf(
 		"https://picsum.photos/1705",

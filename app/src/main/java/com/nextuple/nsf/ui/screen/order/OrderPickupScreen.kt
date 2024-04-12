@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.response.AthleteCheckInDetail
@@ -64,14 +65,15 @@ import com.nextuple.nsf.ui.common.MultiOptionModal
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.common.chip.StatusChip
+import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PrinterModal
-import com.nextuple.nsf.ui.screen.prep.ExpandableStepCard
-import com.nextuple.nsf.ui.state.Printer
+import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.Printer
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.StringUtils.toPhoneNumberFormatted
 import com.nextuple.nsf.util.TimeUtils
@@ -82,25 +84,26 @@ const val STEP_BRING_TO_ATHLETE: Int = 2
 
 @Composable
 fun OrderPickupScreen(
+    printViewModel: PrintViewModel = hiltViewModel(),
     scanManager: ScanManager,
     completeOrderPickupState: GenericViewState = GenericViewState.Idle,
     orderNumber: String?,
     athleteDetail: AthleteDetail?,
     checkInDetail: AthleteCheckInDetail?,
     frDetail: FulfillmentRequestDetail?,
+    holdSlipZpl: MutableList<String>?,
     defaultStep: Int = STEP_GET_ORDER,
     onOrderPickupClicked: (String) -> Unit,
     scanHoldSlipState: GenericViewState,
     onScanSuccess: (scanData: String) -> Unit,
     onOrderPickupSuccess: () -> Unit,
     onResetHoldSlipScan: () -> Unit,
+    bypassPrinter: Boolean,
     printer: Printer,
     printerConnectionState: GenericViewState = GenericViewState.Idle,
-    printHoldSlipState: GenericViewState = GenericViewState.Idle,
     onPrintHoldSlip: (String) -> Unit,
     holdSlipState: GenericViewState = GenericViewState.Idle,
-    onPrintHoldSlipSuccessCallBack: () -> Unit,
-    onResetPrintHoldSlip: () -> Unit,
+    resetGetHoldSlipState: () -> Unit,
     onConnectPrinter: (Printer, String) -> Unit,
     onResetPrinter: () -> Unit,
     ipPrefix: String?
@@ -164,7 +167,7 @@ fun OrderPickupScreen(
 						mutableStateOf(
 							DetailedCallToActionMode.Done(
 								BrandColor.WHITE,
-								BrandColor.GREEN_500
+								BrandColor.BLUE_800_NT
 							)
 						)
 					}
@@ -278,8 +281,10 @@ fun OrderPickupScreen(
 					onConnectPrinter = onConnectPrinter
 				)
 			}
+			// Todo: and refactor. Same as OrderDetailsScreen
 			if (holdSlipState == GenericViewState.Success) {
-				onPrintHoldSlipSuccessCallBack.invoke()
+				resetGetHoldSlipState()
+				printViewModel.printHoldSlip(holdSlipZpl!!, printer, bypassPrinter)
 			} else if (holdSlipState == GenericViewState.Failure) {
 				Toast.makeText(
 					context,
@@ -287,20 +292,20 @@ fun OrderPickupScreen(
 					Toast.LENGTH_SHORT
 				).show()
 			}
-			if (printHoldSlipState == GenericViewState.Success) {
+			if (printViewModel.holdSlipPrintState == GenericViewState.Success) {
 				Toast.makeText(
 					context,
 					stringResource(R.string.hold_slip_print_success),
 					Toast.LENGTH_SHORT
 				).show()
-				onResetPrintHoldSlip()
-			} else if (printHoldSlipState == GenericViewState.Failure) {
+				printViewModel.resetHoldSlipPrintState()
+			} else if (printViewModel.holdSlipPrintState == GenericViewState.Failure) {
 				Toast.makeText(
 					context,
 					stringResource(R.string.hold_slip_print_error),
 					Toast.LENGTH_SHORT
 				).show()
-				onResetPrintHoldSlip()
+				printViewModel.resetHoldSlipPrintState()
 			}
 		}
 		if (completeOrderPickupState == GenericViewState.Loading) {
@@ -476,7 +481,7 @@ private fun PickupCompleteModal(
 					modifier = modifier
 						.border(
 							width = 2.dp,
-							color = BrandColor.GREEN_500,
+							color = BrandColor.BLUE_300_NT,
 							shape = RoundedCornerShape(size = 3.dp)
 						)
 						.background(
@@ -484,7 +489,7 @@ private fun PickupCompleteModal(
 							shape = RoundedCornerShape(size = 3.dp)
 						),
 					statusText = deliverySpeed,
-					statusColor = BrandColor.GREEN_500,
+					statusColor = BrandColor.BLUE_300_NT,
 					fontSize = 16.sp
 				)
 				Text(
@@ -541,18 +546,19 @@ fun PickOrderScreenPreview() {
 			fulfillmentRequestNumber = "123456.001",
 			holdingLocation = "Main Holding Area, Bin 10"
 		),
+		holdSlipZpl = mutableListOf(),
 		onOrderPickupClicked = {},
 		onOrderPickupSuccess = {},
 		scanHoldSlipState = GenericViewState.Success,
 		onScanSuccess = {},
 		onResetHoldSlipScan = {},
+		resetGetHoldSlipState = {},
 		ipPrefix = "",
 		printer = Printer(printerName = "BOPIS", ipAddress = "", connectionStatus = false),
 		onPrintHoldSlip = {},
-		onPrintHoldSlipSuccessCallBack = {},
-		onResetPrintHoldSlip = {},
 		onConnectPrinter = { _, _ -> },
-		onResetPrinter = {}
+		onResetPrinter = {},
+		bypassPrinter = false
 	)
 }
 

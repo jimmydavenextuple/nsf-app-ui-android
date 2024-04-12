@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,7 +50,7 @@ fun OrderCard(
 	val isReadyOrder = OrderStatus.isReadyStatusText(orderStatus)
 
 	Card(
-		modifier = modifier,
+		modifier = modifier.wrapContentHeight(),
 		shape = RoundedCornerShape(12.dp),
 		onClick = onClick,
 		colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_100),
@@ -59,7 +60,7 @@ fun OrderCard(
 			modifier = Modifier
 				.background(color = BrandColor.WHITE)
 				.fillMaxWidth()
-				.height(if (isReadyOrder) 116.dp else 78.dp)
+				.height(if (isReadyOrder) 100.dp else 90.dp)
 				.padding(12.dp),
 			horizontalArrangement = Arrangement.SpaceBetween
 		) {

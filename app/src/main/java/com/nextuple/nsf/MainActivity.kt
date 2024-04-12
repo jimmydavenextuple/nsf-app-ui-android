@@ -1,6 +1,5 @@
 package com.nextuple.nsf
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,6 +7,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.nextuple.nsf.messaging.MyFirebaseMessagingService
@@ -19,7 +21,6 @@ import com.nextuple.nsf.ui.state.ConfigViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
-import com.nextuple.nsf.ui.state.PrepViewModel
 import com.nextuple.nsf.ui.state.SettingsViewModel
 import com.nextuple.nsf.ui.state.UserViewModel
 import com.nextuple.nsf.ui.theme.AppTheme
@@ -28,6 +29,7 @@ import com.nextuple.nsf.ui.util.OnDataScanned
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.DataWedgeBroadcastReceiver
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,7 +37,6 @@ class MainActivity : ComponentActivity() {
 
 	private val userVM: UserViewModel by viewModels()
 	private val pickVM: PickViewModel by viewModels()
-	private val prepVM: PrepViewModel by viewModels()
 	private val orderVM: OrderViewModel by viewModels()
 	private val settingsVM: SettingsViewModel by viewModels()
 	private val infoVM: InfoViewModel by viewModels()
@@ -62,23 +63,25 @@ class MainActivity : ComponentActivity() {
 		logService.setDevice(deviceService.getDevice())
 
 		infoVM.setOnStoreOverviewCallbacks(
-			pickVM::onStoreOverview,
-			prepVM::onStoreOverview
+			pickVM::onStoreOverview
 		)
 		userVM.setOnLogoutCallbacks(
 			pickVM::onLogout,
-			prepVM::onLogout,
 			infoVM::onLogout
 		)
 		settingsVM.setIpPrefix()
 
+		lifecycleScope.launch {
+			repeatOnLifecycle(Lifecycle.State.STARTED) {
+				userVM.handleTimeoutLogout(SESSION_TIMEOUT_IN_MILLIS)
+			}
+		}
 		setContent {
 			AppTheme {
 				App(
 					infoVM = infoVM,
 					userVM = userVM,
 					pickVM = pickVM,
-					prepVM = prepVM,
 					orderVM = orderVM,
 					settingsVM = settingsVM,
 					configVM = configVM,
@@ -117,8 +120,8 @@ class MainActivity : ComponentActivity() {
 					mapOf("FirebaseToken" to token))
 				if(BuildConfig.DEBUG) {
 					Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
-					MyFirebaseMessagingService.sendRegistrationToServer(token, logService)
 				}
+				MyFirebaseMessagingService.sendRegistrationToServer(token)
 			}
 		)
 	}
@@ -133,13 +136,17 @@ class MainActivity : ComponentActivity() {
 		super.onStop()
 	}
 
+	override fun onPause() {
+		super.onPause()
+		userVM.updateUserActivity()
+	}
 	override fun onUserInteraction() {
 		super.onUserInteraction()
 		startSessionListener()
 	}
 
 	private fun startSessionListener() {
-		if (userVM.viewState == UserViewModel.ViewState.LoggedIn) {
+		if (userVM.isLoggedIn()) {
 			// check the user's activeness after a specified time in milliseconds
 			handler.removeCallbacks(runnable)
 			handler.postDelayed(runnable, SESSION_TIMEOUT_IN_MILLIS)

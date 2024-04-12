@@ -1,7 +1,7 @@
 package com.nextuple.nsf.service
 
 import android.app.Application
-import com.nextuple.nsf.service.dto.Brand.NT
+import com.nextuple.nsf.service.dto.Brand.NT_BRAND_A
 import com.nextuple.nsf.service.dto.Device
 import com.nextuple.nsf.service.dto.Store
 import com.nextuple.nsf.service.dto.User
@@ -46,7 +46,7 @@ class LogServiceTest {
 			firstName = "testFirst",
 			lastName = "testLast",
 			dks = "testDks",
-			store = Store(id = "1", brand = NT)
+			store = Store(id = "1", brand = NT_BRAND_A)
 		)
 		val device = Device(
 			model = "testModel",
@@ -70,7 +70,7 @@ class LogServiceTest {
 			firstName = "testFirst",
 			lastName = "testLast",
 			dks = "testDks",
-			store = Store(id = "1", brand = NT)
+			store = Store(id = "1", brand = NT_BRAND_A)
 		)
 		val device = Device(
 			model = "testModel",

@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.nextuple.nsf.service.dto.Result
 import androidx.lifecycle.viewModelScope
 import com.nextuple.nsf.retrofit.dto.DeclineItemRequest
 import com.nextuple.nsf.retrofit.dto.PickItemRequest
@@ -15,6 +14,7 @@ import com.nextuple.nsf.retrofit.dto.PickTask
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
 import com.nextuple.nsf.retrofit.dto.response.StoreOverviewResponse
 import com.nextuple.nsf.service.PickService
+import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.dto.Result.ErrorType.NOT_FOUND
 import com.nextuple.nsf.ui.util.GenericViewState
 import dagger.hilt.android.lifecycle.HiltViewModel

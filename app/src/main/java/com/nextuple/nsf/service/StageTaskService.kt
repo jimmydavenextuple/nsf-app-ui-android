@@ -4,11 +4,11 @@ import com.nextuple.nsf.datastore.UserRepository
 import com.nextuple.nsf.retrofit.api.StageTaskApi
 import com.nextuple.nsf.retrofit.dto.RecordHoldingLocationRequest
 import com.nextuple.nsf.retrofit.dto.StageTask
-import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.LogService.Companion.EVENT_GET_HOLD_SLIP
 import com.nextuple.nsf.service.LogService.Companion.EVENT_GET_HOLD_SLIP_RES
 import com.nextuple.nsf.service.LogService.Companion.EVENT_STAGE
 import com.nextuple.nsf.service.LogService.Companion.EVENT_STAGE_RES
+import com.nextuple.nsf.service.dto.Result
 
 class StageTaskService(
 	private val stageTaskApi: StageTaskApi,

@@ -40,8 +40,7 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.StageTaskContainer
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
-import com.nextuple.nsf.ui.screen.prep.ExpandableStepCard
-import com.nextuple.nsf.ui.screen.prep.SelectHoldingAreaCard
+import com.nextuple.nsf.ui.screen.prep.component.SelectHoldingAreaCard
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState

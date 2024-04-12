@@ -1,8 +1,6 @@
 package com.nextuple.nsf.retrofit.dto.response
 
-import com.nextuple.nsf.retrofit.dto.PackTask
 import com.nextuple.nsf.retrofit.dto.PickTask
-import com.nextuple.nsf.retrofit.dto.StageTask
 
 data class StoreOverviewResponse(
     val pickOverview: PickOverview,
@@ -20,30 +18,13 @@ data class StoreOverviewResponse(
 	)
 
 	data class UserOverview(
-		val currentPickTask: PickTask? = null,
-		val currentPackTask: PackTask? = null,
-		val currentStageTask: StageTask? = null
+		val currentPickTask: PickTask? = null
 	)
 
 	data class PrepOverview(
 		val tasksInProgress: Int,
-		val tasksUnassigned: Int,
-		val prepTasks: List<PrepTask> = emptyList()
+		val tasksUnassigned: Int
 	)
 
-	data class PrepTask(
-		val id: Long,
-		val taskType: String,
-		val orderNumber: String,
-		val athleteFirstName: String? = null,
-		val athleteLastName: String? = null,
-		val items: List<PrepTaskItem> = emptyList()
-	)
 
-	data class PrepTaskItem(
-		val id: Long,
-		val sku: String,
-		val productName: String,
-		val productImageUrls: List<String>
-	)
 }

@@ -110,19 +110,24 @@ class LogService(private val app: Application) {
 		const val EVENT_PICK_ITEM_RES = "PickItemRes"
 		const val EVENT_PICK_DECLINE = "PickDecline"
 		const val EVENT_PICK_DECLINE_RES = "PickDeclineRes"
-		const val EVENT_PICK_DECLINE_DETAIL = "PickDeclineDetail"
 
 		// Prep
-		const val EVENT_PACK_START = "PackStart"
-		const val EVENT_PACK_START_RES = "PackStartRes"
 		const val EVENT_PACK = "Pack"
 		const val EVENT_PACK_RES = "PackRes"
+		const val EVENT_START_PACK_ONLY = "StartPackOnly"
+		const val EVENT_START_PACK_ONLY_RES = "StartPackOnlyRes"
+		const val EVENT_COMPLETE_PACK = "CompletePack"
+		const val EVENT_COMPLETE_PACK_RES = "CompletePackRes"
 		const val EVENT_STAGE = "Stage"
 		const val EVENT_STAGE_RES = "StageRes"
 		const val EVENT_GET_HOLD_SLIP = "GetHoldSlip"
 		const val EVENT_GET_HOLD_SLIP_RES = "GetHoldSlipRes"
 		const val EVENT_GET_PREP_DETAILS = "GetPrepDetails"
+		const val EVENT_DECLINE_PACK_ITEM = "DeclinePackItem"
 		const val EVENT_PACK_BY_GEAR = "PackByGear"
+		const val EVENT_PACK_BY_GEAR_RES = "PackByGearRes"
+		const val EVENT_PACK_BY_ORDER = "PackByOrder"
+		const val EVENT_PACK_BY_ORDER_RES = "PackByOrderRes"
 		const val EVENT_GET_PREP_DETAILS_RES = "GetPrepDetailsRes"
 
 		// Order Details

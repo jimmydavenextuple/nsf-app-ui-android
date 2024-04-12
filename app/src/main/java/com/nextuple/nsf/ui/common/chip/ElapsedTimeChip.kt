@@ -41,3 +41,9 @@ fun ElapsedTimeChip(
 		backgroundColor = BrandColor.PINK_NT
 	)
 }
+
+@Composable
+@Preview(showBackground = true)
+fun PreviewElapsedTimeChip() {
+	ElapsedTimeChip(athleteCheckInTime = "3:06")
+}

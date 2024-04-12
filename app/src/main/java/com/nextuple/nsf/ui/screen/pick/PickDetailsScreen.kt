@@ -2,27 +2,26 @@ package com.nextuple.nsf.ui.screen.pick
 
 import android.os.Handler
 import android.os.Looper
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -39,8 +38,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -171,7 +177,7 @@ fun PickDetailsScreen(
 	}
 
 	Box(
-		modifier = Modifier.fillMaxSize(),
+		modifier = Modifier.fillMaxHeight(),
 		contentAlignment = Alignment.Center
 	) {
 		Column(
@@ -184,10 +190,12 @@ fun PickDetailsScreen(
 				HorizontalProgressBar(
 					modifier = Modifier
 						.background(BrandColor.GRAY_100)
+						.height(33.dp)
 						.padding(start = 20.dp, end = 40.dp, top = 8.dp, bottom = 8.dp),
 					title = stringResource(id = R.string.units),
 					workedCount = unitsWorked,
-					totalCount = totalUnits
+					totalCount = totalUnits,
+					completedColor = BrandColor.BLUE_300_NT
 				)
 				Spacer(
 					modifier = Modifier
@@ -211,9 +219,9 @@ fun PickDetailsScreen(
 				mainContent = {
 					Column(
 						modifier = Modifier
-							.wrapContentHeight()
+							.height(412.dp)
 							.fillMaxWidth()
-							.padding(vertical = 6.dp, horizontal = 30.dp)
+							.padding(top = 6.dp, start = 30.dp, end = 30.dp)
 					) {
 						Row(
 							modifier = Modifier
@@ -232,7 +240,7 @@ fun PickDetailsScreen(
 								letterSpacing = 1.5.sp
 							)
 							Text(
-								text = subFulfillmentType?.toString() ?: "",
+								text = subFulfillmentType.toString(),
 								maxLines = 1,
 								color = BrandColor.GRAY_500,
 								fontFamily = FontFamily.ARCHIVO,
@@ -246,7 +254,7 @@ fun PickDetailsScreen(
 							modifier = Modifier
 								.width(210.dp),
 							text = currentPickTaskItem?.productName ?: "",
-							maxLines = 2,
+							maxLines = if (clearanceColor.isNullOrEmpty()) 2 else 1,
 							overflow = TextOverflow.Ellipsis,
 							fontFamily = FontFamily.ARCHIVO,
 							fontSize = 12.sp,
@@ -283,6 +291,7 @@ fun PickDetailsScreen(
 
 						ProductAttributes(
 							upcs = currentPickTaskItem?.upcs.orEmpty(),
+							styleNum = currentPickTaskItem?.style,
 							locations = locations.ifEmpty { defaultLocations },
 							onHandQty = currentPickTaskItem?.onHandQty,
 							primaryAttr = currentPickTaskItem?.primaryAttr,
@@ -292,11 +301,15 @@ fun PickDetailsScreen(
 							lastReturn = currentPickTaskItem?.lastReturn.toString()
 						)
 
-						Spacer(modifier = Modifier.height(6.dp))
-
-						DetailedCallToAction(
+						Row(
 							modifier = Modifier
-								.align(Alignment.CenterHorizontally),
+								.fillMaxWidth()
+								.fillMaxHeight(),
+							horizontalArrangement = Arrangement.Center,
+							verticalAlignment = Alignment.Bottom
+						) {
+							Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+								DetailedCallToAction(
 							detailedCallToActionMode = when {
 								recordPickState is GenericViewState.Loading -> {
 									DetailedCallToActionMode.Loading()
@@ -346,17 +359,14 @@ fun PickDetailsScreen(
 								}
 							}
 						)
-
-						Box(
+								HorizontalDivider(
 							modifier = Modifier
-								.padding(top = 8.dp)
-								.size(width = 124.dp, height = 2.dp)
-								.background(
-									color = Color(0xFFD9D9D9),
-									shape = RoundedCornerShape(size = 4.dp)
+										.width(124.dp),
+									color = BrandColor.GRAY_400,
+									thickness = 2.dp
 								)
-								.align(Alignment.CenterHorizontally)
-						)
+							}
+						}
 					}
 				},
 				secondaryContent = {
@@ -376,7 +386,7 @@ fun PickDetailsScreen(
 							onDeclineClick()
 							showDeclineModal = true
 						},
-						text = stringResource(id = R.string.decline),
+						text = stringResource(id = string.decline),
 						textSize = 16.sp
 					)
 				},
@@ -397,8 +407,8 @@ fun PickDetailsScreen(
 	if (showDeclineModal && declineModalOptions != null) {
 		if (subFulfillmentType != SubFulfillmentType.BOPL) {
 			MultiOptionModal(
-				title = stringResource(id = R.string.decline_reason),
-				subTitle = stringResource(id = R.string.decline_reason_subtitle),
+				title = stringResource(id = string.decline_reason),
+				subTitle = stringResource(id = string.decline_reason_subtitle),
 				buttons = declineModalOptions.keys.map { it.uppercase() },
 				buttonClick = { displayStr ->
 					val declineReason = declineModalOptions[displayStr] ?: return@MultiOptionModal
@@ -490,6 +500,7 @@ private fun PickImages(
 @Composable
 private fun ProductAttributes(
 	upcs: List<String>,
+    styleNum: String?,
 	locations: List<String>,
 	onHandQty: Int?,
 	primaryAttr: ProductAttribute?,
@@ -498,21 +509,40 @@ private fun ProductAttributes(
 	lastReturn: String,
 	lastReceived: String
 ) {
+	val clipboardManager: ClipboardManager = LocalClipboardManager.current
 	val interactionSource = remember { MutableInteractionSource() }
 	val interactionSourceOnHand = remember { MutableInteractionSource() }
-	val isPressed by interactionSource.collectIsPressedAsState()
-	val isOnHandPressed by interactionSourceOnHand.collectIsPressedAsState()
+	var showLocationDialog by remember { mutableStateOf(false) }
+	var showAdditionalDetailsDialog by remember { mutableStateOf(false) }
+	var copyCoordinatesOrigin: LayoutCoordinates? = null
+	var copyCoordinatesX by remember { mutableIntStateOf(0) }
+	var copyCoordinatesY by remember { mutableIntStateOf(0) }
+	var isCopyPressed by remember { mutableStateOf(false) }
 
 	val maxLocations = 4
 	if (locations.size > 1) {
 		val toIndex = Integer.min(locations.size, maxLocations)
 
-		AnimatedVisibility(visible = isPressed) {
-			LocationDialog(locations = locations.subList(0, toIndex))
+		if (showLocationDialog) {
+			LocationDialog(locations = locations.subList(0, toIndex)) {
+				showLocationDialog = false
+			}
 		}
 	}
-	AnimatedVisibility(visible = isOnHandPressed) {
-		AdditionalDetailsDialog(onHandQty.toString(), lastReceived, lastReturn)
+
+	if (showAdditionalDetailsDialog) {
+		AdditionalDetailsDialog(onHandQty.toString(), lastReceived, lastReturn) {
+			showAdditionalDetailsDialog = false
+		}
+	}
+	if (isCopyPressed) {
+		CustomTextPopup(
+			content = "Copied",
+			onDismiss = { },
+			onHide = { isCopyPressed = false },
+			screenPositionX = copyCoordinatesX,
+			screenPositionY = copyCoordinatesY
+		)
 	}
 
 	Box(
@@ -529,7 +559,7 @@ private fun ProductAttributes(
 					.clickable(
 						interactionSource = interactionSource,
 						indication = LocalIndication.current
-					) {},
+					) { showLocationDialog = true },
 				iconImageVector = if (locations.size > 1) {
 					ImageVector.vectorResource(
 						R.drawable.ic_location
@@ -537,7 +567,7 @@ private fun ProductAttributes(
 				} else {
 					null
 				},
-				label = stringResource(R.string.item_location),
+				label = stringResource(string.item_location),
 				value = locations.firstOrNull(),
 				valueMaxLines = 1
 			)
@@ -548,7 +578,7 @@ private fun ProductAttributes(
 					.clickable(
 						interactionSource = interactionSourceOnHand,
 						indication = LocalIndication.current
-					) {}
+					) { showAdditionalDetailsDialog = true }
 					.background(color = BrandColor.GRAY_100),
 				label = stringResource(id = R.string.on_hand),
 				iconImageVector = ImageVector.vectorResource(R.drawable.ic_on_hand_icon),
@@ -557,17 +587,42 @@ private fun ProductAttributes(
 			AttributeText(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(vertical = 2.dp),
-				label = stringResource(R.string.upc),
+					.padding(vertical = 2.dp)
+					.pointerInput(upcs) {
+						copyCoordinatesOrigin?.let {
+							detectTapGestures { offset ->
+								copyCoordinatesX = it.positionInRoot().x.toInt() + offset.x.toInt()
+								copyCoordinatesY = it.positionInRoot().y.toInt() + offset.y.toInt()
+								clipboardManager.setText(AnnotatedString(upcs.first()))
+								isCopyPressed = true
+							}
+						}
+					}
+					.onGloballyPositioned {
+						copyCoordinatesOrigin = it
+					},
+				label = stringResource(string.upc),
+				iconImageVector = ImageVector.vectorResource(R.drawable.ic_copy_icon),
 				value = upcs.firstOrNull(),
 				valueMaxLines = 1
 			)
+			if (!styleNum.isNullOrEmpty()) {
+				AttributeText(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 2.dp)
+						.background(color = BrandColor.GRAY_100),
+					label = "Style",
+					value = styleNum,
+					valueMaxLines = 1
+				)
+			}
 			AttributeText(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(vertical = 2.dp)
 					.background(
-						color = if (primaryAttr?.value.isNullOrEmpty()) {
+						color = if (primaryAttr?.value.isNullOrEmpty() || !styleNum.isNullOrEmpty()) {
 							Color.Transparent
 						} else {
 							BrandColor.GRAY_100
@@ -580,10 +635,18 @@ private fun ProductAttributes(
 			AttributeText(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(vertical = 2.dp),
+					.padding(vertical = 2.dp)
+					.background(
+						color = if ((primaryAttr?.value.isNullOrEmpty() || secondaryAttr?.value.isNullOrEmpty()) || styleNum.isNullOrEmpty()) {
+							Color.Transparent
+						} else {
+							BrandColor.GRAY_100
+						}
+					),
 				label = secondaryAttr?.name.orEmpty(),
 				value = secondaryAttr?.value
 			)
+			if (styleNum.isNullOrEmpty()) {
 			AttributeText(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -598,6 +661,7 @@ private fun ProductAttributes(
 				label = tertiaryAttr?.name.orEmpty(),
 				value = tertiaryAttr?.value
 			)
+			}
 		}
 	}
 }
@@ -716,7 +780,8 @@ fun PickDetailsScreenPreview() {
 			declinedQty = 0,
 			pickedQty = 0,
 			clearanceColorRgb = "0,175,65",
-			clearanceColorDesc = "GREEN"
+			clearanceColorDesc = "GREEN",
+			style = null
 		),
 		unitsWorked = 1,
 		totalUnits = 3,

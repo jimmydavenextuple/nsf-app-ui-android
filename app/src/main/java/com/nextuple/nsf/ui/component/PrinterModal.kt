@@ -15,9 +15,9 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.InfoModal
 import com.nextuple.nsf.ui.common.TopLabeledTextField
-import com.nextuple.nsf.ui.state.Printer
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.GenericViewState
+import com.nextuple.nsf.ui.util.Printer
 import com.nextuple.nsf.util.StringUtils.isValidIPv4Address
 
 @Composable

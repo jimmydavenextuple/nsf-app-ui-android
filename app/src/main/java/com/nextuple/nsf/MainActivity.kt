@@ -118,9 +118,9 @@ class MainActivity : ComponentActivity() {
 				// Log and toast
 				logService.trackEvent("FetchedFireBaseToken",
 					mapOf("FirebaseToken" to token))
-				if(BuildConfig.DEBUG) {
-					Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
-				}
+//				if(BuildConfig.DEBUG) {
+//					Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+//				}
 				MyFirebaseMessagingService.sendRegistrationToServer(token)
 			}
 		)

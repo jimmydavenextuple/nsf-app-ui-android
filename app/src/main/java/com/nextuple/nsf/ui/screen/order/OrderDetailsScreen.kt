@@ -660,7 +660,7 @@ fun CancelConfirmationModalPreview() {
 @Composable
 fun CancelReasonModalPreview() {
 	CancelReasonModal(
-		cancelReasons = listOf("ATHLETE REQUEST", "DAMAGE"),
+		cancelReasons = listOf("CUSTOMER REQUEST", "DAMAGE"),
 		onCancelReasonClicked = {},
 		dismissModal = {}
 	)

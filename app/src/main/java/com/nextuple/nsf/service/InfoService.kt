@@ -51,7 +51,7 @@ class InfoService(
 		val dks = userRepository.getDks() ?: return Result.generalError()
 
 		val res = infoApi.getDeclineCodes(
-			brand = store.brand.name,
+			brand = store.brand.chainName,
 			store = store.id,
 			fulfillmentType = FulfillmentType.BOPIS.name,
 			subFulfillmentType = SubFulfillmentType.BOPIS.name,

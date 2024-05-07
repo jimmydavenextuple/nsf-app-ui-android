@@ -201,7 +201,7 @@ fun PreviewOrderScreen() {
 			Filter("stage"),
 			Filter("dispense")
 		),
-		selectedTab = OrderScreenTab.READY,
+		selectedTab = OrderScreenTab.IN_PROGRESS,
 		onSelectTab = {}
 	) { _, _ -> }
 }

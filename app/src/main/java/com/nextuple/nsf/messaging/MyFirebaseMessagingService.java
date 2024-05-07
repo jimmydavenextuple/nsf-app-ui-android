@@ -84,7 +84,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         new Handler(Looper.getMainLooper()).post(() ->
                 Toast.makeText(
                         MyFirebaseMessagingService.this.getApplicationContext(),
-                        from + " -> " + body, Toast.LENGTH_SHORT)
+                        body, Toast.LENGTH_SHORT)
                         .show()
         );
     }

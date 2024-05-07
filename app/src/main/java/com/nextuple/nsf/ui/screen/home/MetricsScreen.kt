@@ -234,7 +234,7 @@ private fun MetricsBody(body: String, color: Color = BrandColor.BLUE_300_NT) {
 private fun determineColor(metric: String, metricType: MetricType, fulfillmentType: SubFulfillmentType): Color {
 	val color: Color = when (getLevel(metric = metric, metricType = metricType, subfulfillmentType = fulfillmentType)) {
 		MetricLevel.GOOD -> BrandColor.BLUE_300_NT
-		MetricLevel.MEDIUM -> BrandColor.PINK_NT
+		MetricLevel.MEDIUM -> BrandColor.YELLOW_400
 		MetricLevel.BAD -> BrandColor.RED_600
 	}
 

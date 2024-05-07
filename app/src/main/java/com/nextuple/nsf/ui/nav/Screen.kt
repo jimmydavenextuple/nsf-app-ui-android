@@ -7,7 +7,7 @@ enum class Screen(
 	val isSearchEnabled: Boolean = false
 ) {
 	LOGIN(route = "login"),
-	HOME(title = "NSF", route = "home", isSearchEnabled = true),
+	HOME(title = "Fulfill", route = "home", isSearchEnabled = true),
 	PICK(title = "Pick Orders", route = "pick", isSearchEnabled = true),
 	PREP(title = "Prep", route = "prep", isSearchEnabled = false), // TODO: Find a way around this to make this only false when trying to pack by gear and true otherwise
 	ORDERS(title = "Orders", route = "orders", isSearchEnabled = true),

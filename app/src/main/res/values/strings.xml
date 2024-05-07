@@ -3,16 +3,16 @@
     <string name="aged_cancel">AGED CANCEL</string>
     <string name="aged_cancel_info">This customer has not collected their order within the allotted time frame for pick up. Please mark it as aged cancel and return the units to the floor.</string>
     <string name="app_name">NSF</string>
-    <string name="athlete">ATHLETE</string>
+    <string name="athlete">Customer</string>
     <string name="athlete_info">Customer Info</string>
     <string name="athlete_name">CUSTOMER NAME</string>
     <string name="back">BACK</string>
     <string name="bring_to_athlete_description">Bring this order to the customer</string>
-    <string name="bring_to_athlete_title">Bring Order To Athlete</string>
+    <string name="bring_to_athlete_title">Bring Order To Customer</string>
     <string name="cancel_error">There was an issue canceling this order. Please try again.</string>
     <string name="cancel_order">CANCEL ORDER</string>
     <string name="cancel_confirmation_title">Confirm Cancel</string>
-    <string name="cancel_confirmation_info">Are you sure you want to cancel this order? The athlete will be notified that the order has been cancelled.</string>
+    <string name="cancel_confirmation_info">Are you sure you want to cancel this order? The customer will be notified that the order has been cancelled.</string>
     <string name="cancel_reason_title">Why are you canceling?</string>
     <string name="cant_find_the_ip">CAN\'T FIND THE IP?</string>
     <string name="car_info">CAR INFO</string>
@@ -141,7 +141,7 @@
     <string name="printer_problems">PRINTER PROBLEMS?</string>
     <string name="other_printer">OTHER PRINTER</string>
     <string name="printer_problems_title">Troubleshooting</string>
-    <string name="printer_problems_info">Label failed to print: \n• Ensure printer is on. \n• Check wifi signal on mobile device.\n• Check IP Address of printer. \n• Tap CONNECT. \n\nLabel printed on multiple labels? \n• Tap CALIBRATE. \n\nStill need help? \nPlease contact the technology service desk to trouble shoot other issues. \n\ntechnologyservicedesk@dcsg.com (724) 273–3456</string>
+    <string name="printer_problems_info">Label failed to print: \n• Ensure printer is on. \n• Check wifi signal on mobile device.\n• Check IP Address of printer. \n• Tap CONNECT. \n\nLabel printed on multiple labels? \n• Tap CALIBRATE. \n\nStill need help? \nPlease contact the technology service desk to trouble shoot other issues. \n\nsupport@nextuple.com (999) 999–1234</string>
 
     <!-- UnderConstruction   -->
     <string name="under_construction_title">Under Construction</string>
@@ -157,7 +157,7 @@
 
     <!-- Order Pickup -->
     <string name="confirm_pickup_modal_title">Confirm Pickup</string>
-    <string name="confirm_pickup_modal_info">Confirming the pickup will charge the athlete’s method of payment.</string>
+    <string name="confirm_pickup_modal_info">Confirming the pickup will charge the customers’s method of payment.</string>
     <string name="pickup_complete">Pickup Complete</string>
     <string name="delivery_speed">Delivery Speed</string>
     <string name="bopl_prep_2">Place Hold Slip On Order</string>

@@ -58,11 +58,11 @@ fun HomeScreen() {
 			MetricsScreen(fulfillmentType = SubFulfillmentType.BOPIS)
 		}
 	} else {
-	EmptyStateScreen(
-		title = stringResource(id = R.string.under_construction_title),
-		body = stringResource(id = R.string.under_construction_info),
-		imageVector = ImageVector.vectorResource(id = R.drawable.under_construction)
-	)
+		EmptyStateScreen(
+			title = stringResource(id = R.string.under_construction_title),
+			body = stringResource(id = R.string.under_construction_info),
+			imageVector = ImageVector.vectorResource(id = R.drawable.under_construction)
+		)
 	}
 }
 
@@ -70,4 +70,14 @@ fun HomeScreen() {
 @PreviewPdt
 fun PreviewHomeScreen() {
 	HomeScreen()
+}
+
+@Composable
+@PreviewPdt
+fun PreviewEmptyStateScreen() {
+	EmptyStateScreen(
+		title = stringResource(id = R.string.under_construction_title),
+		body = stringResource(id = R.string.under_construction_info),
+		imageVector = ImageVector.vectorResource(id = R.drawable.under_construction)
+	)
 }

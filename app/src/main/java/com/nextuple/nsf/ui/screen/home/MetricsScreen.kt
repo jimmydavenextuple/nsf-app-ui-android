@@ -258,7 +258,14 @@ private fun MetricsSubscript(subscript: String) {
 @Composable
 @PreviewPdt
 fun PreviewEmptyMetricsScreen() {
-	MetricsScreen(fulfillmentType = SubFulfillmentType.BOPIS)
+	MetricsScreen(fulfillmentType = SubFulfillmentType.BOPIS,
+		uph = 8.1f,
+		fillRate = .973f,
+		productivity = .891f,
+		unitWorked = 109,
+		totalUnits = 122,
+		carSpeed = "02:21",
+		personSpeed = "03:37")
 }
 
 @Composable

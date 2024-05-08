@@ -171,7 +171,7 @@ fun LoginScreen(
 			modifier = Modifier
 				.align(Alignment.BottomStart)
 				.padding(24.dp),
-			text = "NSF ${BuildConfig.APP_VERSION}",
+			text = "Store Fulfillment ${BuildConfig.APP_VERSION}",
 			fontSize = 10.sp,
 			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight(700),

@@ -149,7 +149,7 @@ private fun ScreenTitle(
 			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
 			letterSpacing = 1.sp,
-			fontSize = 32.sp
+			fontSize = 20.sp
 		)
 	} else {
 		TextStyle(

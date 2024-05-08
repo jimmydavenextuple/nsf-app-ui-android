@@ -58,10 +58,10 @@ fun HomeScreen() {
 			MetricsScreen(
 				fulfillmentType = SubFulfillmentType.BOPIS,
 				uph = 8.1f,
-				fillRate = .973f,
-				productivity = .891f,
-				unitWorked = 109,
-				totalUnits = 122,
+				fillRate = .931f,
+				productivity = .811f,
+				unitWorked = 95,
+				totalUnits = 102,
 				carSpeed = "02:21",
 				personSpeed = "03:37")
 		}

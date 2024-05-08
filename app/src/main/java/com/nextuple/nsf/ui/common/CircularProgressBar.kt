@@ -58,9 +58,9 @@ fun CircularProgressBar(
     indicatorThickness: Dp = 20.dp,
     animationDuration: Int = 1000,
     animationDelay: Int = 0,
-	backgroundIndicatorColor: Color = BrandColor.BLUE_100_NT,
-	completedIndicatorColor: Color = BrandColor.BLUE_300_NT,
-	inProgressIndicatorColor: Color = BrandColor.YELLOW_NT,
+    backgroundIndicatorColor: Color = BrandColor.BLUE_100_NT,
+    completedIndicatorColor: Color = BrandColor.BLUE_300_NT,
+    inProgressIndicatorColor: Color = BrandColor.YELLOW_NT,
     showLegends: Boolean = false,
     backgroundLegendText: String = "Unworked",
     completedLegendText: String = "Progress",
@@ -71,199 +71,205 @@ fun CircularProgressBar(
     percent: Float? = null,
     centerIconModifier: Modifier = Modifier.clickable { },
     centerProgressTextStyle: TextStyle = TextStyle(
-		fontWeight = FontWeight.Bold,
-		fontFamily = FontFamily.ARCHIVO,
-		letterSpacing = 1.5.sp,
-		fontSize = MaterialTheme.typography.displayLarge.fontSize
-	),
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.ARCHIVO,
+        letterSpacing = 1.5.sp,
+        fontSize = MaterialTheme.typography.displayLarge.fontSize
+    ),
     centerTextStyle: TextStyle = TextStyle(
-		fontWeight = FontWeight.SemiBold,
-		fontFamily = FontFamily.ARCHIVO,
-		letterSpacing = 1.5.sp,
-		fontSize = MaterialTheme.typography.bodySmall.fontSize
-	),
+        fontWeight = FontWeight.SemiBold,
+        fontFamily = FontFamily.ARCHIVO,
+        letterSpacing = 1.5.sp,
+        fontSize = MaterialTheme.typography.bodySmall.fontSize
+    ),
     legendsTextStyle: TextStyle = TextStyle(
-		fontFamily = FontFamily.ARCHIVO,
-		fontWeight = FontWeight.Medium,
-		textAlign = TextAlign.Center,
-		fontSize = 20.sp
-	)
+        fontFamily = FontFamily.ARCHIVO,
+        fontWeight = FontWeight.Medium,
+        textAlign = TextAlign.Center,
+        fontSize = 20.sp
+    )
 ) {
-	var completedProgressRemember by remember {
-		mutableStateOf(0f)
-	}
+    var completedProgressRemember by remember {
+        mutableStateOf(0f)
+    }
 
-	var inProgressRemember by remember {
-		mutableStateOf(0f)
-	}
+    var inProgressRemember by remember {
+        mutableStateOf(0f)
+    }
 
-	// Number Animation
-	val completedAnimateNumer = animateFloatAsState(
-		targetValue = completedProgressRemember,
-		animationSpec = tween(
-			durationMillis = animationDuration,
-			delayMillis = animationDelay
-		)
-	)
-	val inProgressAnimateNumber = animateFloatAsState(
-		targetValue = inProgressRemember,
-		animationSpec = tween(
-			durationMillis = animationDuration,
-			delayMillis = animationDelay
-		)
-	)
-	SideEffect {
-		if (percent != null) {
-			completedProgressRemember = percent.toFloat()
-		} else {
-		completedProgressRemember = if (totalUnits == 0) 0f else completedUnits * 100f / totalUnits
-		inProgressRemember = if (totalUnits == 0) 0f else (inProgressUnits + completedUnits) * 100f / totalUnits
-		}
-	}
-	Column(
-		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally
-	) {
-		Box(
-			contentAlignment = Alignment.Center,
-			modifier = Modifier.size(size = progressBarSize).testTag("CircularProgressBar")
-		) {
-			Canvas(
-				modifier = Modifier.size(size = progressBarSize)
-			) {
-				val canvasSize = size.minDimension
+    // Number Animation
+    val completedAnimateNumer = animateFloatAsState(
+        targetValue = completedProgressRemember,
+        animationSpec = tween(
+            durationMillis = animationDuration,
+            delayMillis = animationDelay
+        )
+    )
+    val inProgressAnimateNumber = animateFloatAsState(
+        targetValue = inProgressRemember,
+        animationSpec = tween(
+            durationMillis = animationDuration,
+            delayMillis = animationDelay
+        )
+    )
+    SideEffect {
+        if (percent != null) {
+            completedProgressRemember = percent.toFloat() * 100f
+            inProgressRemember =
+                (1 - percent.toFloat()) * 100f
+        } else {
+            completedProgressRemember =
+                if (totalUnits == 0) 0f else completedUnits * 100f / totalUnits
+            inProgressRemember =
+                if (totalUnits == 0) 0f else (inProgressUnits + completedUnits) * 100f / totalUnits
+        }
+    }
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(size = progressBarSize)
+                .testTag("CircularProgressBar")
+        ) {
+            Canvas(
+                modifier = Modifier.size(size = progressBarSize)
+            ) {
+                val canvasSize = size.minDimension
 
-				val radius =
-					canvasSize / 2 - maxOf(indicatorThickness, indicatorThickness).toPx() / 2
+                val radius =
+                    canvasSize / 2 - maxOf(indicatorThickness, indicatorThickness).toPx() / 2
 
-				// Background circle
-				drawCircle(
-					color = backgroundIndicatorColor,
-					radius = radius,
-					style = Stroke(width = indicatorThickness.toPx(), cap = StrokeCap.Round)
-				)
+                // Background circle
+                drawCircle(
+                    color = backgroundIndicatorColor,
+                    radius = radius,
+                    style = Stroke(width = indicatorThickness.toPx(), cap = StrokeCap.Round)
+                )
 
-				val completedUnitsSweepAngle = (completedAnimateNumer.value / 100) * 360
-				val inProgressUnitsSweepAngle = (inProgressAnimateNumber.value / 100) * 360
+                val completedUnitsSweepAngle = (completedAnimateNumer.value / 100) * 360
+                val inProgressUnitsSweepAngle = (inProgressAnimateNumber.value / 100) * 360
 
-				drawArc(
-					color = inProgressIndicatorColor,
-					startAngle = 270f,
-					sweepAngle = inProgressUnitsSweepAngle,
-					useCenter = false,
-					topLeft = size.center - Offset(radius, radius),
-					size = Size(radius * 2, radius * 2),
-					style = Stroke(
-						width = indicatorThickness.toPx(),
-						cap = if (roundBorder) StrokeCap.Round else StrokeCap.Butt
-					)
-				)
+                drawArc(
+                    color = inProgressIndicatorColor,
+                    startAngle = 270f,
+                    sweepAngle = inProgressUnitsSweepAngle,
+                    useCenter = false,
+                    topLeft = size.center - Offset(radius, radius),
+                    size = Size(radius * 2, radius * 2),
+                    style = Stroke(
+                        width = indicatorThickness.toPx(),
+                        cap = if (roundBorder) StrokeCap.Round else StrokeCap.Butt
+                    )
+                )
 
-				drawArc(
-					color = completedIndicatorColor,
-					startAngle = 270f,
-					sweepAngle = completedUnitsSweepAngle,
-					useCenter = false,
-					topLeft = size.center - Offset(radius, radius),
-					size = Size(radius * 2, radius * 2),
-					style = Stroke(
-						width = indicatorThickness.toPx(),
-						cap = if (roundBorder) StrokeCap.Round else StrokeCap.Butt
-					)
-				)
-			}
+                drawArc(
+                    color = completedIndicatorColor,
+                    startAngle = 270f,
+                    sweepAngle = completedUnitsSweepAngle,
+                    useCenter = false,
+                    topLeft = size.center - Offset(radius, radius),
+                    size = Size(radius * 2, radius * 2),
+                    style = Stroke(
+                        width = indicatorThickness.toPx(),
+                        cap = if (roundBorder) StrokeCap.Round else StrokeCap.Butt
+                    )
+                )
+            }
 
-			// Display the text inside circle
-			DisplayText(
-				completedUnits = completedUnits,
-				totalUnits = totalUnits,
-				centerProgressTextStyle = centerProgressTextStyle,
-				centerTextStyle = centerTextStyle,
-				centerText = centerText,
-				showCenterImage = showCenterImage,
-				modifier = centerIconModifier,
-				percent = percent
+            // Display the text inside circle
+            DisplayText(
+                completedUnits = completedUnits,
+                totalUnits = totalUnits,
+                centerProgressTextStyle = centerProgressTextStyle,
+                centerTextStyle = centerTextStyle,
+                centerText = centerText,
+                showCenterImage = showCenterImage,
+                modifier = centerIconModifier,
+                percent = percent
 
-			)
-		}
-		if (showLegends) {
-			Spacer(modifier = Modifier.height(24.dp))
+            )
+        }
+        if (showLegends) {
+            Spacer(modifier = Modifier.height(24.dp))
 
-			DisplayLegends(
-				items = listOf(
-					Legend(backgroundIndicatorColor, backgroundLegendText),
-					Legend(completedIndicatorColor, completedLegendText),
-					Legend(inProgressIndicatorColor, inProgressLegendText)
-				),
-				textStyle = legendsTextStyle
-			)
-		}
-	}
+            DisplayLegends(
+                items = listOf(
+                    Legend(backgroundIndicatorColor, backgroundLegendText),
+                    Legend(completedIndicatorColor, completedLegendText),
+                    Legend(inProgressIndicatorColor, inProgressLegendText)
+                ),
+                textStyle = legendsTextStyle
+            )
+        }
+    }
 }
 
 @Composable
 private fun DisplayText(
-	completedUnits: Int,
-	totalUnits: Int,
-	centerProgressTextStyle: TextStyle,
-	centerTextStyle: TextStyle,
-	centerText: String?,
-	showCenterImage: Boolean,
-	percent: Float?,
-	modifier: Modifier
+    completedUnits: Int,
+    totalUnits: Int,
+    centerProgressTextStyle: TextStyle,
+    centerTextStyle: TextStyle,
+    centerText: String?,
+    showCenterImage: Boolean,
+    percent: Float?,
+    modifier: Modifier
 ) {
-	Column(
-		modifier = Modifier.testTag("CircularProgressBarTextInside"),
-		horizontalAlignment = Alignment.CenterHorizontally
-	) {
-		// Text that shows the number inside the circle
-		if (percent != null) {
-			if (percent <= 0) {
-		Text(
-					text = "--%",
-					style = centerProgressTextStyle,
-					fontFamily = FontFamily.SANS
-				)
-			} else {
-				Text(
-					text = String.format("%.1f", percent * 100) + "%",
-					style = centerProgressTextStyle,
-					fontFamily = FontFamily.SANS
-				)
-			}
-		} else {
-			Text(
-			text = "$completedUnits/$totalUnits",
-			style = centerProgressTextStyle,
-			fontFamily = FontFamily.SANS
-		)
-		centerText?.let {
-			Text(
-				text = centerText,
-				style = centerTextStyle,
-				fontFamily = FontFamily.ARCHIVO,
-				fontSize = 12.sp,
-				fontWeight = FontWeight.Bold,
-				color = BrandColor.GRAY_600
-			)
-		}
-		if (showCenterImage) {
-			Spacer(modifier = Modifier.height(3.dp))
-			DisplayImage(modifier = modifier)
-			}
-		}
-	}
+    Column(
+        modifier = Modifier.testTag("CircularProgressBarTextInside"),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Text that shows the number inside the circle
+        if (percent != null) {
+            if (percent <= 0) {
+                Text(
+                    text = "--%",
+                    style = centerProgressTextStyle,
+                    fontFamily = FontFamily.SANS
+                )
+            } else {
+                Text(
+                    text = String.format("%.1f", percent * 100) + "%",
+                    style = centerProgressTextStyle,
+                    fontFamily = FontFamily.SANS
+                )
+            }
+        } else {
+            Text(
+                text = "$completedUnits/$totalUnits",
+                style = centerProgressTextStyle,
+                fontFamily = FontFamily.SANS
+            )
+            centerText?.let {
+                Text(
+                    text = centerText,
+                    style = centerTextStyle,
+                    fontFamily = FontFamily.ARCHIVO,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = BrandColor.GRAY_600
+                )
+            }
+            if (showCenterImage) {
+                Spacer(modifier = Modifier.height(3.dp))
+                DisplayImage(modifier = modifier)
+            }
+        }
+    }
 }
 
 @Composable
 private fun DisplayImage(
-	modifier: Modifier
+    modifier: Modifier
 ) {
-	Image(
-		painter = painterResource(id = R.drawable.circular_progress_question_mark),
-		contentDescription = null,
-		modifier = modifier.testTag("CircularProgressBarCenterImage")
-	)
+    Image(
+        painter = painterResource(id = R.drawable.circular_progress_question_mark),
+        contentDescription = null,
+        modifier = modifier.testTag("CircularProgressBarCenterImage")
+    )
 }
 
 @Composable
@@ -273,30 +279,30 @@ fun DisplayLegends(
     items: List<Legend>,
     textStyle: TextStyle
 ) {
-	Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-		items.forEach {
-			Row(
-				modifier = Modifier,
-				horizontalArrangement = Arrangement.Start
-			) {
-				Box(
-					modifier = Modifier
-						.size(circleSize.dp)
-						.clip(CircleShape)
-						.background(color = it.color)
-				)
-				Spacer(modifier = Modifier.width(space.dp))
-				Text(
-					modifier = Modifier
-						.padding(start = 5.dp)
-						.wrapContentHeight()
-						.align(Alignment.CenterVertically),
-					text = it.text,
-					style = textStyle
-				)
-			}
-		}
-	}
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        items.forEach {
+            Row(
+                modifier = Modifier,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(circleSize.dp)
+                        .clip(CircleShape)
+                        .background(color = it.color)
+                )
+                Spacer(modifier = Modifier.width(space.dp))
+                Text(
+                    modifier = Modifier
+                        .padding(start = 5.dp)
+                        .wrapContentHeight()
+                        .align(Alignment.CenterVertically),
+                    text = it.text,
+                    style = textStyle
+                )
+            }
+        }
+    }
 }
 
 data class Legend(val color: Color, val text: String)
@@ -304,14 +310,30 @@ data class Legend(val color: Color, val text: String)
 @Preview(showBackground = true)
 @Composable
 fun CircularProgressBarPreview() {
-	CircularProgressBar(
-		completedUnits = 3,
-		totalUnits = 4,
-		inProgressUnits = 2,
-		centerText = "UNITS WORKED",
-		showLegends = true,
-		modifier = Modifier
-			.fillMaxWidth()
-			.padding(16.dp)
-	)
+    CircularProgressBar(
+        completedUnits = 3,
+        totalUnits = 4,
+        inProgressUnits = 2,
+        centerText = "UNITS WORKED",
+        showLegends = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CircularProgressBarPercentPreview() {
+    CircularProgressBar(
+        completedUnits = 80,
+        totalUnits = 100,
+        inProgressUnits = 0,
+        percent = 0.800F,
+        centerText = "",
+        showLegends = false,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    )
 }

@@ -26,6 +26,7 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.CircularProgressBar
 import com.nextuple.nsf.ui.common.HorizontalProgressBar
 import com.nextuple.nsf.ui.theme.BrandColor
+import com.nextuple.nsf.ui.theme.BrandColor.BLUE_300_NT
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.PreviewPdt
 import com.nextuple.nsf.util.SubFulfillmentType
@@ -87,8 +88,8 @@ private fun BopisMetrics(
 		) {
 			MetricsTitle(title = stringResource(R.string.fill_rate))
 			CircularProgressBar(
-				completedUnits = 0,
-				totalUnits = 0,
+				completedUnits = unitWorked,
+				totalUnits = totalUnits,
 				inProgressUnits = 0,
 				percent = fillRate,
 				centerProgressTextStyle = TextStyle(
@@ -99,7 +100,7 @@ private fun BopisMetrics(
 				),
 				progressBarSize = 75.dp,
 				indicatorThickness = 9.72.dp,
-				completedIndicatorColor = fillRateColor
+				completedIndicatorColor = BLUE_300_NT
 			)
 		}
 		val productivityColor = determineColor(

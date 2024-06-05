@@ -8,7 +8,7 @@ object NavUtil {
 	const val PICK_DEEP_LINK = "nsf://pick"
 	fun getStartDestination(isLoggedIn: Boolean, deepLinkUri: Uri?) =
 		when {
-			isLoggedIn && deepLinkUri == null -> Screen.PICK.route
+			isLoggedIn && deepLinkUri == null -> Screen.HOME.route
 			isLoggedIn && deepLinkUri != null -> getRouteForDeepLink(deepLinkUri)
 			else -> Screen.LOGIN.route
 		}

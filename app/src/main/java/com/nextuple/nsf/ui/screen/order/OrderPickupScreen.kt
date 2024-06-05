@@ -84,29 +84,29 @@ const val STEP_BRING_TO_ATHLETE: Int = 2
 
 @Composable
 fun OrderPickupScreen(
-    printViewModel: PrintViewModel = hiltViewModel(),
-    scanManager: ScanManager,
-    completeOrderPickupState: GenericViewState = GenericViewState.Idle,
-    orderNumber: String?,
-    athleteDetail: AthleteDetail?,
-    checkInDetail: AthleteCheckInDetail?,
-    frDetail: FulfillmentRequestDetail?,
-    holdSlipZpl: MutableList<String>?,
-    defaultStep: Int = STEP_GET_ORDER,
-    onOrderPickupClicked: (String) -> Unit,
-    scanHoldSlipState: GenericViewState,
-    onScanSuccess: (scanData: String) -> Unit,
-    onOrderPickupSuccess: () -> Unit,
-    onResetHoldSlipScan: () -> Unit,
-    bypassPrinter: Boolean,
-    printer: Printer,
-    printerConnectionState: GenericViewState = GenericViewState.Idle,
-    onPrintHoldSlip: (String) -> Unit,
-    holdSlipState: GenericViewState = GenericViewState.Idle,
-    resetGetHoldSlipState: () -> Unit,
-    onConnectPrinter: (Printer, String) -> Unit,
-    onResetPrinter: () -> Unit,
-    ipPrefix: String?
+	printViewModel: PrintViewModel = hiltViewModel(),
+	scanManager: ScanManager,
+	completeOrderPickupState: GenericViewState = GenericViewState.Idle,
+	orderNumber: String?,
+	athleteDetail: AthleteDetail?,
+	checkInDetail: AthleteCheckInDetail?,
+	frDetail: FulfillmentRequestDetail?,
+	holdSlipZpl: MutableList<String>?,
+	defaultStep: Int = STEP_GET_ORDER,
+	onOrderPickupClicked: (String) -> Unit,
+	scanHoldSlipState: GenericViewState,
+	onScanSuccess: (scanData: String) -> Unit,
+	onOrderPickupSuccess: () -> Unit,
+	onResetHoldSlipScan: () -> Unit,
+	bypassPrinter: Boolean,
+	printer: Printer,
+	printerConnectionState: GenericViewState = GenericViewState.Idle,
+	onPrintHoldSlip: (String) -> Unit,
+	holdSlipState: GenericViewState = GenericViewState.Idle,
+	resetGetHoldSlipState: () -> Unit,
+	onConnectPrinter: (Printer, String) -> Unit,
+	onResetPrinter: () -> Unit,
+	ipPrefix: String?
 ) {
 	val currentStep = remember {
 		mutableStateOf(defaultStep)
@@ -162,6 +162,7 @@ fun OrderPickupScreen(
 						mutableStateOf(DetailedCallToActionMode.Loading())
 					}
 				}
+
 				GenericViewState.Success -> {
 					scanState = remember {
 						mutableStateOf(
@@ -175,6 +176,7 @@ fun OrderPickupScreen(
 						advanceToAthleteStep()
 					}, 1000)
 				}
+
 				else -> {
 					scanState = remember {
 						mutableStateOf(DetailedCallToActionMode.Scan(""))
@@ -292,14 +294,14 @@ fun OrderPickupScreen(
 					Toast.LENGTH_SHORT
 				).show()
 			}
-			if (printViewModel.holdSlipPrintState == GenericViewState.Success) {
+			if (printViewModel.printHoldSlipState == GenericViewState.Success) {
 				Toast.makeText(
 					context,
 					stringResource(R.string.hold_slip_print_success),
 					Toast.LENGTH_SHORT
 				).show()
 				printViewModel.resetHoldSlipPrintState()
-			} else if (printViewModel.holdSlipPrintState == GenericViewState.Failure) {
+			} else if (printViewModel.printHoldSlipState == GenericViewState.Failure) {
 				Toast.makeText(
 					context,
 					stringResource(R.string.hold_slip_print_error),
@@ -328,7 +330,12 @@ private fun OrderPickupCardItem(
 	isActive: Boolean,
 	extraContent: @Composable () -> Unit = {}
 ) {
-	ExpandableStepCard(stepNumber = stepNumber, title = title, isActive = isActive, isComplete = !isActive && stepNumber == "1") {
+	ExpandableStepCard(
+		stepNumber = stepNumber,
+		title = title,
+		isActive = isActive,
+		isComplete = !isActive && stepNumber == "1"
+	) {
 		extraContent()
 	}
 }
@@ -360,7 +367,10 @@ private fun GetOrdersContent(
 				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {
 				Row(verticalAlignment = Alignment.CenterVertically) {
-					Image(painter = painterResource(id = R.drawable.ic_package_location), contentDescription = "")
+					Image(
+						painter = painterResource(id = R.drawable.ic_package_location),
+						contentDescription = ""
+					)
 					Spacer(modifier = Modifier.width(5.dp))
 					Text(
 						text = holdingLocation,

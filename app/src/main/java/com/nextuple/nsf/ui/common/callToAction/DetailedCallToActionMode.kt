@@ -21,25 +21,25 @@ sealed class DetailedCallToActionMode(
 	 * Once clicking on scan option changes to Loading state
 	 */
 	class Loading(
-        backgroundColor: Color = BrandColor.GRAY_100,
-        contentColor: Color = BrandColor.PINK_NT
+		backgroundColor: Color = BrandColor.GRAY_100,
+		contentColor: Color = BrandColor.PINK_NT
 	) : DetailedCallToActionMode(backgroundColor, contentColor)
 
 	/**
 	 * Once scanning is completed changes from Loading -> Done
 	 */
 	class Done(
-        backgroundColor: Color = BrandColor.BLUE_300_NT,
-        contentColor: Color = Color.White
+		backgroundColor: Color = BrandColor.BLUE_300_NT,
+		contentColor: Color = Color.White
 	) : DetailedCallToActionMode(backgroundColor, contentColor)
 
 	/**
 	 * Once item is declined
 	 */
 	class Decline(
-        val text: String = "Declined",
-        backgroundColor: Color = BrandColor.GRAY_800,
-        contentColor: Color = Color.White
+		val text: String = "Declined",
+		backgroundColor: Color = BrandColor.GRAY_800,
+		contentColor: Color = Color.White
 	) : DetailedCallToActionMode(backgroundColor, contentColor)
 }
 

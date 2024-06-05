@@ -54,7 +54,6 @@ class SettingsViewModel @Inject constructor(
 		connectionStatus = false
 	)
 
-
 	private var _printersList = mutableListOf(
 		defaultPrinter,
 		Printer(
@@ -105,7 +104,8 @@ class SettingsViewModel @Inject constructor(
 	 */
 	private fun getIpAddress(): String = "$PLACEHOLDER_IP_PREFIX${SecureRandom().nextInt(256)}"
 
-	fun findPrinter(printerName: PrinterName) = _printersList.find { it.printerName == printerName.name } ?: defaultPrinter
+	fun findPrinter(printerName: PrinterName) =
+		_printersList.find { it.printerName == printerName.name } ?: defaultPrinter
 
 	fun connectPrinter(printer: Printer, ipAddress: String) {
 		printerConnectionState = GenericViewState.Loading
@@ -140,18 +140,19 @@ class SettingsViewModel @Inject constructor(
 				// Close the socket after confirming printer connectivity and saving it
 				try {
 					socket?.close()
-				} catch (ignored: Exception) { }
+				} catch (ignored: Exception) {
+				}
 			}
 		}
 	}
-
 
 	fun disConnectPrinter(printer: Printer) {
 		printerConnectionState = GenericViewState.Loading
 		viewModelScope.launch {
 			val index = printersList?.indexOf(printer)
 			if ((index?.compareTo(0) ?: 0) >= 0) {
-				_printersList[index ?: 0] = printer.copy(connectionStatus = !printer.connectionStatus)
+				_printersList[index ?: 0] =
+					printer.copy(connectionStatus = !printer.connectionStatus)
 			}
 			printersList = _printersList
 			savePrintersToDevice()
@@ -163,14 +164,11 @@ class SettingsViewModel @Inject constructor(
 		printerConnectionState = GenericViewState.Idle
 	}
 
-
 	fun toggleBypassPrinter(): Boolean {
 		bypassPrinter = !bypassPrinter
 
 		return bypassPrinter
 	}
-
-
 
 	fun retrieveSavedPrinters() = viewModelScope.launch {
 		val savedPrinterList: MutableList<com.nextuple.nsf.Printers> = mutableListOf()
@@ -210,4 +208,3 @@ class SettingsViewModel @Inject constructor(
 		printersRepository.savePrinters(printersToSave)
 	}
 }
-

@@ -7,11 +7,8 @@ import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
 object TestData {
 
 	val PACK_TASK_ITEM = PackTaskItem(
-		id = 1,
-		packedQty = 2,
 		sku = "sku",
 		qty = 1,
-		declinedQty = 2,
 		productName = "name",
 		productImageUrls = emptyList()
 	)

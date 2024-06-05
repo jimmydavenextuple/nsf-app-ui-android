@@ -52,26 +52,27 @@ class UserServiceTest {
 	}
 
 	@Test
-	fun `login should call user api with the expected dks and store and update userRepo on success`() = runTest {
-		val dks = "dks123"
-		val firstName = "firstname"
-		val lastName = "lastName"
-		val store = Store(id = "456", brand = NT_BRAND_A)
+	fun `login should call user api with the expected dks and store and update userRepo on success`() =
+		runTest {
+			val dks = "dks123"
+			val firstName = "firstname"
+			val lastName = "lastName"
+			val store = Store(id = "456", brand = NT_BRAND_A)
 
-		every { runBlocking { userApi.login(any()) } } returns ApiResponse.Success(
-			data = LoginData(firstName = firstName, lastName = lastName)
-		)
-		every { deviceService.getStore() } returns store
-		justRun { runBlocking { userRepository.updateUser(any(), any(), any()) } }
+			every { runBlocking { userApi.login(any()) } } returns ApiResponse.Success(
+				data = LoginData(firstName = firstName, lastName = lastName)
+			)
+			every { deviceService.getStore() } returns store
+			justRun { runBlocking { userRepository.updateUser(any(), any(), any()) } }
 
-		service.login(dks = dks)
-		advanceUntilIdle()
+			service.login(dks = dks)
+			advanceUntilIdle()
 
-		verify {
-			runBlocking { userApi.login(req = LoginRequest(dks = dks, store = store.id)) }
-			runBlocking { userRepository.updateUser(firstName, lastName, dks) }
+			verify {
+				runBlocking { userApi.login(req = LoginRequest(dks = dks, store = store.id)) }
+				runBlocking { userRepository.updateUser(firstName, lastName, dks) }
+			}
 		}
-	}
 
 	@Test
 	fun `login should return general error on api success response having null data`() = runTest {

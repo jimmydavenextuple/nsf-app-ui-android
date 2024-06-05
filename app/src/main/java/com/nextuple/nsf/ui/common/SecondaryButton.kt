@@ -25,18 +25,20 @@ import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun SecondaryButton(
-    modifier: Modifier = Modifier,
-    text: String,
-    buttonColor: Color = Color.Transparent,
-    textColor: Color = BrandColor.GRAY_900,
-    textSize: TextUnit = 16.sp,
-    buttonShape: Shape = RoundedCornerShape(4.dp),
-    enabled: Boolean = true,
-    buttonState: ButtonState = ButtonState.DEFAULT,
-    onButtonClick: () -> Unit
+	modifier: Modifier = Modifier,
+	text: String,
+	buttonColor: Color = Color.Transparent,
+	textColor: Color = BrandColor.GRAY_900,
+	textSize: TextUnit = 16.sp,
+	buttonShape: Shape = RoundedCornerShape(4.dp),
+	enabled: Boolean = true,
+	buttonState: ButtonState = ButtonState.DEFAULT,
+	onButtonClick: () -> Unit
 ) {
 	Button(
-		modifier = modifier.height(IntrinsicSize.Min).testTag("SecondaryButton"),
+		modifier = modifier
+			.height(IntrinsicSize.Min)
+			.testTag("SecondaryButton"),
 		onClick = onButtonClick,
 		border = BorderStroke(2.dp, if (enabled) textColor else BrandColor.GRAY_500),
 		shape = buttonShape,
@@ -55,6 +57,7 @@ fun SecondaryButton(
 					color = textColor
 				)
 			}
+
 			else -> {
 				Text(
 					text = text,

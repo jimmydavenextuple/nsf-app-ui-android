@@ -4,6 +4,7 @@ import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.retrofit.ApiCallAdapterFactory
 import com.nextuple.nsf.retrofit.api.ConfigApi
 import com.nextuple.nsf.retrofit.api.InfoApi
+import com.nextuple.nsf.retrofit.api.MetricsApi
 import com.nextuple.nsf.retrofit.api.OrderApi
 import com.nextuple.nsf.retrofit.api.PackTaskApi
 import com.nextuple.nsf.retrofit.api.PickApi
@@ -57,8 +58,12 @@ internal object RetrofitModule {
 	fun provideOrderApi(retrofit: Retrofit): OrderApi = retrofit.create(OrderApi::class.java)
 
 	@Provides
-	fun provideStageTaskApi(retrofit: Retrofit): StageTaskApi = retrofit.create(StageTaskApi::class.java)
+	fun provideStageTaskApi(retrofit: Retrofit): StageTaskApi =
+		retrofit.create(StageTaskApi::class.java)
 
 	@Provides
 	fun provideConfigApi(retrofit: Retrofit): ConfigApi = retrofit.create(ConfigApi::class.java)
+
+	@Provides
+	fun provideMetricsApi(retrofit: Retrofit): MetricsApi = retrofit.create(MetricsApi::class.java)
 }

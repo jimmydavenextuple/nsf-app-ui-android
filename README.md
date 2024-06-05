@@ -29,7 +29,9 @@ The device types we must support consist of:
 
 Use `./devTools/emulateScan.sh` to send an emulated scan from DataWedge to the app.
 
-This requires `adb`, which should be included as part of any Android Studio install. To verify that it works, navigate to the Home screen Order Search component and run the script. The supplied input should appear in the search field.
+This requires `adb`, which should be included as part of any Android Studio install. To verify that
+it works, navigate to the Home screen Order Search component and run the script. The supplied input
+should appear in the search field.
 
 ## Snapshot Testing using [Shot Library](https://github.com/pedrovgs/Shot)
 
@@ -53,6 +55,8 @@ rm -rf app/screenshots/dev/debug/screenshots-default/
 ```
 
 ### References
+
 * Known Issue(s)
-  * Unable to make public void sun.nio.ch.ChannelInputStream.close() throws java.io.IOException accessible: module java.base does not "exports sun.nio.ch" to unnamed module @
-    * Fix: https://github.com/pedrovgs/Shot/issues/268
+    * Unable to make public void sun.nio.ch.ChannelInputStream.close() throws java.io.IOException
+      accessible: module java.base does not "exports sun.nio.ch" to unnamed module @
+        * Fix: https://github.com/pedrovgs/Shot/issues/268

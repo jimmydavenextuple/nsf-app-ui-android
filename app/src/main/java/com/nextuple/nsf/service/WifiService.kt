@@ -10,7 +10,8 @@ class WifiService @Inject constructor(
 	@ApplicationContext private val context: Context
 ) {
 	fun getIpAddressFromDevice(): String {
-		val wifiMgr = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+		val wifiMgr =
+			context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
 		// Min SDK at time of this change is 30, so we still need this.
 		@Suppress("DEPRECATION")

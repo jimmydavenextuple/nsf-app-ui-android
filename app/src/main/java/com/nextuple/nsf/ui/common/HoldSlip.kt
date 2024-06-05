@@ -86,7 +86,12 @@ fun HoldSlip(
 					contentScale = if (isSmallSize && isScanable) ContentScale.Fit else ContentScale.Crop
 				)
 				if (isSelected && !isScanable) {
-					Step(text = null, isActive = true, isOutlined = true, activeColor = BrandColor.GREEN_500)
+					Step(
+						text = null,
+						isActive = true,
+						isOutlined = true,
+						activeColor = BrandColor.GREEN_500
+					)
 				}
 			}
 			Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
@@ -121,7 +126,11 @@ fun HoldSlip(
 					)
 				}
 
-				Image(modifier = Modifier.padding(top = 3.dp), painter = painterResource(id = R.drawable.ic_hold_slip_rect), contentDescription = "")
+				Image(
+					modifier = Modifier.padding(top = 3.dp),
+					painter = painterResource(id = R.drawable.ic_hold_slip_rect),
+					contentDescription = ""
+				)
 			}
 			HorizontalDivider(
 				modifier = Modifier
@@ -130,7 +139,10 @@ fun HoldSlip(
 				color = LightGray
 			)
 			Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-				Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.Center
+				) {
 					if (isScanable) {
 						Icon(
 							modifier = Modifier
@@ -141,7 +153,10 @@ fun HoldSlip(
 							contentDescription = null
 						)
 					} else {
-						Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.Center
+						) {
 							Text(
 								modifier = Modifier,
 								text = "PART $packageNum/$packageNum",
@@ -158,7 +173,10 @@ fun HoldSlip(
 					}
 				}
 				if (isSmallSize && isScanable) {
-					Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.Center
+					) {
 						Text(
 							modifier = Modifier,
 							text = "PART $packageNum/$totalPackageNum",
@@ -189,6 +207,9 @@ fun PreviewHoldSlip() {
 		isSmallSize = true,
 		isScanable = true,
 		isSelected = false,
-		scanStatus = DetailedCallToActionMode.Done(backgroundColor = White, contentColor = BrandColor.BLUE_300_NT)
+		scanStatus = DetailedCallToActionMode.Done(
+			backgroundColor = White,
+			contentColor = BrandColor.BLUE_300_NT
+		)
 	)
 }

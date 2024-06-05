@@ -28,6 +28,10 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class PackTaskServiceTest {
 
+	companion object {
+		private const val FR_NO = "10100100100.001"
+	}
+
 	@get:Rule
 	val coroutineRule = CoroutineRule()
 
@@ -64,7 +68,14 @@ class PackTaskServiceTest {
 		)
 
 		every { runBlocking { userRepository.getDks() } } returns "dks"
-		every { runBlocking { packTaskApi.packAndGetHoldSlip(any(), any()) } } returns ApiResponse.Success(
+		every {
+			runBlocking {
+				packTaskApi.packAndGetHoldSlip(
+					any(),
+					any()
+				)
+			}
+		} returns ApiResponse.Success(
 			data = stageTask
 		)
 
@@ -77,15 +88,23 @@ class PackTaskServiceTest {
 	}
 
 	@Test
-	fun `packAndGetHoldSlip should return general error on api success response having null data`() = runTest {
-		every { runBlocking { packTaskApi.packAndGetHoldSlip(any(), any()) } } returns ApiResponse.Success()
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+	fun `packAndGetHoldSlip should return general error on api success response having null data`() =
+		runTest {
+			every {
+				runBlocking {
+					packTaskApi.packAndGetHoldSlip(
+						any(),
+						any()
+					)
+				}
+			} returns ApiResponse.Success()
+			every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		val res = service.packAndGetHoldSlip(taskId = "taskId")
-		advanceUntilIdle()
+			val res = service.packAndGetHoldSlip(taskId = "taskId")
+			advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
-	}
+			Assert.assertEquals(Result.generalError(), res)
+		}
 
 	@Test
 	fun `packAndGetHoldSlip should return general error if getDks is null`() = runTest {
@@ -106,7 +125,14 @@ class PackTaskServiceTest {
 			items = emptyList()
 		)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
-		every { runBlocking { packTaskApi.getPrepDetails(any(), any()) } } returns ApiResponse.Success(
+		every {
+			runBlocking {
+				packTaskApi.getPrepDetails(
+					any(),
+					any()
+				)
+			}
+		} returns ApiResponse.Success(
 			data = listOf(prepDetail)
 		)
 
@@ -119,15 +145,23 @@ class PackTaskServiceTest {
 	}
 
 	@Test
-	fun `getPrepDetails, single fr, should return general error on api success response having null data`() = runTest {
-		every { runBlocking { packTaskApi.getPrepDetails(any(), any()) } } returns ApiResponse.Success()
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+	fun `getPrepDetails, single fr, should return general error on api success response having null data`() =
+		runTest {
+			every {
+				runBlocking {
+					packTaskApi.getPrepDetails(
+						any(),
+						any()
+					)
+				}
+			} returns ApiResponse.Success()
+			every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		val res = service.getPrepDetails(frNo = "xx900000")
-		advanceUntilIdle()
+			val res = service.getPrepDetails(frNo = "xx900000")
+			advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
-	}
+			Assert.assertEquals(Result.generalError(), res)
+		}
 
 	@Test
 	fun `getPrepDetails, single fr, should return general error if getDks is null`() = runTest {
@@ -148,7 +182,14 @@ class PackTaskServiceTest {
 			items = emptyList()
 		)
 		every { runBlocking { userRepository.getDks() } } returns "dks"
-		every { runBlocking { packTaskApi.getPrepDetails(any(), any()) } } returns ApiResponse.Success(
+		every {
+			runBlocking {
+				packTaskApi.getPrepDetails(
+					any(),
+					any()
+				)
+			}
+		} returns ApiResponse.Success(
 			data = listOf(prepDetail)
 		)
 
@@ -161,15 +202,23 @@ class PackTaskServiceTest {
 	}
 
 	@Test
-	fun `getPrepDetails, fr list, should return general error on api success response having null data`() = runTest {
-		every { runBlocking { packTaskApi.getPrepDetails(any(), any()) } } returns ApiResponse.Success()
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+	fun `getPrepDetails, fr list, should return general error on api success response having null data`() =
+		runTest {
+			every {
+				runBlocking {
+					packTaskApi.getPrepDetails(
+						any(),
+						any()
+					)
+				}
+			} returns ApiResponse.Success()
+			every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		val res = service.getPrepDetails(frNos = listOf("xx900000"))
-		advanceUntilIdle()
+			val res = service.getPrepDetails(frNos = listOf("xx900000"))
+			advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
-	}
+			Assert.assertEquals(Result.generalError(), res)
+		}
 
 	@Test
 	fun `getPrepDetails, fr list, should return general error if getDks is null`() = runTest {
@@ -204,16 +253,24 @@ class PackTaskServiceTest {
 	}
 
 	@Test
-	fun `packByGear should return general error on api success response having null data`() = runTest {
-		every { runBlocking { packTaskApi.getPrepDetails(any(), any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+	fun `packByGear should return general error on api success response having null data`() =
+		runTest {
+			every {
+				runBlocking {
+					packTaskApi.getPrepDetails(
+						any(),
+						any()
+					)
+				}
+			} returns ApiResponse.Success()
+			every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+			every { runBlocking { userRepository.getDks() } } returns "dks"
 
-		val res = service.packByGear(upc = "upc")
-		advanceUntilIdle()
+			val res = service.packByGear(upc = "upc")
+			advanceUntilIdle()
 
-		Assert.assertEquals(Result.generalError(), res)
-	}
+			Assert.assertEquals(Result.generalError(), res)
+		}
 
 	@Test
 	fun `packByGear should return general error if getStore is null`() = runTest {
@@ -233,6 +290,61 @@ class PackTaskServiceTest {
 		val res = service.packByGear(upc = "upc")
 		advanceUntilIdle()
 
+		Assert.assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `packByOrder should call api with expected values`() = runTest {
+		val prepDetail = PrepDetail(
+			fulfillmentType = "BOPIS",
+			subFulfillmentType = "BOPIS",
+			fulfillmentRequestNumber = FR_NO,
+			items = emptyList()
+		)
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { packTaskApi.packByOrder(any(), any()) } } returns ApiResponse.Success(
+			data = prepDetail
+		)
+		service.packByOrder(frNo = FR_NO)
+		advanceUntilIdle()
+		verify {
+			runBlocking { packTaskApi.packByOrder(any(), any()) }
+		}
+	}
+
+	@Test
+	fun `packByOrder should return general error on api success response having null data`() =
+		runTest {
+			every {
+				runBlocking {
+					packTaskApi.getPrepDetails(
+						any(),
+						any()
+					)
+				}
+			} returns ApiResponse.Success()
+			every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+			every { runBlocking { userRepository.getDks() } } returns "dks"
+			val res = service.packByOrder(frNo = FR_NO)
+			advanceUntilIdle()
+			Assert.assertEquals(Result.generalError(), res)
+		}
+
+	@Test
+	fun `packByOrder should return general error if getStore is null`() = runTest {
+		every { deviceService.getStore() } returns null
+		val res = service.packByOrder(frNo = FR_NO)
+		advanceUntilIdle()
+		Assert.assertEquals(Result.generalError(), res)
+	}
+
+	@Test
+	fun `packByOrder should return general error if getDks is null`() = runTest {
+		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getDks() } } returns null
+		val res = service.packByOrder(frNo = FR_NO)
+		advanceUntilIdle()
 		Assert.assertEquals(Result.generalError(), res)
 	}
 }

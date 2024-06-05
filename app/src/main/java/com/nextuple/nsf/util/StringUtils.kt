@@ -37,4 +37,30 @@ object StringUtils {
 		val bin = holdingLocation.substring(binStartIndex).trim()
 		return area to bin
 	}
+
+	/**
+	 * Used to format a double into a percent. No calculation occurs.
+	 * Removes the zero if the value is 100.0
+	 * Returns --% if the value is null
+	 * Ex: 97.3 -> 97.3%
+	 * Ex: 100.0 -> 100%
+	 */
+	fun Double?.toPercent() = when {
+		this == null -> "--%"
+		this != 100.0 -> String.format("%.1f", this) + "%"
+		else -> String.format("%.0f", this) + "%"
+	}
+
+	/**
+	 * Used to format time from metrics
+	 * if null or an error occurs it will return --:--
+	 * ex: 00:12:32.123 -> 12:32
+	 */
+	private const val timePlaceholder = "--:--"
+	fun formatTime(time: String?) = runCatching {
+		if (time == null) return@runCatching timePlaceholder
+		val timeWithoutMillis = time.split(".").first()
+		val timeUnits = timeWithoutMillis.split(":")
+		"${timeUnits[1]}:${timeUnits[2]}"
+	}.getOrDefault(timePlaceholder)
 }

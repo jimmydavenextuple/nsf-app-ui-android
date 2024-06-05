@@ -1,7 +1,7 @@
 package com.nextuple.nsf.retrofit
 
-import com.nextuple.nsf.retrofit.dto.ApiResponse
 import com.google.gson.reflect.TypeToken
+import com.nextuple.nsf.retrofit.dto.ApiResponse
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK

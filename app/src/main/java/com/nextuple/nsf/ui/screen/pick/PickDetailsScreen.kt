@@ -194,8 +194,7 @@ fun PickDetailsScreen(
 						.padding(start = 20.dp, end = 40.dp, top = 8.dp, bottom = 8.dp),
 					title = stringResource(id = R.string.units),
 					workedCount = unitsWorked,
-					totalCount = totalUnits,
-					completedColor = BrandColor.BLUE_300_NT
+					totalCount = totalUnits
 				)
 				Spacer(
 					modifier = Modifier
@@ -266,7 +265,16 @@ fun PickDetailsScreen(
 						Spacer(modifier = Modifier.height(6.dp))
 
 						if (!clearanceColor.isNullOrEmpty() && !currentPickTaskItem?.clearanceColorDesc.isNullOrEmpty()) {
-							ClearanceTag(Modifier, clearanceColor.toString(), colorDesc = if (recordPickState == GenericViewState.Idle) currentPickTaskItem?.clearanceColorDesc ?: "" else "")
+							ClearanceTag(
+								Modifier,
+								clearanceColor.toString(),
+								colorDesc = if (recordPickState == GenericViewState.Idle) {
+									currentPickTaskItem?.clearanceColorDesc
+										?: ""
+								} else {
+									""
+								}
+							)
 						}
 
 						Spacer(modifier = Modifier.height(6.dp))
@@ -308,59 +316,63 @@ fun PickDetailsScreen(
 							horizontalArrangement = Arrangement.Center,
 							verticalAlignment = Alignment.Bottom
 						) {
-							Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+							Column(
+								modifier = Modifier.fillMaxWidth(),
+								horizontalAlignment = Alignment.CenterHorizontally
+							) {
 								DetailedCallToAction(
-							detailedCallToActionMode = when {
-								recordPickState is GenericViewState.Loading -> {
-									DetailedCallToActionMode.Loading()
-								}
-
-								recordPickState is GenericViewState.Success -> {
-									if (totalUnits != unitsWorked) {
-										Handler(Looper.getMainLooper()).postDelayed({
-											onRecordPickCompletion.invoke()
-										}, 1500)
-									} else {
-										onRecordPickCompletion.invoke()
-									}
-									DetailedCallToActionMode.Done()
-								}
-
-								pickDeclineState == GenericViewState.Success -> {
-									hideDecline = true
-
-									if (totalUnits != unitsWorked) {
-										Handler(Looper.getMainLooper()).postDelayed({
-											onDeclineCompletion.invoke()
-										}, 1500)
-									} else {
-										onDeclineCompletion.invoke()
-									}
-									DetailedCallToActionMode.Decline()
-								}
-
-								else -> {
-									val scanText =
-										if (remainingPickQty != null && remainingPickQty > 0) {
-											"Pick $remainingPickQty"
-										} else {
-											"Pick"
+									detailedCallToActionMode = when {
+										recordPickState is GenericViewState.Loading -> {
+											DetailedCallToActionMode.Loading()
 										}
 
-									DetailedCallToActionMode.Scan(scanText)
-								}
-							},
-							onClick = {
-								if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
-									onItemScan(
-										upc = currentPickTaskItem?.upcs?.firstOrNull().orEmpty(),
-										symbology = "upc"
-									)
-								}
-							}
-						)
+										recordPickState is GenericViewState.Success -> {
+											if (totalUnits != unitsWorked) {
+												Handler(Looper.getMainLooper()).postDelayed({
+													onRecordPickCompletion.invoke()
+												}, 1500)
+											} else {
+												onRecordPickCompletion.invoke()
+											}
+											DetailedCallToActionMode.Done()
+										}
+
+										pickDeclineState == GenericViewState.Success -> {
+											hideDecline = true
+
+											if (totalUnits != unitsWorked) {
+												Handler(Looper.getMainLooper()).postDelayed({
+													onDeclineCompletion.invoke()
+												}, 1500)
+											} else {
+												onDeclineCompletion.invoke()
+											}
+											DetailedCallToActionMode.Decline()
+										}
+
+										else -> {
+											val scanText =
+												if (remainingPickQty != null && remainingPickQty > 0) {
+													"Pick $remainingPickQty"
+												} else {
+													"Pick"
+												}
+
+											DetailedCallToActionMode.Scan(scanText)
+										}
+									},
+									onClick = {
+										if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
+											onItemScan(
+												upc = currentPickTaskItem?.upcs?.firstOrNull()
+													.orEmpty(),
+												symbology = "upc"
+											)
+										}
+									}
+								)
 								HorizontalDivider(
-							modifier = Modifier
+									modifier = Modifier
 										.width(124.dp),
 									color = BrandColor.GRAY_400,
 									thickness = 2.dp
@@ -386,7 +398,7 @@ fun PickDetailsScreen(
 							onDeclineClick()
 							showDeclineModal = true
 						},
-						text = stringResource(id = string.decline),
+						text = stringResource(id = R.string.decline),
 						textSize = 16.sp
 					)
 				},
@@ -407,8 +419,8 @@ fun PickDetailsScreen(
 	if (showDeclineModal && declineModalOptions != null) {
 		if (subFulfillmentType != SubFulfillmentType.BOPL) {
 			MultiOptionModal(
-				title = stringResource(id = string.decline_reason),
-				subTitle = stringResource(id = string.decline_reason_subtitle),
+				title = stringResource(id = R.string.decline_reason),
+				subTitle = stringResource(id = R.string.decline_reason_subtitle),
 				buttons = declineModalOptions.keys.map { it.uppercase() },
 				buttonClick = { displayStr ->
 					val declineReason = declineModalOptions[displayStr] ?: return@MultiOptionModal
@@ -500,7 +512,7 @@ private fun PickImages(
 @Composable
 private fun ProductAttributes(
 	upcs: List<String>,
-    styleNum: String?,
+	styleNum: String?,
 	locations: List<String>,
 	onHandQty: Int?,
 	primaryAttr: ProductAttribute?,
@@ -567,7 +579,7 @@ private fun ProductAttributes(
 				} else {
 					null
 				},
-				label = stringResource(string.item_location),
+				label = stringResource(R.string.item_location),
 				value = locations.firstOrNull(),
 				valueMaxLines = 1
 			)
@@ -601,7 +613,7 @@ private fun ProductAttributes(
 					.onGloballyPositioned {
 						copyCoordinatesOrigin = it
 					},
-				label = stringResource(string.upc),
+				label = stringResource(R.string.upc),
 				iconImageVector = ImageVector.vectorResource(R.drawable.ic_copy_icon),
 				value = upcs.firstOrNull(),
 				valueMaxLines = 1
@@ -647,20 +659,20 @@ private fun ProductAttributes(
 				value = secondaryAttr?.value
 			)
 			if (styleNum.isNullOrEmpty()) {
-			AttributeText(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 2.dp)
-					.background(
-						color = if (tertiaryAttr?.value.isNullOrEmpty()) {
-							Color.Transparent
-						} else {
-							BrandColor.GRAY_100
-						}
-					),
-				label = tertiaryAttr?.name.orEmpty(),
-				value = tertiaryAttr?.value
-			)
+				AttributeText(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 2.dp)
+						.background(
+							color = if (tertiaryAttr?.value.isNullOrEmpty()) {
+								Color.Transparent
+							} else {
+								BrandColor.GRAY_100
+							}
+						),
+					label = tertiaryAttr?.name.orEmpty(),
+					value = tertiaryAttr?.value
+				)
 			}
 		}
 	}

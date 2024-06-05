@@ -24,10 +24,10 @@ import com.nextuple.nsf.ui.theme.BrandColor
  */
 @Composable
 fun CallToAction(
-    modifier: Modifier = Modifier,
-    iconTint: Color = Color.White,
-    callToActionMode: CallToActionMode,
-    onClick: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	iconTint: Color = Color.White,
+	callToActionMode: CallToActionMode,
+	onClick: () -> Unit = {}
 ) {
 	FloatingActionButton(
 		modifier = modifier.testTag("callToAction"),

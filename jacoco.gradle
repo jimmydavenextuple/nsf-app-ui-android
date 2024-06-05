@@ -79,6 +79,7 @@ ext.excludes = [
         '**/.github/*',
         'version'
 ]
+
 def createVariantCoverage(variant) {
     def variantName = variant.name
     def testTaskName = "test${variantName.capitalize()}UnitTest"

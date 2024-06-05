@@ -8,9 +8,9 @@ import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
 import com.nextuple.nsf.service.dto.Result
 
 class OrderService(
-    private val orderApi: OrderApi,
-    private val deviceService: DeviceService,
-    private val userRepository: UserRepository
+	private val orderApi: OrderApi,
+	private val deviceService: DeviceService,
+	private val userRepository: UserRepository
 ) {
 
 	suspend fun getOrders(
@@ -79,7 +79,8 @@ class OrderService(
 
 	suspend fun pickupExtend(fulfillmentRequestNumber: String): Result<OrderDetailsResponse> {
 		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = orderApi.pickupExtend(userId = dks, fulfillmentRequestNumber = fulfillmentRequestNumber)
+		val res =
+			orderApi.pickupExtend(userId = dks, fulfillmentRequestNumber = fulfillmentRequestNumber)
 
 		return runCatching {
 			Result.fromApiResponse(res) {
@@ -105,7 +106,10 @@ class OrderService(
 
 	suspend fun startPickupTask(fulfillmentRequestNumber: String): Result<OrderDetailsResponse> {
 		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = orderApi.startPickupTask(userId = dks, fulfillmentRequestNumber = fulfillmentRequestNumber)
+		val res = orderApi.startPickupTask(
+			userId = dks,
+			fulfillmentRequestNumber = fulfillmentRequestNumber
+		)
 
 		return runCatching {
 			Result.fromApiResponse(res) {

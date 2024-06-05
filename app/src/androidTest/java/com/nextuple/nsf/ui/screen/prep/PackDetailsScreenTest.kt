@@ -1,8 +1,9 @@
 package com.nextuple.nsf.ui.screen.prep
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.nextuple.nsf.util.TestData
 import com.karumi.shot.ScreenshotTest
+import com.nextuple.nsf.ui.screen.prep.component.PackTaskItemCard
+import com.nextuple.nsf.util.TestData
 import org.junit.Rule
 import org.junit.Test
 

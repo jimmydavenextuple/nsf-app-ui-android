@@ -38,8 +38,8 @@ import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
+import com.nextuple.nsf.ui.common.HeaderText
 import com.nextuple.nsf.ui.common.PrimaryButton
-import com.nextuple.nsf.ui.screen.prep.component.HeaderText
 import com.nextuple.nsf.ui.screen.prep.component.PackTaskItemCard
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
@@ -61,7 +61,11 @@ fun BOPLMultiUnitModal(
 		Surface {
 			Column(modifier = Modifier.wrapContentHeight()) {
 				if (!isStep2Active) {
-					Column(modifier = Modifier.heightIn(max = 495.dp).verticalScroll(rememberScrollState())) {
+					Column(
+						modifier = Modifier
+							.heightIn(max = 495.dp)
+							.verticalScroll(rememberScrollState())
+					) {
 						Row(
 							modifier = Modifier
 								.fillMaxWidth()
@@ -144,7 +148,8 @@ fun BOPLMultiUnitModal(
 						horizontalArrangement = Arrangement.SpaceBetween,
 						verticalAlignment = Alignment.CenterVertically
 					) {
-						val packItemsCompleted = packItems.filter { packTaskItem -> packTaskItem.isScanned }.size
+						val packItemsCompleted =
+							packItems.filter { packTaskItem -> packTaskItem.isScanned }.size
 						Text(
 							text = "Place Hold Slip $packItemsCompleted/${packItems.size} On Unit",
 							style = TextStyle(
@@ -171,7 +176,10 @@ fun BOPLMultiUnitModal(
 							.padding(bottom = 10.dp),
 						horizontalArrangement = Arrangement.Center
 					) {
-						Image(painter = painterResource(id = R.drawable.ic_bopl_treadmill), contentDescription = "Place Hold Slip")
+						Image(
+							painter = painterResource(id = R.drawable.ic_bopl_treadmill),
+							contentDescription = "Place Hold Slip"
+						)
 					}
 					Row(
 						modifier = Modifier

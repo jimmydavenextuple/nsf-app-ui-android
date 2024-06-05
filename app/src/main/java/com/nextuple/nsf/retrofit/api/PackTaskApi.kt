@@ -15,7 +15,6 @@ import retrofit2.http.Path
 
 interface PackTaskApi {
 
-
 	@POST("v1/pack-task/getPrepDetails")
 	suspend fun getPrepDetails(
 		@Header("userId") userId: String,
@@ -30,6 +29,7 @@ interface PackTaskApi {
 		@Header("userId") userId: String,
 		@Body packByGearRequest: PackByGearRequest
 	): ApiResponse<PrepDetail>
+
 	/**
 	 * Begin the pack process by order. Creates the pack task if one does not already exist.
 	 */
@@ -38,6 +38,7 @@ interface PackTaskApi {
 		@Header("userId") userId: String,
 		@Body packByOrderRequest: PackByOrderRequest
 	): ApiResponse<PrepDetail>
+
 	/**
 	 * Starts an existing pack task.
 	 */
@@ -46,6 +47,7 @@ interface PackTaskApi {
 		@Path("taskId") taskId: String,
 		@Header("userId") userId: String
 	): ApiResponse<PrepDetail>
+
 	/**
 	 * Completes a started pack task and then advances to stage.
 	 */
@@ -54,6 +56,7 @@ interface PackTaskApi {
 		@Path("taskId") taskId: String,
 		@Header("userId") userId: String
 	): ApiResponse<StageTask>
+
 	/**
 	 * Starts the pack task, completes the pack task, and then advances to stage.
 	 */
@@ -62,6 +65,7 @@ interface PackTaskApi {
 		@Path("taskId") taskId: String,
 		@Header("userId") userId: String
 	): ApiResponse<StageTask>
+
 	@POST("v1/pack-task/record-decline")
 	suspend fun declinePackItem(
 		@Header("userId") userId: String,

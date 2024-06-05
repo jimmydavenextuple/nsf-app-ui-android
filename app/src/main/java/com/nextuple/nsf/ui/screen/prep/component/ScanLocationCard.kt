@@ -20,10 +20,10 @@ import com.nextuple.nsf.ui.util.GenericViewState
 
 @Composable
 fun ScanLocationCard(
-    isActive: Boolean,
-    stepNumber: String,
-    holdLocationState: GenericViewState,
-    onScanClick: () -> Unit = {}
+	isActive: Boolean,
+	stepNumber: String,
+	holdLocationState: GenericViewState,
+	onScanClick: () -> Unit = {}
 ) {
 	ExpandableStepCard(
 		stepNumber = stepNumber,
@@ -47,6 +47,7 @@ fun ScanLocationCard(
 						is GenericViewState.Success -> {
 							DetailedCallToActionMode.Done()
 						}
+
 						else -> {
 							DetailedCallToActionMode.Scan(stringResource(id = R.string.scan_location))
 						}

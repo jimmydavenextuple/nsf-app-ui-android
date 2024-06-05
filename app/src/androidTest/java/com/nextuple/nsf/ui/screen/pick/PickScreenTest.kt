@@ -1,8 +1,8 @@
 package com.nextuple.nsf.ui.screen.pick
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.nextuple.nsf.ui.util.GenericViewState
 import com.karumi.shot.ScreenshotTest
+import com.nextuple.nsf.ui.util.GenericViewState
 import org.junit.Rule
 import org.junit.Test
 
@@ -12,19 +12,23 @@ class PickScreenTest : ScreenshotTest {
 
 	@Test
 	fun pickScreenDefault() {
-		renderPickScreen()
+		renderPickLanding()
 
 		compareScreenshot(composeTestRule)
 	}
 
-	private fun renderPickScreen() {
+	private fun renderPickLanding() {
 		composeTestRule.setContent {
-			PickScreen(
+			PickLanding(
+				tasksUnassigned = null,
 				unitsWorked = 1,
 				totalUnits = 2,
-				hasActiveTask = false,
-				onHasActiveTask = {},
-				storeOverviewState = GenericViewState.Success
+				inProgressUnits = null,
+				storeOverviewState = GenericViewState.Success,
+				startTaskStatus = GenericViewState.Idle,
+				onStartPicking = {},
+				startTaskCompletion = {},
+				resetScreen = {}
 			)
 		}
 	}

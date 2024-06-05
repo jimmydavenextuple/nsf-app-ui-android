@@ -156,9 +156,13 @@ fun EditLocation(
 							isActive = !isSelectHoldingActive,
 							extraContent = {
 								when (scanLocationState) {
-									GenericViewState.Success -> Handler(Looper.getMainLooper()).postDelayed({
-										onDismissRequest()
-									}, 500)
+									GenericViewState.Success -> Handler(Looper.getMainLooper()).postDelayed(
+										{
+											onDismissRequest()
+										},
+										500
+									)
+
 									else -> {}
 								}
 								Column(
@@ -186,7 +190,8 @@ fun EditLocation(
 										},
 										onClick = {
 											if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
-												val bin = "Bin ${Random.nextInt(from = 1, until = 100)}"
+												val bin =
+													"Bin ${Random.nextInt(from = 1, until = 100)}"
 
 												containers?.firstOrNull()?.id?.let {
 													onLocationChange(

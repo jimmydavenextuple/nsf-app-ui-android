@@ -45,10 +45,10 @@ object BrandColor {
 	val ORANGE_700 = Color(0xFFAC470C)
 
 	val RED_100 = Color(0xFFF6E1E3)
+	val RED_500 = Color(0xFFDD0D18)
 	val RED_600 = Color(0xFFB10715)
 
 	val YELLOW_400 = Color(0xFFF9A74A)
-
 
 	val YELLOW_NT = Color(0xfffcb918)
 	val PINK_NT = Color(0xffbf3177)

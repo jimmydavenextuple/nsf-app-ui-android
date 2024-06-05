@@ -46,7 +46,7 @@ import com.nextuple.nsf.ui.util.Printer
 fun PrinterBOPLModal(
 	printersList: List<Printer>?,
 	boplPrinter: Printer,
-	connectPrinter: (printer: Printer, ipAdress: String) -> Unit,
+	connectPrinter: (printer: Printer, ipAddress: String) -> Unit,
 	otherPrinterOnClick: () -> Unit,
 	onDismissRequest: () -> Unit
 ) {
@@ -145,7 +145,11 @@ fun PrinterBOPLModal(
 }
 
 @Composable
-private fun RadioButtonRow(printer: Printer, selectedOption: Printer, onOptionSelected: (printer: Printer) -> Unit) {
+private fun RadioButtonRow(
+	printer: Printer,
+	selectedOption: Printer,
+	onOptionSelected: (printer: Printer) -> Unit
+) {
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()

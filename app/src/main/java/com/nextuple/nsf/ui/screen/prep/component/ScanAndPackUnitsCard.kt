@@ -34,15 +34,15 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun ScanAndPackUnitsCard(
-    isActive: Boolean,
-    stepNumber: String,
-    isComplete: Boolean,
-    packItems: List<PackTaskItem>?,
-    onPackItem: (String) -> Boolean = { false },
-    pickedBy: String?,
-    onAllItemsScanned: () -> Unit = {},
-    onStageCompletionCallBack: () -> Unit = {},
-    onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit
+	isActive: Boolean,
+	stepNumber: String,
+	isComplete: Boolean,
+	packItems: List<PackTaskItem>?,
+	onPackItem: (String) -> Boolean = { false },
+	pickedBy: String?,
+	onAllItemsScanned: () -> Unit = {},
+	onStageCompletionCallBack: () -> Unit = {},
+	onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit
 ) {
 	var showDeclineModal by remember {
 		mutableStateOf(false)
@@ -104,10 +104,10 @@ fun ScanAndPackUnitsCard(
 					)
 				)
 				if (!pickedBy.isNullOrEmpty()) {
-                    com.nextuple.nsf.ui.common.TextInfo(
-                        label = stringResource(id = R.string.picked_by),
-                        value = pickedBy
-                    )
+					com.nextuple.nsf.ui.common.TextInfo(
+						label = stringResource(id = R.string.picked_by),
+						value = pickedBy
+					)
 				}
 			}
 		}

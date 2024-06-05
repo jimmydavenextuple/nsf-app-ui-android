@@ -62,7 +62,7 @@ fun SettingsScreen(
 				.fillMaxWidth()
 				.wrapContentHeight(),
 			shape = RoundedCornerShape(12.dp),
-			colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_100) ,
+			colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_100),
 			elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
 		) {
 			Column(modifier = Modifier.padding(12.dp)) {
@@ -81,7 +81,14 @@ fun SettingsScreen(
 					)
 				)
 				printersList?.forEach { printer ->
-					PrinterListItem(printer, ipPrefix, onReset, printerConnectionState, onConnectPrinter, onDisConnectPrinter)
+					PrinterListItem(
+						printer,
+						ipPrefix,
+						onReset,
+						printerConnectionState,
+						onConnectPrinter,
+						onDisConnectPrinter
+					)
 				}
 				PrinterProblem(
 					modifier = Modifier.padding(top = 22.dp, bottom = 10.dp)
@@ -92,7 +99,14 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> Unit, printerConnectionState: GenericViewState, onConnectPrinter: (Printer, String) -> Unit, onDisConnectPrinter: (Printer) -> Unit) {
+private fun PrinterListItem(
+	printer: Printer,
+	ipPrefix: String?,
+	onReset: () -> Unit,
+	printerConnectionState: GenericViewState,
+	onConnectPrinter: (Printer, String) -> Unit,
+	onDisConnectPrinter: (Printer) -> Unit
+) {
 	var showConnectModal by remember { mutableStateOf(false) }
 	var showDisconnectModal by remember { mutableStateOf(false) }
 

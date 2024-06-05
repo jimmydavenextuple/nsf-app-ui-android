@@ -7,10 +7,10 @@ import com.nextuple.nsf.service.dto.Result
 import javax.inject.Inject
 
 class ConfigService @Inject constructor(
-    private val deviceService: DeviceService,
-    private val logService: LogService,
-    private val configApi: ConfigApi,
-    private val userRepository: UserRepository
+	private val deviceService: DeviceService,
+	private val logService: LogService,
+	private val configApi: ConfigApi,
+	private val userRepository: UserRepository
 ) {
 	private var storeConfig: StoreConfig? = null
 

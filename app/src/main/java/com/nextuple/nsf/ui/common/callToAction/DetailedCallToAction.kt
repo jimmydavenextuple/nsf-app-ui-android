@@ -27,9 +27,9 @@ import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun DetailedCallToAction(
-    modifier: Modifier = Modifier,
-    detailedCallToActionMode: DetailedCallToActionMode,
-    onClick: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	detailedCallToActionMode: DetailedCallToActionMode,
+	onClick: () -> Unit = {}
 ) {
 	Box(
 		modifier = modifier

@@ -54,14 +54,18 @@ fun AdditionalDetailsDialog(
 					.padding(top = 10.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
 					.fillMaxWidth()
 			) {
-				Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-				Text(
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.SpaceBetween,
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Text(
 						text = stringResource(R.string.additional_details),
-					fontFamily = FontFamily.ARCHIVO,
+						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 18.sp,
-					fontWeight = FontWeight(700),
+						fontWeight = FontWeight(700),
 						letterSpacing = 0.5.sp
-				)
+					)
 					Icon(
 						modifier = Modifier
 							.align(Alignment.CenterVertically)
@@ -108,5 +112,9 @@ fun AdditionalDetailsDialog(
 @Composable
 @Preview
 private fun OnHandDialogPreview() {
-	AdditionalDetailsDialog(onHandQty = "6", lastReceived = "02/01/2023", lastReturned = "08/21/2023") {}
+	AdditionalDetailsDialog(
+		onHandQty = "6",
+		lastReceived = "02/01/2023",
+		lastReturned = "08/21/2023"
+	) {}
 }

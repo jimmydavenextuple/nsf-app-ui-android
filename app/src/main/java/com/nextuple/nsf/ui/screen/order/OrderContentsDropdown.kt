@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.nextuple.nsf.R
 import com.nextuple.nsf.R.drawable
 import com.nextuple.nsf.R.string
 import com.nextuple.nsf.retrofit.dto.PackedItem
@@ -149,7 +150,7 @@ private fun PackedItemCard(modifier: Modifier = Modifier, packedItem: PackedItem
 				)
 			}
 			OrderTextInfo(
-				label = stringResource(id = string.upc),
+				label = stringResource(id = R.string.upc),
 				value = packedItem.scannedUpc ?: ""
 			)
 		}

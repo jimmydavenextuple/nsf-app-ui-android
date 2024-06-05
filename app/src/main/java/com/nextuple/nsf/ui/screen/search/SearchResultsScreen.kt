@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -65,8 +64,8 @@ fun SearchResultsScreen(
 	orderResults: List<OrderDetailsResponse>?,
 	getOrderDetails: (String) -> Unit,
 	getOrderDetailsCompletion: () -> Unit,
-    scanManager: ScanManager = NoOpScanManager(),
-    newSearch: (String) -> Unit
+	scanManager: ScanManager = NoOpScanManager(),
+	newSearch: (String) -> Unit
 ) {
 	val focusManager = LocalFocusManager.current
 	var searchInputText by remember { mutableStateOf(searchInput) }
@@ -132,7 +131,11 @@ fun SearchResultsScreen(
 					letterSpacing = 0.5.sp,
 					fontSize = 12.sp
 				)
-				OrderCardList(orderList = orderResults, getOrderDetails = getOrderDetails)
+				OrderCardList(
+					orderList = orderResults,
+					getOrderDetails = getOrderDetails,
+					sddReadyList = null
+				)
 			}
 		}
 	}
@@ -142,7 +145,6 @@ fun SearchResultsScreen(
 	}
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SearchBar(
 	modifier: Modifier = Modifier,
@@ -208,7 +210,11 @@ private fun SearchBar(
 			}
 		}
 
-		HorizontalDivider(modifier = Modifier.padding(top = 8.dp), thickness = 1.dp, color = borderColor)
+		HorizontalDivider(
+			modifier = Modifier.padding(top = 8.dp),
+			thickness = 1.dp,
+			color = borderColor
+		)
 	}
 }
 

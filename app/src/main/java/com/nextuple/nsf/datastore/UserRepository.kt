@@ -25,6 +25,7 @@ class UserRepository @Inject constructor(
 				.build()
 		}
 	}
+
 	suspend fun updateLastActiveTime() {
 		userDataStore.updateData {
 			it.toBuilder()

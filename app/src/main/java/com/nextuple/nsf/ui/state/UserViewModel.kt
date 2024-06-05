@@ -99,6 +99,7 @@ class UserViewModel @Inject constructor(
 			userRepository.updateLastActiveTime()
 		}
 	}
+
 	fun handleTimeoutLogout(timeoutDuration: Long) = viewModelScope.launch {
 		if (!isLoggedIn()) return@launch
 		val lastActiveTime = Instant.ofEpochSecond(user.first().lastActiveTime.seconds)
@@ -106,9 +107,11 @@ class UserViewModel @Inject constructor(
 			logout()
 		}
 	}
+
 	fun updateViewState(viewState: ViewState) {
 		this.viewState = viewState
 	}
+
 	fun isLoggedIn() = viewState == ViewState.LoggedIn
 	private fun appendDksPrefixIfNeeded(dks: String): String =
 		if (!dks.lowercase().startsWith("dks") && dks.all { it.isDigit() }) {

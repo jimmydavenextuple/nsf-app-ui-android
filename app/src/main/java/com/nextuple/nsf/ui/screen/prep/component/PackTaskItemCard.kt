@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,11 +25,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +39,7 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.common.PrimaryButton
+import com.nextuple.nsf.ui.common.ScanIcon
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import kotlinx.coroutines.launch
@@ -52,10 +50,10 @@ enum class DragAnchors { Start, End }
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PackTaskItemCard(
-    modifier: Modifier = Modifier,
-    packTaskItem: PackTaskItem,
-    onDeclineClick: () -> Unit = {},
-    declineEnabled: Boolean = true
+	modifier: Modifier = Modifier,
+	packTaskItem: PackTaskItem,
+	onDeclineClick: () -> Unit = {},
+	declineEnabled: Boolean = true
 ) {
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
@@ -88,7 +86,9 @@ fun PackTaskItemCard(
 					enabled = declineEnabled,
 					state = state
 				)
-		} else { Modifier }
+		} else {
+			Modifier
+		}
 	) {
 		Row(
 			modifier = modifier,
@@ -148,7 +148,7 @@ fun PackTaskItemCard(
 					.align(alignment = Alignment.CenterVertically)
 					.padding(horizontal = 12.dp)
 					.size(height = 30.dp, width = 34.dp),
-				packTaskItem = packTaskItem
+				isScanned = packTaskItem.isScanned
 			)
 		}
 
@@ -186,28 +186,6 @@ private fun TextInfo(label: String, value: String) {
 		fontWeight = FontWeight.Normal,
 		letterSpacing = 0.5.sp
 	)
-}
-
-@Composable
-private fun ScanIcon(
-	modifier: Modifier = Modifier,
-	packTaskItem: PackTaskItem
-) {
-	if (packTaskItem.isScanned) {
-		Icon(
-			modifier = modifier,
-			imageVector = ImageVector.vectorResource(R.drawable.ic_check),
-			contentDescription = "scan success icon",
-			tint = BrandColor.BLUE_300_NT
-		)
-	} else {
-		Icon(
-			modifier = modifier,
-			imageVector = ImageVector.vectorResource(R.drawable.ic_scan),
-			contentDescription = "scan icon",
-			tint = BrandColor.PINK_NT
-		)
-	}
 }
 
 @Preview(showBackground = true)

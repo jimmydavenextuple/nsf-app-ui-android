@@ -1,13 +1,9 @@
 package com.nextuple.nsf.ui.screen.prep
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -17,30 +13,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nextuple.nsf.BuildConfig
-import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
-import com.nextuple.nsf.ui.common.ButtonState
-import com.nextuple.nsf.ui.common.PrimaryButton
-import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PrinterModal
+import com.nextuple.nsf.ui.screen.prep.component.PackOrderCard
 import com.nextuple.nsf.ui.screen.prep.component.PrepDetailScaffold
 import com.nextuple.nsf.ui.screen.prep.component.ScanAndPackUnitsCard
 import com.nextuple.nsf.ui.screen.prep.component.ScanLocationCard
 import com.nextuple.nsf.ui.screen.prep.component.SelectHoldingAreaCard
 import com.nextuple.nsf.ui.state.PrepViewModel
 import com.nextuple.nsf.ui.state.PrepViewModel.PrepOrder
+import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
+import com.nextuple.nsf.ui.util.AppMessage
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -55,16 +42,17 @@ enum class PrepStep {
 
 @Composable
 fun BOPISPrepDetailScreen(
+	printViewModel: PrintViewModel,
 	scanManager: ScanManager,
-    currentPrepStage: PrepViewModel.Step,
+	currentPrepStage: PrepViewModel.Step,
 	prepOrder: PrepOrder,
 	isOrderAssembled: Boolean,
 	onPackItem: (String) -> Boolean = { false },
-	holdSlipState: GenericViewState = GenericViewState.Idle,
+	getHoldSlipState: GenericViewState = GenericViewState.Idle,
 	holdLocationState: GenericViewState = GenericViewState.Idle,
 	onRecordHoldingLocation: (holdingLocation: String) -> Unit = { _ -> },
 	onStageCompletionCallBack: () -> Unit = {},
-    onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit,
+	onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit,
 	holdingAreas: List<String>,
 	ipPrefix: String?,
 	printer: Printer,
@@ -82,14 +70,17 @@ fun BOPISPrepDetailScreen(
 	var activeStep by remember {
 		mutableStateOf(
 			if (currentPrepStage == PrepViewModel.Step.Stage) {
-                PrepStep.HOLDING_AREA
+				PrepStep.HOLDING_AREA
 			} else {
-                PrepStep.PACK
+				PrepStep.PACK
 			}
 		)
 	}
 
-	fun updateStep(prepStep: PrepStep) { activeStep = prepStep }
+	fun updateStep(prepStep: PrepStep) {
+		activeStep = prepStep
+	}
+
 	fun isStepActive(prepStep: PrepStep) = activeStep == prepStep
 	fun isStepComplete(prepStep: PrepStep) = activeStep.ordinal > prepStep.ordinal
 
@@ -120,56 +111,64 @@ fun BOPISPrepDetailScreen(
 		}
 		onDispose {
 			scanManager.set { _, _ -> }
+		}
 	}
+	var appMessage: AppMessage? by remember { mutableStateOf(null) }
+	fun setOmniMessage(updatedMessage: AppMessage?) {
+		appMessage = updatedMessage
 	}
 
 	PrepDetailScaffold(
 		athleteName = prepOrder.athleteName,
-		orderNumber = prepOrder.orderNumber
-		) {
-			if (isOrderAssembled) {
-				PackOrderCard(
-					isActive = isStepActive(PrepStep.PACK),
-					isComplete = isStepComplete(PrepStep.PACK),
-					onPackOrder = onPackOrder
-				)
-			} else {
-				ScanAndPackUnitsCard(
-					packItems = prepOrder.packItems,
+		orderNumber = prepOrder.orderNumber,
+		appMessage = appMessage,
+		onDismissMessage = {
+			setOmniMessage(null)
+		}
+	) {
+		if (isOrderAssembled) {
+			PackOrderCard(
+				isActive = isStepActive(PrepStep.PACK),
+				isComplete = isStepComplete(PrepStep.PACK),
+				onPackOrder = onPackOrder
+			)
+		} else {
+			ScanAndPackUnitsCard(
+				packItems = prepOrder.packItems,
 				stepNumber = "1",
-					isActive = isStepActive(PrepStep.PACK),
-					isComplete = isStepComplete(PrepStep.PACK),
-					onPackItem = onPackItem,
-					pickedBy = prepOrder.pickedBy,
+				isActive = isStepActive(PrepStep.PACK),
+				isComplete = isStepComplete(PrepStep.PACK),
+				onPackItem = onPackItem,
+				pickedBy = prepOrder.pickedBy,
 				onAllItemsScanned = onPackOrder,
 				onStageCompletionCallBack = onStageCompletionCallBack,
 				onConfirmDecline = onConfirmDecline
-				)
-			}
-			SelectHoldingAreaCard(
-				stepNumber = "2",
-				isActive = isStepActive(PrepStep.HOLDING_AREA),
-				isComplete = isStepComplete(PrepStep.HOLDING_AREA),
-				holdingAreas = holdingAreas,
-				selectedHoldingArea = selectedHoldingArea,
-				onSelectedOptionTextChanged = { selectedHoldingArea = it },
-				onSubmitHoldingArea = { updateStep(PrepStep.SCAN_LOCATION) },
-				isReprintActive = true,
-				onReprintHoldSlip = { handlePrintHoldSlip() }
-			)
-			ScanLocationCard(
-				isActive = isStepActive(PrepStep.SCAN_LOCATION),
-				holdLocationState = holdLocationState,
-			stepNumber = "3",
-				onScanClick = {
-					if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
-						val bin = "Bin ${Random.nextInt(from = 1, until = 100)}"
-
-						onRecordHoldingLocation("$selectedHoldingArea $bin")
-					}
-				}
 			)
 		}
+		SelectHoldingAreaCard(
+			stepNumber = "2",
+			isActive = isStepActive(PrepStep.HOLDING_AREA),
+			isComplete = isStepComplete(PrepStep.HOLDING_AREA),
+			holdingAreas = holdingAreas,
+			selectedHoldingArea = selectedHoldingArea,
+			onSelectedOptionTextChanged = { selectedHoldingArea = it },
+			onSubmitHoldingArea = { updateStep(PrepStep.SCAN_LOCATION) },
+			isReprintActive = true,
+			onReprintHoldSlip = { handlePrintHoldSlip() }
+		)
+		ScanLocationCard(
+			isActive = isStepActive(PrepStep.SCAN_LOCATION),
+			holdLocationState = holdLocationState,
+			stepNumber = "3",
+			onScanClick = {
+				if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
+					val bin = "Bin ${Random.nextInt(from = 1, until = 100)}"
+
+					onRecordHoldingLocation("$selectedHoldingArea $bin")
+				}
+			}
+		)
+	}
 
 	if (holdLocationState is GenericViewState.Success) {
 		LaunchedEffect(Unit) {
@@ -189,69 +188,41 @@ fun BOPISPrepDetailScreen(
 		)
 	}
 
-	if (holdSlipState == GenericViewState.Loading) {
-		Box(
-			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.Center
-		) {
-			CircularProgressIndicator(
-				color = BrandColor.GRAY_900
-			)
-		}
-	} else if (holdSlipState == GenericViewState.Success && isStepActive(PrepStep.PACK)) {
-		handlePrintHoldSlip()
-	}
-}
-
-@Composable
-private fun PackOrderCard(
-	isActive: Boolean,
-	isComplete: Boolean,
-	onPackOrder: () -> Unit = {}
-) {
-	ExpandableStepCard(
-		stepNumber = "1",
-		title = stringResource(id = R.string.pack_order),
-		isActive = isActive,
-		isComplete = isComplete,
-		extraContent = {
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally
+	when {
+		getHoldSlipState == GenericViewState.Loading -> {
+			Box(
+				modifier = Modifier.fillMaxSize(),
+				contentAlignment = Alignment.Center
 			) {
-				Image(
-					modifier = Modifier.padding(vertical = 8.dp),
-					imageVector = ImageVector.vectorResource(R.drawable.pack_order),
-					contentDescription = stringResource(id = R.string.pack_order)
-				)
-				Text(
-					modifier = Modifier.padding(horizontal = 16.dp),
-					text = stringResource(id = R.string.pack_info),
-					style = TextStyle(
-						fontSize = 12.sp,
-						fontFamily = FontFamily.ARCHIVO,
-						fontWeight = FontWeight(400),
-						color = BrandColor.BLACK,
-						letterSpacing = 0.5.sp
-					)
-				)
-				PrimaryButton(
-					modifier = Modifier.padding(vertical = 12.dp),
-					text = stringResource(id = R.string.print_hold_slip),
-					buttonState = ButtonState.DEFAULT,
-					onButtonClick = onPackOrder
-
-
-
+				CircularProgressIndicator(
+					color = BrandColor.GRAY_900
 				)
 			}
 		}
-	)
+
+		getHoldSlipState == GenericViewState.Success && isStepActive(PrepStep.PACK) -> {
+			handlePrintHoldSlip()
+		}
+	}
+
+	LaunchedEffect(getHoldSlipState) {
+		if (getHoldSlipState == GenericViewState.Failure) {
+			setOmniMessage(AppMessage.getHoldSlipError)
+		}
+	}
+
+	LaunchedEffect(printViewModel.printHoldSlipState) {
+		if (printViewModel.printHoldSlipState == GenericViewState.Failure) {
+			setOmniMessage(AppMessage.printHoldSlipError)
+		}
+	}
 }
 
 @PreviewPdt
 @Composable
 private fun BOPISPrepDetailScreenPreview() {
 	BOPISPrepDetailScreen(
+		printViewModel = hiltViewModel(),
 		scanManager = NoOpScanManager(),
 		isOrderAssembled = false,
 		prepOrder = PrepOrder(
@@ -271,29 +242,3 @@ private fun BOPISPrepDetailScreenPreview() {
 		holdLocationState = GenericViewState.Idle
 	)
 }
-
-@Preview
-@Composable
-private fun PackOrderCardPreview() {
-	PackOrderCard(
-		isActive = true,
-		isComplete = false,
-
-		onPackOrder = {}
-	)
-}
-
-@Preview
-@Composable
-private fun SelectHoldingAreaCardPreview() {
-	SelectHoldingAreaCard(
-		stepNumber = "2",
-		isActive = true,
-		isComplete = false,
-		holdingAreas = listOf(),
-		selectedHoldingArea = "",
-		isReprintActive = true
-	)
-}
-
-

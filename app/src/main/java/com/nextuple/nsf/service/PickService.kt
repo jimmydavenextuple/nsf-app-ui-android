@@ -14,10 +14,10 @@ import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_START_RES
 import com.nextuple.nsf.service.dto.Result
 
 class PickService(
-    private val pickApi: PickApi,
-    private val deviceService: DeviceService,
-    private val logService: LogService,
-    private val userRepository: UserRepository
+	private val pickApi: PickApi,
+	private val deviceService: DeviceService,
+	private val logService: LogService,
+	private val userRepository: UserRepository
 ) {
 	suspend fun startPick(): Result<PickTask?> = runCatching {
 		logService.trackEvent(EVENT_PICK_START)

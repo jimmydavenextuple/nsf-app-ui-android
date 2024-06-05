@@ -27,15 +27,15 @@ import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun Step(
-    modifier: Modifier = Modifier,
-    size: Dp = 28.dp,
-    text: String?,
-    isActive: Boolean,
-    activeTextColor: Color = BrandColor.GRAY_50,
-    inactiveTextColor: Color = BrandColor.GRAY_500,
-    activeColor: Color = BrandColor.BLACK,
-    inactiveColor: Color = BrandColor.GRAY_500,
-    isOutlined: Boolean = false
+	modifier: Modifier = Modifier,
+	size: Dp = 28.dp,
+	text: String?,
+	isActive: Boolean,
+	activeTextColor: Color = BrandColor.GRAY_50,
+	inactiveTextColor: Color = BrandColor.GRAY_500,
+	activeColor: Color = BrandColor.BLACK,
+	inactiveColor: Color = BrandColor.GRAY_500,
+	isOutlined: Boolean = false
 ) {
 	Box(
 		modifier = modifier

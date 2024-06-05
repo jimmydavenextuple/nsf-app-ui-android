@@ -5,10 +5,10 @@ import com.nextuple.nsf.service.dto.Device
 import com.nextuple.nsf.service.dto.Store
 
 class DeviceService(
-    private val logService: LogService,
-    private val getDeviceModel: () -> String,
-    private val getDeviceId: () -> String,
-    private val getMacAddress: () -> String
+	private val logService: LogService,
+	private val getDeviceModel: () -> String,
+	private val getDeviceId: () -> String,
+	private val getMacAddress: () -> String
 ) {
 	fun getStore(): Store? = runCatching {
 		return Store(

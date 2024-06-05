@@ -18,7 +18,13 @@ data class StoreConfig(
 	val pickSymbologyPrefixes: List<String> = emptyList()
 ) {
 	companion object {
-		val DEFAULT_HOLDING_LOCATIONS = listOf("Main Holding Area", "Front Counter", "Back Room", "Alternate - 1", "Alternate - 2")
+		val DEFAULT_HOLDING_LOCATIONS = listOf(
+			"Main Holding Area",
+			"Front Counter",
+			"Back Room",
+			"Alternate - 1",
+			"Alternate - 2"
+		)
 		val PICK_ITEM_SYMBOLOGY_PREFIXES = setOf("upc", "ean", "code39", "code128")
 	}
 }

@@ -4,31 +4,32 @@ import com.nextuple.nsf.retrofit.dto.StageTaskContainer
 import com.nextuple.nsf.retrofit.dto.Status
 
 data class OrderDetailsResponse(
-    /*
-        TODO: Revisit mapping once FIT 2.0 is fully ready
-     */
+	/*
+		TODO: Revisit mapping once FIT 2.0 is fully ready
+	 */
 	val orderNumber: String? = null,
-    val orderStatusText: String? = null,
+	val orderStatusText: String? = null,
 
-    val orderDate: String? = null,
-    val expectedDeliveryDate: String? = null,
-    val receivedDate: String? = null,
+	val orderDate: String? = null,
+	val expectedDeliveryDate: String? = null,
+	val receivedDate: String? = null,
 
-    val pickedByUserId: String? = null,
-    val packedOnDate: String? = null,
-    val packedByUserId: String? = null,
-    val stagedByUserId: String? = null,
-    val dispensedByUserId: String? = null,
+	val pickedByUserId: String? = null,
+	val packedOnDate: String? = null,
+	val packedByUserId: String? = null,
+	val stagedByUserId: String? = null,
+	val dispensedByUserId: String? = null,
 
-    val pickupByDate: String? = null,
+	val pickupByDate: String? = null,
 	// If count <=0 show EXTEND_PICKUP
-    val pickupExtendedCount: Int? = null,
-    val pickedUpDate: String? = null,
+	val pickupExtendedCount: Int? = null,
+	val pickedUpDate: String? = null,
 
-    val athleteDetail: AthleteDetail? = null,
-    val athleteCheckInDetail: AthleteCheckInDetail? = null,
+	val athleteDetail: AthleteDetail? = null,
+	val athleteCheckInDetail: AthleteCheckInDetail? = null,
+	val driverDetail: DriverDetail? = null,
 
-    val fulfillmentRequestDetail: FulfillmentRequestDetail
+	val fulfillmentRequestDetail: FulfillmentRequestDetail
 )
 
 data class AthleteDetail(
@@ -37,6 +38,12 @@ data class AthleteDetail(
 	val athleteProxyFirstName: String? = null,
 	val athleteProxyLastName: String? = null,
 	val athletePhoneNumber: String? = null
+)
+
+data class DriverDetail(
+	val driverFirstName: String? = null,
+	val driverLastName: String? = null,
+	val batchId: String? = null
 )
 
 data class AthleteCheckInDetail(
@@ -68,8 +75,17 @@ data class FulfillmentRequestDetail(
 	val holdingLocation: String? = null
 )
 
-fun AthleteDetail.athleteFullName() = "${athleteFirstName.orEmpty()} ${athleteLastName.orEmpty()}".trim()
+fun AthleteDetail.athleteFullName() =
+	"${athleteFirstName.orEmpty()} ${athleteLastName.orEmpty()}".trim()
 
-fun AthleteDetail.athleteShortName() = "${athleteLastName.orEmpty()}, ${athleteFirstName?.firstOrNull() ?: ""}."
+fun AthleteDetail.athleteShortName() =
+	"${athleteLastName.orEmpty()}, ${athleteFirstName?.firstOrNull() ?: ""}."
 
-fun AthleteDetail.athleteProxyFullName() = "${athleteProxyFirstName.orEmpty()} ${athleteProxyLastName.orEmpty()}".trim()
+fun AthleteDetail.sddShortName() =
+	"${athleteFirstName.orEmpty()} ${athleteLastName?.firstOrNull() ?: ""}."
+
+fun DriverDetail.sddShortName() =
+	"${driverFirstName.orEmpty()} ${driverLastName?.firstOrNull() ?: ""}."
+
+fun AthleteDetail.athleteProxyFullName() =
+	"${athleteProxyFirstName.orEmpty()} ${athleteProxyLastName.orEmpty()}".trim()

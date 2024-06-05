@@ -1,16 +1,16 @@
 package com.nextuple.nsf.ui.screen.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,24 +28,26 @@ import com.nextuple.nsf.ui.common.HorizontalProgressBar
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.util.StringUtils.formatTime
+import com.nextuple.nsf.util.StringUtils.toPercent
 import com.nextuple.nsf.util.SubFulfillmentType
 
 @Composable
 fun MetricsScreen(
-    modifier: Modifier = Modifier,
-    fulfillmentType: SubFulfillmentType,
-    fillRate: Float = 0f,
-    productivity: Float = 0f,
-    unitWorked: Int = 0,
-    totalUnits: Int = 0,
-    uph: Float = 0f,
-    carSpeed: String? = null,
-    personSpeed: String? = null
+	modifier: Modifier = Modifier,
+	fulfillmentType: SubFulfillmentType,
+	fillRatePercentage: Double?,
+	productivityPercentage: Double?,
+	unitsWorked: Int?,
+	totalUnits: Int?,
+	uph: Double?,
+	curbsideDeliverySpeed: String?,
+	inStoreDeliverySpeed: String?
 ) {
 	Column(
 		modifier = modifier
-			.fillMaxSize()
-			.padding(horizontal = 48.dp, vertical = 8.dp)
+			.padding(horizontal = 48.dp, vertical = 8.dp),
+		verticalArrangement = Arrangement.Top
 	) {
 		Text(
 			modifier = Modifier.padding(bottom = 12.dp),
@@ -59,26 +61,35 @@ fun MetricsScreen(
 		)
 		when (fulfillmentType) {
 			SubFulfillmentType.BOPIS -> {
-				BopisMetrics(fillRate, productivity, unitWorked, totalUnits, uph, carSpeed ?: "--:--", personSpeed ?: "--:--")
+				BopisMetrics(
+					fillRate = fillRatePercentage,
+					productivity = productivityPercentage,
+					unitWorked = unitsWorked,
+					totalUnits = totalUnits,
+					uph = uph,
+					curbsideDeliverySpeed = curbsideDeliverySpeed,
+					inStoreDeliverySpeed = inStoreDeliverySpeed
+				)
 			}
-			SubFulfillmentType.BOPL -> {
+
+			else -> { /* empty waiting to add other order types*/
 			}
-			else -> {}
 		}
 	}
 }
 
 @Composable
 private fun BopisMetrics(
-	fillRate: Float,
-	productivity: Float,
-	unitWorked: Int,
-	totalUnits: Int,
-	uph: Float,
-	carSpeed: String,
-	personSpeed: String
+	fillRate: Double?,
+	productivity: Double?,
+	unitWorked: Int?,
+	totalUnits: Int?,
+	uph: Double?,
+	curbsideDeliverySpeed: String?,
+	inStoreDeliverySpeed: String?
 ) {
-	val fillRateColor = determineColor(fillRate.toString(), MetricType.FILL_RATE, SubFulfillmentType.BOPIS)
+	val fillRateColor =
+		determineColor(fillRate.toString(), MetricType.FILL_RATE, SubFulfillmentType.BOPIS)
 	Row {
 		Column(
 			Modifier
@@ -91,19 +102,15 @@ private fun BopisMetrics(
 				totalUnits = 0,
 				inProgressUnits = 0,
 				percent = fillRate,
-				centerProgressTextStyle = TextStyle(
-					fontSize = 20.sp,
-					fontWeight = FontWeight(700),
-					lineHeight = 20.sp,
-					color = fillRateColor
-				),
+				showPercent = true,
+				centerProgressTextStyle = metricsBodyStyle(fillRateColor),
 				progressBarSize = 75.dp,
 				indicatorThickness = 9.72.dp,
 				completedIndicatorColor = fillRateColor
 			)
 		}
 		val productivityColor = determineColor(
-			(productivity * 100).toString(),
+			productivity?.let { productivity.toString() },
 			MetricType.PRODUCTIVITY,
 			SubFulfillmentType.BOPIS
 		)
@@ -111,21 +118,17 @@ private fun BopisMetrics(
 			MetricsTitle(title = stringResource(R.string.productivity))
 
 			Row(verticalAlignment = Alignment.CenterVertically) {
-				if (productivity == 0f) {
-					MetricsBody(body = "--%")
-				} else {
-					MetricsBody(
-						body = String.format("%.1f", productivity * 100) + "%",
-						color = productivityColor
-					)
-				}
+				MetricsBody(
+					body = productivity.toPercent(),
+					color = productivityColor
+				)
 
 				HorizontalProgressBar(
 					modifier = Modifier.size(height = 12.dp, width = 108.dp),
 					title = "",
 					totalCount = null,
 					workedCount = null,
-					percent = productivity.toString(),
+					percent = productivity?.let { productivity * .01 } ?: 0.0,
 					completedColor = productivityColor
 				)
 			}
@@ -133,10 +136,17 @@ private fun BopisMetrics(
 			Spacer(modifier = Modifier.size(8.dp))
 
 			MetricsTitle(title = stringResource(R.string.units_worked_in_time))
-			if (unitWorked == 0 && totalUnits == 0) {
+			if (unitWorked == 0 && totalUnits == 0 || unitWorked == null || totalUnits == null) {
 				MetricsBody(body = "--/--")
 			} else {
-				MetricsBody(body = "$unitWorked/$totalUnits", color = determineColor("$unitWorked/$totalUnits", MetricType.UNITS_WORKED_IN_TIME, SubFulfillmentType.BOPIS))
+				MetricsBody(
+					body = "$unitWorked/$totalUnits",
+					color = determineColor(
+						"$unitWorked/$totalUnits",
+						MetricType.UNITS_WORKED_IN_TIME,
+						SubFulfillmentType.BOPIS
+					)
+				)
 			}
 		}
 	}
@@ -148,10 +158,13 @@ private fun BopisMetrics(
 	Row {
 		Column {
 			MetricsTitle(title = stringResource(R.string.bopis_pick_uph))
-			if (uph == 0f) {
+			if (uph == null) {
 				MetricsBody(body = "--")
 			} else {
-				MetricsBody(body = uph.toString(), determineColor(uph.toString(), MetricType.UPH, SubFulfillmentType.BOPIS))
+				MetricsBody(
+					body = String.format("%.1f", uph),
+					color = determineColor(uph.toString(), MetricType.UPH, SubFulfillmentType.BOPIS)
+				)
 			}
 		}
 	}
@@ -169,17 +182,39 @@ private fun BopisMetrics(
 					.padding(start = 8.dp),
 				verticalAlignment = Alignment.CenterVertically
 			) {
-				Icon(modifier = Modifier.size(32.dp), painter = painterResource(id = R.drawable.ic_car), contentDescription = "Car")
+				Icon(
+					modifier = Modifier.size(32.dp),
+					painter = painterResource(id = R.drawable.ic_car),
+					contentDescription = "Car"
+				)
 				Spacer(modifier = Modifier.size(8.dp))
 				Column {
-					MetricsBody(body = carSpeed, determineColor(carSpeed, MetricType.DELIVERY_CAR, SubFulfillmentType.BOPIS))
+					MetricsBody(
+						body = formatTime(curbsideDeliverySpeed),
+						color = determineColor(
+							curbsideDeliverySpeed,
+							MetricType.DELIVERY_CAR,
+							SubFulfillmentType.BOPIS
+						)
+					)
 					MetricsSubscript(subscript = stringResource(R.string.mm_ss))
 				}
 				Spacer(modifier = Modifier.size(width = 40.dp, height = 5.dp))
-				Icon(modifier = Modifier.size(36.dp), painter = painterResource(id = R.drawable.ic_store), contentDescription = "Car")
+				Icon(
+					modifier = Modifier.size(36.dp),
+					painter = painterResource(id = R.drawable.ic_store),
+					contentDescription = "Store"
+				)
 				Spacer(modifier = Modifier.size(8.dp))
 				Column {
-					MetricsBody(body = personSpeed, determineColor(personSpeed, MetricType.DELIVERY_PERSON, SubFulfillmentType.BOPIS))
+					MetricsBody(
+						body = formatTime(inStoreDeliverySpeed),
+						color = determineColor(
+							inStoreDeliverySpeed,
+							MetricType.DELIVERY_PERSON,
+							SubFulfillmentType.BOPIS
+						)
+					)
 					MetricsSubscript(subscript = stringResource(R.string.mm_ss))
 				}
 			}
@@ -221,18 +256,22 @@ private fun MetricsTitle(title: String) {
 private fun MetricsBody(body: String, color: Color = BrandColor.BLUE_300_NT) {
 	Text(
 		text = body,
-		style = TextStyle(
-			fontFamily = FontFamily.SANS,
-			fontSize = 20.sp,
-			fontWeight = FontWeight(700),
-			lineHeight = 20.sp,
-			color = color
-		)
+		style = metricsBodyStyle(color)
 	)
 }
 
-private fun determineColor(metric: String, metricType: MetricType, fulfillmentType: SubFulfillmentType): Color {
-	val color: Color = when (getLevel(metric = metric, metricType = metricType, subfulfillmentType = fulfillmentType)) {
+private fun determineColor(
+	metric: String?,
+	metricType: MetricType,
+	fulfillmentType: SubFulfillmentType
+): Color {
+	val color: Color = when (
+		getLevel(
+			metric = metric,
+			metricType = metricType,
+			subfulfillmentType = fulfillmentType
+		)
+	) {
 		MetricLevel.GOOD -> BrandColor.BLUE_300_NT
 		MetricLevel.MEDIUM -> BrandColor.YELLOW_400
 		MetricLevel.BAD -> BrandColor.RED_600
@@ -257,22 +296,31 @@ private fun MetricsSubscript(subscript: String) {
 
 @Composable
 @PreviewPdt
-fun PreviewEmptyMetricsScreen() {
-	MetricsScreen(fulfillmentType = SubFulfillmentType.BOPIS)
+fun PreviewMetricsScreen() {
+	MetricsScreen(
+		fulfillmentType = SubFulfillmentType.BOPIS,
+		uph = 8.1,
+		fillRatePercentage = 97.3,
+		productivityPercentage = 89.1,
+		unitsWorked = 109,
+		totalUnits = 122,
+		curbsideDeliverySpeed = "00:02:21.012",
+		inStoreDeliverySpeed = "00:03:37.012"
+	)
 }
 
 @Composable
 @PreviewPdt
-fun PreviewMetricsScreen() {
+fun PreviewEmptyMetricsScreen() {
 	MetricsScreen(
 		fulfillmentType = SubFulfillmentType.BOPIS,
-		uph = 8.1f,
-		fillRate = .973f,
-		productivity = .891f,
-		unitWorked = 109,
-		totalUnits = 122,
-		carSpeed = "02:21",
-		personSpeed = "03:37"
+		uph = null,
+		fillRatePercentage = null,
+		productivityPercentage = null,
+		unitsWorked = null,
+		totalUnits = null,
+		curbsideDeliverySpeed = null,
+		inStoreDeliverySpeed = null
 	)
 }
 
@@ -284,6 +332,19 @@ enum class MetricLevel {
 	GOOD, BAD, MEDIUM
 }
 
-fun getLevel(subfulfillmentType: SubFulfillmentType, metricType: MetricType, metric: String): MetricLevel {
+// will need to update metric data type
+fun getLevel(
+	subfulfillmentType: SubFulfillmentType,
+	metricType: MetricType,
+	metric: String?
+): MetricLevel {
 	return MetricLevel.GOOD
 }
+
+fun metricsBodyStyle(color: Color) = TextStyle(
+	fontFamily = FontFamily.SANS,
+	fontSize = 20.sp,
+	fontWeight = FontWeight(700),
+	lineHeight = 20.sp,
+	color = color
+)

@@ -41,22 +41,22 @@ import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun InfoModal(
-    modifier: Modifier = Modifier,
-    title: String,
-    subTitle: String? = null,
-    buttonText: String,
-    buttonState: ButtonState = ButtonState.DEFAULT,
-    isButtonEnabled: Boolean = true,
-    buttonClick: (shouldShowAgain: Boolean) -> Unit,
-    crossIconClick: (shouldShowAgain: Boolean) -> Unit,
-    backgroundColor: Color = Color.White,
-    showCheckBox: Boolean = false,
-    checkBoxText: String? = null,
-    shape: Shape = RoundedCornerShape(4.dp),
-    visualContent: @Composable () -> Unit = {},
-    dismissOnBackPress: Boolean = true,
-    dismissOnClickOutside: Boolean = true,
-    onDismissRequest: (shouldShowAgain: Boolean) -> Unit
+	modifier: Modifier = Modifier,
+	title: String,
+	subTitle: String? = null,
+	buttonText: String,
+	buttonState: ButtonState = ButtonState.DEFAULT,
+	isButtonEnabled: Boolean = true,
+	buttonClick: (shouldShowAgain: Boolean) -> Unit,
+	crossIconClick: (shouldShowAgain: Boolean) -> Unit,
+	backgroundColor: Color = Color.White,
+	showCheckBox: Boolean = false,
+	checkBoxText: String? = null,
+	shape: Shape = RoundedCornerShape(4.dp),
+	visualContent: @Composable () -> Unit = {},
+	dismissOnBackPress: Boolean = true,
+	dismissOnClickOutside: Boolean = true,
+	onDismissRequest: (shouldShowAgain: Boolean) -> Unit
 ) {
 	var checkedState by remember { mutableStateOf(false) }
 
@@ -125,7 +125,8 @@ fun InfoModal(
 				Spacer(modifier = Modifier.height(16.dp))
 
 				PrimaryButton(
-					modifier = Modifier.fillMaxWidth(0.85f)
+					modifier = Modifier
+						.fillMaxWidth(0.85f)
 						.semantics { testTag = "InfoModalButton" },
 					text = buttonText,
 					buttonColor = BrandColor.PINK_NT,

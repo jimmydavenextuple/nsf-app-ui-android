@@ -24,10 +24,14 @@ import com.nextuple.nsf.ui.screen.order.OrderScreenTab.READY
 import com.nextuple.nsf.ui.util.DeclineAction
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.util.OrderStatus
+import com.nextuple.nsf.util.SubFulfillmentType
 import com.nextuple.nsf.util.TimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 @HiltViewModel
@@ -86,9 +90,27 @@ class OrderViewModel @Inject constructor(
 		private set
 
 	val orderDate: String by derivedStateOf {
-		formatTimeStamp(
+		formatDate(
 			timestamp = orderDetailResponse?.orderDate,
 			errorName = "OrderDetailResponse_OrderDate"
+		)
+	}
+	val orderTime: String by derivedStateOf {
+		formatTime(
+			timestamp = orderDetailResponse?.orderDate,
+			errorName = "OrderDetailResponse_OrderTime"
+		)
+	}
+	val packDate: String by derivedStateOf {
+		formatDate(
+			timestamp = orderDetailResponse?.packedOnDate,
+			errorName = "OrderDetailResponse_PackDate"
+		)
+	}
+	val packTime: String by derivedStateOf {
+		formatTime(
+			timestamp = orderDetailResponse?.packedOnDate,
+			errorName = "OrderDetailResponse_PackTime"
 		)
 	}
 
@@ -106,14 +128,14 @@ class OrderViewModel @Inject constructor(
 		)
 	}
 
-	val packedOnDate: String by derivedStateOf {
-		formatTimeStamp(
-			timestamp = orderDetailResponse?.packedOnDate,
-			errorName = "OrderDetailResponse_PackedOnDate"
+	val pickedUpOnDate: String by derivedStateOf {
+		formatDate(
+			timestamp = orderDetailResponse?.pickedUpDate,
+			errorName = "OrderDetailResponse_PickedUpOnDate"
 		)
 	}
-	val pickedUpOnDate: String by derivedStateOf {
-		formatTimeStamp(
+	val pickedUpOnTime: String by derivedStateOf {
+		formatTime(
 			timestamp = orderDetailResponse?.pickedUpDate,
 			errorName = "OrderDetailResponse_PickedUpOnDate"
 		)
@@ -128,7 +150,23 @@ class OrderViewModel @Inject constructor(
 	private var orderList: List<OrderDetailsResponse>? by mutableStateOf(null)
 
 	val readyOrders by derivedStateOf {
-		orderList.orEmpty().filter { OrderStatus.isReadyStatusText(it.orderStatusText) }
+		orderList.orEmpty().filter {
+			OrderStatus.isReadyStatusText(it.orderStatusText) && !(
+				it.fulfillmentRequestDetail.subFulfillmentType == SubFulfillmentType.SAME_DAY.name && OrderStatus.isCheckedInStatus(
+					it.orderStatusText
+				)
+				)
+		}
+	}
+	private val sddReadyOrders by derivedStateOf {
+		orderList.orEmpty().filter {
+			it.fulfillmentRequestDetail.subFulfillmentType == SubFulfillmentType.SAME_DAY.name && OrderStatus.isCheckedInStatus(
+				it.orderStatusText
+			)
+		}
+	}
+	val sddOrderByBatchIds by derivedStateOf {
+		sddReadyOrders.groupBy { it.driverDetail?.batchId }.map { it.value }
 	}
 
 	val inProgressOrders by derivedStateOf {
@@ -197,22 +235,27 @@ class OrderViewModel @Inject constructor(
 
 	fun getOrderDetails(fulfillmentRequestNumber: String) = viewModelScope.launch {
 		orderDetailsState = GenericViewState.Loading
-		orderDetailResponse = when (val res = orderService.getOrderDetails(fulfillmentRequestNumber)) {
-			is Result.Success -> {
-				errMsg = null
-				orderDetailsState = GenericViewState.Success
-				res.data
-			}
+		orderDetailResponse =
+			when (val res = orderService.getOrderDetails(fulfillmentRequestNumber)) {
+				is Result.Success -> {
+					errMsg = null
+					orderDetailsState = GenericViewState.Success
+					res.data
+				}
 
-			is Result.Error -> {
-				errMsg = res.msg
-				orderDetailsState = GenericViewState.Failure
-				null
+				is Result.Error -> {
+					errMsg = res.msg
+					orderDetailsState = GenericViewState.Failure
+					null
+				}
 			}
-		}
 	}
 
-	fun cancelOrder(fulfillmentRequestNumber: String, declinedReason: DeclineCode, shouldTranslateReason: Boolean = false) = viewModelScope.launch {
+	fun cancelOrder(
+		fulfillmentRequestNumber: String,
+		declinedReason: DeclineCode,
+		shouldTranslateReason: Boolean = false
+	) = viewModelScope.launch {
 		cancelReasonData = CancelReasonData(GenericViewState.Loading)
 		val res = orderService.recordDecline(
 			fulfillmentRequestNumber = fulfillmentRequestNumber,
@@ -227,6 +270,7 @@ class OrderViewModel @Inject constructor(
 					isDamaged = declinedReason.id == "DAMAGE"
 				)
 			}
+
 			is Result.Error -> {
 				cancelReasonData = CancelReasonData(GenericViewState.Failure)
 				logService.trackError(
@@ -254,7 +298,10 @@ class OrderViewModel @Inject constructor(
 
 	fun pickupExtend(fulfillmentRequestNumber: String) = viewModelScope.launch {
 		viewState = GenericViewState.Loading
-		orderDetailResponse = when (val res = orderService.pickupExtend(fulfillmentRequestNumber = fulfillmentRequestNumber)) {
+		orderDetailResponse = when (
+			val res =
+				orderService.pickupExtend(fulfillmentRequestNumber = fulfillmentRequestNumber)
+		) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = GenericViewState.Success
@@ -288,7 +335,10 @@ class OrderViewModel @Inject constructor(
 
 	fun startPickup(fulfillmentRequestNumber: String) = viewModelScope.launch {
 		startPickupState = GenericViewState.Loading
-		orderDetailResponse = when (val res = orderService.startPickupTask(fulfillmentRequestNumber = fulfillmentRequestNumber)) {
+		orderDetailResponse = when (
+			val res =
+				orderService.startPickupTask(fulfillmentRequestNumber = fulfillmentRequestNumber)
+		) {
 			is Result.Success -> {
 				errMsg = null
 				startPickupState = GenericViewState.Success
@@ -324,7 +374,10 @@ class OrderViewModel @Inject constructor(
 	fun getHoldSlip(fulfillmentRequestNumber: String) = viewModelScope.launch {
 		getHoldSlipState = GenericViewState.Loading
 		holdSlipZpl =
-			when (val res = stageTaskService.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)) {
+			when (
+				val res =
+					stageTaskService.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)
+			) {
 				is Result.Success -> {
 					errMsg = null
 					getHoldSlipState = GenericViewState.Success
@@ -432,6 +485,26 @@ class OrderViewModel @Inject constructor(
 	fun resetCancelReasonData() {
 		cancelReasonData = CancelReasonData()
 	}
+
+	private fun formatDate(timestamp: String?, errorName: String): String = runCatching {
+		val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
+		df.timeZone = TimeZone.getTimeZone("UTC")
+		val date = timestamp?.let { df.parse(it) }
+		val dateSplit = date.toString().split(" ")
+		dateSplit[1] + " " + dateSplit[2] + ", " + dateSplit[5]
+	}.onFailure {
+		logService.trackError(errorName, it)
+	}.getOrNull().orEmpty()
+
+	private fun formatTime(timestamp: String?, errorName: String): String = runCatching {
+		val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH)
+		df.timeZone = TimeZone.getTimeZone("UTC")
+		val date = timestamp?.let { df.parse(it) }
+		val dateSplit = date.toString().split(" ")
+		dateSplit[3] + " " + dateSplit[4]
+	}.onFailure {
+		logService.trackError(errorName, it)
+	}.getOrNull().orEmpty()
 
 	private fun formatTimeStamp(timestamp: String?, errorName: String): String = runCatching {
 		timestamp?.ifEmpty { null }?.let {

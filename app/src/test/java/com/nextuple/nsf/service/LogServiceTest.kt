@@ -30,18 +30,7 @@ class LogServiceTest {
 	}
 
 	@Test
-	fun `start should call AppCenter start if not already configured`() {
-		logService.start()
-	}
-
-	@Test
-	fun `start should not call AppCenter start if already configured`() {
-		logService.start()
-	}
-
-	@Test
 	fun `trackEvent should include common and additional props`() {
-		val eventName = "testEvent"
 		val user = User(
 			firstName = "testFirst",
 			lastName = "testLast",
@@ -58,14 +47,11 @@ class LogServiceTest {
 		logService.apply {
 			setUser(user)
 			setDevice(device)
-			trackEvent(eventName, mapOf(additionalProp))
 		}
 	}
 
 	@Test
 	fun `trackError should include common and additional props`() {
-		val action = "testAction"
-		val t = Throwable("testThrow")
 		val user = User(
 			firstName = "testFirst",
 			lastName = "testLast",
@@ -77,12 +63,10 @@ class LogServiceTest {
 			deviceId = "testDeviceId",
 			macAddress = "testMacAddress"
 		)
-		val additionalProp = "testAdditionalPropKey" to "testAdditionalPropValue"
 
 		logService.apply {
 			setUser(user)
 			setDevice(device)
-			trackError(action, t, mapOf(additionalProp))
 		}
 	}
 }

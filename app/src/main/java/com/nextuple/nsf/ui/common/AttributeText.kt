@@ -83,5 +83,10 @@ fun PreviewAttributeText() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewAttributeTextWithIcon() {
-	AttributeText(label = "label", value = "value value value", iconImageVector = ImageVector.vectorResource(R.drawable.ic_location), fontSize = 14.sp)
+	AttributeText(
+		label = "label",
+		value = "value value value",
+		iconImageVector = ImageVector.vectorResource(R.drawable.ic_location),
+		fontSize = 14.sp
+	)
 }

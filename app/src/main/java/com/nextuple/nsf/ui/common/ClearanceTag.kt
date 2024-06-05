@@ -32,13 +32,25 @@ fun ClearanceTag(modifier: Modifier = Modifier, clearanceColor: String, colorDes
 	val color = Color(rgbNums[0], rgbNums[1], rgbNums[2])
 
 	if (colorDesc.contains("purple", true) || color == Color(112, 48, 160)) {
-		Image(painter = painterResource(id = R.drawable.ic_clearance_purple), contentDescription = "Purple Clearance Tag")
+		Image(
+			painter = painterResource(id = R.drawable.ic_clearance_purple),
+			contentDescription = "Purple Clearance Tag"
+		)
 	} else if (colorDesc.contains("yellow", true) || color == Color(255, 165, 10)) {
-		Image(painter = painterResource(id = R.drawable.ic_clearance_yellow), contentDescription = "Yellow Clearance Tag")
+		Image(
+			painter = painterResource(id = R.drawable.ic_clearance_yellow),
+			contentDescription = "Yellow Clearance Tag"
+		)
 	} else if (colorDesc.contains("green", true) || color == Color(0, 175, 65)) {
-		Image(painter = painterResource(id = R.drawable.ic_clearance_green), contentDescription = "Green Clearance Tag")
+		Image(
+			painter = painterResource(id = R.drawable.ic_clearance_green),
+			contentDescription = "Green Clearance Tag"
+		)
 	} else if (colorDesc.contains("pink", true) || color == Color(244, 134, 200)) {
-		Image(painter = painterResource(id = R.drawable.ic_clearance_pink), contentDescription = "Pink Clearance Tag")
+		Image(
+			painter = painterResource(id = R.drawable.ic_clearance_pink),
+			contentDescription = "Pink Clearance Tag"
+		)
 	} else {
 		Box(
 			modifier = modifier

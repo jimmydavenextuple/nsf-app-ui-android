@@ -5,38 +5,38 @@ import com.nextuple.nsf.util.SubFulfillmentType
 import java.time.Instant
 
 data class PickTask(
-    val id: Long,
-    val fulfillmentType: FulfillmentType,
-    val subFulfillmentType: SubFulfillmentType,
-    val items: List<PickTaskItem>,
-    val pickedQty: Int? = null,
-    val declinedQty: Int? = null,
-    val totalWorkedQty: Int,
-    val totalQty: Int,
-    val totalRemainingQty: Int
+	val id: Long,
+	val fulfillmentType: FulfillmentType,
+	val subFulfillmentType: SubFulfillmentType,
+	val items: List<PickTaskItem>,
+	val pickedQty: Int? = null,
+	val declinedQty: Int? = null,
+	val totalWorkedQty: Int,
+	val totalQty: Int,
+	val totalRemainingQty: Int
 )
 
 data class PickTaskItem(
-    val sku: String,
-    val upcs: List<String>,
-    val style: String?,
-    val primaryAttr: ProductAttribute? = null,
-    val secondaryAttr: ProductAttribute? = null,
-    val tertiaryAttr: ProductAttribute? = null,
-    val locations: List<String> = emptyList(),
-    val onHandQty: Int?,
-    val qty: Int,
-    val pickedQty: Int,
-    val declinedQty: Int,
-    val productName: String,
-    val productBrand: String,
-    val productImageUrls: List<String> = emptyList(),
-    val productHighResImageUrls: List<String> = emptyList(),
-    val clearanceColorCode: String? = null,
-    val clearanceColorDesc: String? = null,
-    val clearanceColorRgb: String? = null,
-    val lastReturn: Instant? = null,
-    val lastReceived: Instant? = null
+	val sku: String,
+	val upcs: List<String>,
+	val style: String?,
+	val primaryAttr: ProductAttribute? = null,
+	val secondaryAttr: ProductAttribute? = null,
+	val tertiaryAttr: ProductAttribute? = null,
+	val locations: List<String> = emptyList(),
+	val onHandQty: Int?,
+	val qty: Int,
+	val pickedQty: Int,
+	val declinedQty: Int,
+	val productName: String,
+	val productBrand: String,
+	val productImageUrls: List<String> = emptyList(),
+	val productHighResImageUrls: List<String> = emptyList(),
+	val clearanceColorCode: String? = null,
+	val clearanceColorDesc: String? = null,
+	val clearanceColorRgb: String? = null,
+	val lastReturn: Instant? = null,
+	val lastReceived: Instant? = null
 ) {
 	fun getRemainingPickQty() = qty - pickedQty - declinedQty
 }

@@ -25,7 +25,8 @@ class CircularProgressBarTest : ScreenshotTest {
 
 	@Before
 	@Throws(Exception::class)
-	fun setUp() {}
+	fun setUp() {
+	}
 
 	@Test
 	fun should_display_circular_progress_bar_and_text_inside() {

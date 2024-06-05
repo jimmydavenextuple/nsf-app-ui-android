@@ -21,13 +21,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -184,7 +182,9 @@ fun LoginScreen(
 			contentAlignment = Alignment.TopEnd
 		) {
 			Image(
-				modifier = Modifier.padding(top = 18.dp, end = 12.dp).height(40.dp),
+				modifier = Modifier
+					.padding(top = 18.dp, end = 12.dp)
+					.height(40.dp),
 				painter = painterResource(R.drawable.nextuple_fulllogo),
 				contentDescription = null,
 				contentScale = ContentScale.FillHeight
@@ -215,11 +215,28 @@ private fun ScanLoginEffect(
 
 @Composable
 @PreviewPdt
-fun PreviewLoginScreen() {
+private fun PreviewLoginScreen() {
 	LoginScreen(
 		isInvalid = false,
 		resetIsInvalid = {},
 		errorMessage = null,
+		showProgressBar = false,
+		onSubmitDks = {},
+		isLoggedIn = false,
+		onLoggedIn = {},
+		scanManager = NoOpScanManager(),
+		haptics = null,
+		isInValidSymbology = { _ -> false }
+	)
+}
+
+@Composable
+@PreviewPdt
+private fun PreviewLoginErrorScreen() {
+	LoginScreen(
+		isInvalid = true,
+		resetIsInvalid = {},
+		errorMessage = "Log in Error",
 		showProgressBar = false,
 		onSubmitDks = {},
 		isLoggedIn = false,

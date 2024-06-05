@@ -1,13 +1,13 @@
 package com.nextuple.nsf.ui.screen.pick
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.util.FulfillmentType.BOPIS
 import com.nextuple.nsf.util.SubFulfillmentType
-import com.karumi.shot.ScreenshotTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -46,7 +46,8 @@ class PickDetailsScreenTest : ScreenshotTest {
 					upcs = listOf("123456789101"),
 					qty = 1,
 					declinedQty = 0,
-					pickedQty = 0
+					pickedQty = 0,
+					style = "style"
 				),
 				unitsWorked = 1,
 				totalUnits = 3,

@@ -66,18 +66,18 @@ data class AppTopBarDropdownMenuItems(
 
 @Composable
 fun AppTopBar(
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = BrandColor.BLUE_300_NT,
-    dropdownBackgroundColor: Color = BrandColor.BLUE_300_NT,
-    screen: Screen,
-    user: User?,
-    orderType: SubFulfillmentType?,
-    items: List<AppTopBarDropdownMenuItems>,
-    showSearchBar: Boolean = false,
-    toggleSearchBar: (Boolean) -> Unit = {},
-    scanManager: ScanManager = NoOpScanManager(),
-    onSearchAction: (String) -> Unit = {},
-    onBackAction: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	backgroundColor: Color = BrandColor.BLUE_300_NT,
+	dropdownBackgroundColor: Color = BrandColor.BLUE_300_NT,
+	screen: Screen,
+	user: User?,
+	orderType: SubFulfillmentType?,
+	items: List<AppTopBarDropdownMenuItems>,
+	showSearchBar: Boolean = false,
+	toggleSearchBar: (Boolean) -> Unit = {},
+	scanManager: ScanManager = NoOpScanManager(),
+	onSearchAction: (String) -> Unit = {},
+	onBackAction: () -> Unit = {}
 ) {
 	var searchInput by remember { mutableStateOf("") }
 
@@ -136,9 +136,9 @@ fun AppTopBar(
 
 @Composable
 private fun ScreenTitle(
-    screen: Screen,
-    orderType: SubFulfillmentType?,
-    onBackAction: () -> Unit
+	screen: Screen,
+	orderType: SubFulfillmentType?,
+	onBackAction: () -> Unit
 ) {
 	val ctx = LocalContext.current
 
@@ -162,7 +162,7 @@ private fun ScreenTitle(
 		)
 	}
 
-	val title = if (screen == Screen.PICK_DETAILS) {
+	val title = if (screen == Screen.PICK) {
 		screen.title + when (orderType) {
 			SubFulfillmentType.BOPIS -> " Products"
 			SubFulfillmentType.BOPL -> " BOPL"
@@ -207,12 +207,12 @@ private fun ScreenTitle(
 
 @Composable
 private fun UserProfile(
-    modifier: Modifier = Modifier,
-    user: User?,
-    dropdownBackgroundColor: Color,
-    items: List<AppTopBarDropdownMenuItems>,
-    screen: Screen,
-    showSearchBar: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	user: User?,
+	dropdownBackgroundColor: Color,
+	items: List<AppTopBarDropdownMenuItems>,
+	screen: Screen,
+	showSearchBar: () -> Unit = {}
 ) {
 	var isExpanded by remember { mutableStateOf(false) }
 
@@ -278,7 +278,9 @@ private fun UserProfile(
 							leadingIcon = {
 								if (iconResId != null) {
 									Icon(
-										modifier = Modifier.size(16.dp).padding(0.dp),
+										modifier = Modifier
+											.size(16.dp)
+											.padding(0.dp),
 										imageVector = ImageVector.vectorResource(iconResId),
 										tint = BrandColor.GRAY_50,
 										contentDescription = null
@@ -414,7 +416,7 @@ fun PreviewAppTopBarSettings() {
 fun PreviewAppTopBarPickDetailsBopis() {
 	AppTopBar(
 		modifier = Modifier.fillMaxWidth(),
-		screen = Screen.PICK_DETAILS,
+		screen = Screen.PICK,
 		orderType = SubFulfillmentType.BOPIS,
 		user = User(
 			firstName = "Anna",
@@ -430,7 +432,7 @@ fun PreviewAppTopBarPickDetailsBopis() {
 fun PreviewAppTopBarPickDetailsBopl() {
 	AppTopBar(
 		modifier = Modifier.fillMaxWidth(),
-		screen = Screen.PICK_DETAILS,
+		screen = Screen.PICK,
 		orderType = SubFulfillmentType.BOPL,
 		user = User(
 			firstName = "Anna",

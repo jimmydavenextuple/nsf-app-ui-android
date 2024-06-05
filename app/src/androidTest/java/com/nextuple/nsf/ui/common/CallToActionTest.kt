@@ -6,9 +6,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.ui.common.callToAction.CallToAction
 import com.nextuple.nsf.ui.common.callToAction.CallToActionMode
-import com.karumi.shot.ScreenshotTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -24,7 +24,8 @@ class CallToActionTest : ScreenshotTest {
 
 	@Before
 	@Throws(Exception::class)
-	fun setUp() {}
+	fun setUp() {
+	}
 
 	@Test
 	fun should_display_floating_action_button() {

@@ -29,7 +29,9 @@ fun TextInfo(
 	valueMaxLines: Int = Int.MAX_VALUE
 ) {
 	Row(modifier = modifier) {
-		val imageModifier = Modifier.size(26.dp).padding(end = 4.dp)
+		val imageModifier = Modifier
+			.size(26.dp)
+			.padding(end = 4.dp)
 
 		if (useEmptyImage) {
 			Box(modifier = imageModifier)
@@ -72,5 +74,9 @@ fun PreviewTextInfo() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewTextInfoWithIcon() {
-	TextInfo(label = "label", value = "value value value", iconImageVector = ImageVector.vectorResource(R.drawable.ic_location))
+	TextInfo(
+		label = "label",
+		value = "value value value",
+		iconImageVector = ImageVector.vectorResource(R.drawable.ic_location)
+	)
 }

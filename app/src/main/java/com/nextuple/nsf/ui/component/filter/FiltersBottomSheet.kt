@@ -43,12 +43,12 @@ import com.nextuple.nsf.ui.theme.FontFamily
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersBottomSheet(
-    state: SheetState,
-    bottomInset: Dp = 48.dp,
-    initialOrderTypes: List<Filter>,
-    initialOrderStatuses: List<Filter>,
-    onDismiss: () -> Unit,
-    onApplyFilters: (orderTypeFilters: List<Filter>, orderStatusFilters: List<Filter>) -> Unit
+	state: SheetState,
+	bottomInset: Dp = 48.dp,
+	initialOrderTypes: List<Filter>,
+	initialOrderStatuses: List<Filter>,
+	onDismiss: () -> Unit,
+	onApplyFilters: (orderTypeFilters: List<Filter>, orderStatusFilters: List<Filter>) -> Unit
 ) {
 	var orderTypes by remember { mutableStateOf(initialOrderTypes) }
 	var orderStatuses by remember { mutableStateOf(initialOrderStatuses) }

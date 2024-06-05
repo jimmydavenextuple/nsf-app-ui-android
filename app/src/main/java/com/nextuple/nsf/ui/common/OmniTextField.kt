@@ -44,19 +44,19 @@ import com.nextuple.nsf.ui.theme.FontFamily
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OmniTextField(
-    modifier: Modifier = Modifier,
-    icon: ImageVector? = null,
-    iconTint: Color = BrandColor.PINK_NT,
-    fieldValue: String,
-    hintText: String = "",
-    onValueChange: (newValue: String) -> Unit,
-    textFieldShape: Shape = RoundedCornerShape(4.dp),
-    keyboardActions: KeyboardActions = KeyboardActions { },
-    borderStroke: BorderStroke = BorderStroke(
+	modifier: Modifier = Modifier,
+	icon: ImageVector? = null,
+	iconTint: Color = BrandColor.PINK_NT,
+	fieldValue: String,
+	hintText: String = "",
+	onValueChange: (newValue: String) -> Unit,
+	textFieldShape: Shape = RoundedCornerShape(4.dp),
+	keyboardActions: KeyboardActions = KeyboardActions { },
+	borderStroke: BorderStroke = BorderStroke(
 		width = 0.5.dp,
 		color = BrandColor.WHITE
 	),
-    onClear: () -> Unit = {}
+	onClear: () -> Unit = {}
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 

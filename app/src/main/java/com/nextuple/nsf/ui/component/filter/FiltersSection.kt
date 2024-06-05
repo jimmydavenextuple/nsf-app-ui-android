@@ -19,10 +19,10 @@ import com.nextuple.nsf.ui.theme.FontFamily
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FiltersSection(
-    modifier: Modifier = Modifier,
-    title: String,
-    filters: List<Filter>,
-    valueToFilterContent: @Composable (filter: Filter) -> Unit
+	modifier: Modifier = Modifier,
+	title: String,
+	filters: List<Filter>,
+	valueToFilterContent: @Composable (filter: Filter) -> Unit
 ) {
 	Column(
 		modifier = modifier,

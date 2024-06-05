@@ -50,11 +50,11 @@ import com.nextuple.nsf.ui.util.ScanManager
 
 @Composable
 fun PrepLandingScreen(
-    numPackTasks: Int,
-    scanManager: ScanManager,
-    onScanGear: (String) -> Unit,
-    onClickPackByOrder: () -> Unit,
-    resetScreen: () -> Unit
+	numPackTasks: Int,
+	scanManager: ScanManager,
+	onScanGear: (String) -> Unit,
+	onClickPackByOrder: () -> Unit,
+	resetScreen: () -> Unit
 ) {
 	var selectedTab by rememberSaveable { mutableStateOf(PACK) }
 

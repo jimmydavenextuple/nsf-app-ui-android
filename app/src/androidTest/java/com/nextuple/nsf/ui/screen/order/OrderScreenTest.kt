@@ -1,9 +1,9 @@
 package com.nextuple.nsf.ui.screen.order
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.ui.screen.order.OrderScreenTab.READY
 import com.nextuple.nsf.util.TestData
-import com.karumi.shot.ScreenshotTest
 import org.junit.Rule
 import org.junit.Test
 

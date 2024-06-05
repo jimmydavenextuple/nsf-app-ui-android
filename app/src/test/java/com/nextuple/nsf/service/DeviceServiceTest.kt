@@ -1,8 +1,6 @@
 package com.nextuple.nsf.service
 
-import com.nextuple.nsf.service.dto.Brand.PL
 import com.nextuple.nsf.service.dto.Device
-import com.nextuple.nsf.service.dto.Store
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs

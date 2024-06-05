@@ -20,7 +20,8 @@ class TopLabeledTextFieldTest : ScreenshotTest {
 
 	@Before
 	@Throws(Exception::class)
-	fun setUp() { }
+	fun setUp() {
+	}
 
 	@Test
 	fun should_display_label_text_and_field_text() {

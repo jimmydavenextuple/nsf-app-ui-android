@@ -26,10 +26,10 @@ data class ActionsCardAction(
 
 @Composable
 fun ActionsCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    primaryAction: ActionsCardAction?,
-    secondaryActions: List<ActionsCardAction>
+	modifier: Modifier = Modifier,
+	title: String,
+	primaryAction: ActionsCardAction?,
+	secondaryActions: List<ActionsCardAction>
 ) {
 	Card(
 		modifier = modifier,

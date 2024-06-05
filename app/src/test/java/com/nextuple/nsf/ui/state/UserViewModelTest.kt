@@ -167,4 +167,40 @@ class UserViewModelTest {
 			configService.clearStoreConfig()
 		}
 	}
+
+	@Test
+	fun `updateUserActivity should call updateLastActiveTime when isLoggedIn is true`() = runTest {
+		vm.updateViewState(ViewState.LoggedIn)
+		vm.updateUserActivity()
+		advanceUntilIdle()
+
+		verify {
+			runBlocking { userRepository.updateLastActiveTime() }
+		}
+	}
+
+	@Test
+	fun `updateUserActivity should NOT call updateLastActiveTime when isLoggedIn is false`() =
+		runTest {
+			vm.updateViewState(ViewState.LoggedOut)
+			vm.updateUserActivity()
+			advanceUntilIdle()
+
+			verify(exactly = 0) {
+				runBlocking { userRepository.updateLastActiveTime() }
+			}
+		}
+
+	@Test
+	fun `handleTimeoutLogout should NOT call logout when isLoggedIn is false`() = runTest {
+		val spy = spyk(vm)
+
+		spy.updateViewState(ViewState.LoggedOut)
+		spy.handleTimeoutLogout(0L)
+		advanceUntilIdle()
+
+		verify(exactly = 0) {
+			spy.logout()
+		}
+	}
 }

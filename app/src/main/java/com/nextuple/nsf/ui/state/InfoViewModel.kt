@@ -57,13 +57,6 @@ open class InfoViewModel @Inject constructor(
 
 	private var storeOverview: StoreOverviewResponse? by mutableStateOf(null)
 
-	private var callbacks: List<(StoreOverviewResponse?) -> Unit> = emptyList()
-
-
-	fun setOnStoreOverviewCallbacks(vararg callbacks: (StoreOverviewResponse?) -> Unit) {
-		this.callbacks = callbacks.toList()
-	}
-
 	fun getStoreOverview() {
 		viewModelScope.launch {
 			storeOverviewState = GenericViewState.Loading
@@ -79,7 +72,7 @@ open class InfoViewModel @Inject constructor(
 					storeOverviewState = GenericViewState.Failure
 					null
 				}
-			}.also { callbacks.forEach { callback -> callback(it) } }
+			}
 		}
 	}
 
@@ -108,5 +101,4 @@ open class InfoViewModel @Inject constructor(
 		declineCodes = null
 		storeOverview = null
 	}
-
 }

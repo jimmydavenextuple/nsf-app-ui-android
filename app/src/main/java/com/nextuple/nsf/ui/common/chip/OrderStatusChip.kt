@@ -60,7 +60,10 @@ fun OrderStatusChip(
 					color = orderStatus.statusColor,
 					shape = RoundedCornerShape(size = 2.dp)
 				)
-				.background(color = BrandColor.TRANSPARENT, shape = RoundedCornerShape(size = 2.dp)),
+				.background(
+					color = BrandColor.TRANSPARENT,
+					shape = RoundedCornerShape(size = 2.dp)
+				),
 			statusText = orderStatus.statusText,
 			statusColor = orderStatus.statusColor,
 			iconDrawable = orderStatus.iconDrawable

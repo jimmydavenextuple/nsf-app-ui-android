@@ -36,12 +36,13 @@ fun HorizontalProgressBar(
 	title: String,
 	workedCount: Int?,
 	totalCount: Int?,
-	percent: String? = null,
+	percent: Double? = null,
 	completedColor: Color = BrandColor.BLUE_300_NT
 ) {
 	var progress by remember { mutableStateOf(0f) }
 
-	progress = percent?.toFloat() ?: ((workedCount?.toFloat() ?: 1f) / (totalCount?.toFloat() ?: 1f))
+	progress =
+		percent?.toFloat() ?: ((workedCount?.toFloat() ?: 1f) / (totalCount?.toFloat() ?: 1f))
 
 	Row(
 		modifier = modifier,
@@ -120,7 +121,9 @@ fun HorizontalProgressBar(
 @Composable
 fun HorizontalProgressBarEmptyPreview() {
 	HorizontalProgressBar(
-		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp).height(17.dp),
+		modifier = Modifier
+			.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp)
+			.height(17.dp),
 		title = "Units",
 		workedCount = 0,
 		totalCount = 5
@@ -131,7 +134,9 @@ fun HorizontalProgressBarEmptyPreview() {
 @Composable
 fun HorizontalProgressBarPartialPreview() {
 	HorizontalProgressBar(
-		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp).height(17.dp),
+		modifier = Modifier
+			.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp)
+			.height(17.dp),
 		title = "Units",
 		workedCount = 3,
 		totalCount = 5
@@ -142,7 +147,9 @@ fun HorizontalProgressBarPartialPreview() {
 @Composable
 fun HorizontalProgressBarCompletePreview() {
 	HorizontalProgressBar(
-		modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp).height(17.dp),
+		modifier = Modifier
+			.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp)
+			.height(17.dp),
 		title = "Units",
 		workedCount = 5,
 		totalCount = 5

@@ -12,10 +12,10 @@ import com.nextuple.nsf.service.dto.Result.Companion.generalError
 import com.nextuple.nsf.service.dto.User
 
 class UserService(
-    private val userApi: UserApi,
-    private val logService: LogService,
-    private val deviceService: DeviceService,
-    private val userRepository: UserRepository
+	private val userApi: UserApi,
+	private val logService: LogService,
+	private val deviceService: DeviceService,
+	private val userRepository: UserRepository
 ) {
 	suspend fun login(dks: String): Result<User> {
 		val store = deviceService.getStore() ?: return generalError()

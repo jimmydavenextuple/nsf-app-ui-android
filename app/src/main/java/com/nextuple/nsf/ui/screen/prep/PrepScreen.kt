@@ -27,63 +27,68 @@ enum class PrepScreenTab(val displayName: String) {
 
 @Composable
 fun PrepScreen(
-    prepViewModel: PrepViewModel = hiltViewModel(),
-    printViewModel: PrintViewModel = hiltViewModel(),
-    configVM: ConfigViewModel,
-    settingsVM: SettingsViewModel,
+	prepViewModel: PrepViewModel = hiltViewModel(),
+	printViewModel: PrintViewModel = hiltViewModel(),
+	configVM: ConfigViewModel,
+	settingsVM: SettingsViewModel,
 	scanManager: ScanManager,
-    frToPack: String?,
-    numPackTasks: Int,
+	frToPack: String?,
+	numPackTasks: Int,
 	onClickPackByOrder: () -> Unit,
-    resetScreen: () -> Unit
+	resetScreen: () -> Unit
 ) {
 	val ctx = LocalContext.current
 	val prepOrder = prepViewModel.prepOrder
 
 	fun onScanGear(upc: String) {
 		prepViewModel.fetchPrepOrder(packType = PackType.GEAR, upcOrFrNo = upc)
-		}
+	}
+
 	fun onPrintHoldSlip(printerName: PrinterName) {
 		prepViewModel.stageTask?.holdSlipZPL?.let {
 			val printer = settingsVM.findPrinter(printerName)
 			printViewModel.printHoldSlip(it, printer, settingsVM.bypassPrinter)
+		}
 	}
 
-
+	fun onPrintBoplHoldSlip() {
+		prepViewModel.prepOrder?.holdSlipZPL?.let {
+			val printer = settingsVM.findPrinter(PrinterName.BOPL)
+			printViewModel.printHoldSlip(it, printer, settingsVM.bypassPrinter)
+		}
 	}
 
 	fun recordHoldLocation(holdingLocation: String) {
 		prepViewModel.stageTask?.containers?.firstOrNull()?.id?.let {
 			prepViewModel.recordHoldingLocation(it, holdingLocation)
+		}
 	}
-
-			}
 
 	fun onStageCompletionCallBack() {
 		prepViewModel.resetHoldLocationState()
-		prepViewModel.resetHoldSlipState()
+		prepViewModel.resetGetHoldSlipState()
 		prepViewModel.resetPrepState()
-				resetScreen()
-			}
+		resetScreen()
+	}
+
 	fun onFailure() {
 		prepViewModel.resetPrepState()
-		}
+	}
 
 	LaunchedEffect(Unit) {
 		if (!frToPack.isNullOrEmpty()) {
 			prepViewModel.fetchPrepOrder(packType = PackType.ORDER, upcOrFrNo = frToPack)
 		} else {
-			prepViewModel.fetchPrepStage()
+			prepViewModel.fetchCurrentStep()
 		}
 	}
 
 	when (prepViewModel.viewState) {
 		GenericViewState.Loading -> {
-
-	Box(
+			Box(
 				modifier = Modifier.fillMaxSize(),
-		contentAlignment = Alignment.Center
-	) {
+				contentAlignment = Alignment.Center
+			) {
 				CircularProgressIndicator(color = BrandColor.GRAY_900)
 			}
 		}
@@ -96,113 +101,112 @@ fun PrepScreen(
 					Toast.LENGTH_SHORT
 				).show()
 				onFailure()
-						}
-					}
+			}
+		}
 
-		else -> {
-			when (prepViewModel.currentStep) {
-				PrepViewModel.Step.Landing -> {
-					PrepLandingScreen(
-						numPackTasks = numPackTasks,
-						scanManager = scanManager,
-						onScanGear = ::onScanGear,
-						onClickPackByOrder = onClickPackByOrder,
-						resetScreen = resetScreen
+		else -> when (prepViewModel.currentStep) {
+			PrepViewModel.Step.Landing -> {
+				PrepLandingScreen(
+					numPackTasks = numPackTasks,
+					scanManager = scanManager,
+					onScanGear = ::onScanGear,
+					onClickPackByOrder = onClickPackByOrder,
+					resetScreen = resetScreen
 				)
+			}
+
+			else -> when (prepOrder?.subFulfillmentType) {
+				SubFulfillmentType.BOPL.name -> {
+					BOPLPrepDetailsScreen(
+						printViewModel = printViewModel,
+						prepOrder = prepOrder,
+						printer = settingsVM.findPrinter(PrinterName.BOPL),
+						startPackAndGetHoldSlip = prepViewModel::startPackAndGetHoldSlip,
+						completePack = prepViewModel::completePack,
+						onDisConnectPrinter = settingsVM::disConnectPrinter,
+						resetScreen = prepViewModel::resetGetHoldSlipState,
+						startPackAndGetHoldSlipState = prepViewModel.startPackAndGetHoldSlipState,
+						currentPrepStage = prepViewModel.currentStep,
+						onRecordHoldingLocation = ::recordHoldLocation,
+						ipPrefix = settingsVM.ipPrefix,
+						printerConnectionState = settingsVM.printerConnectionState,
+						onConnectPrinter = settingsVM::connectPrinter,
+						onResetPrinter = settingsVM::resetConnectionState,
+						onStageCompletionCallBack = ::onStageCompletionCallBack,
+						holdingAreas = configVM.getHoldingLocations(),
+						printerList = settingsVM.printersList,
+						onPrintHoldSlip = { onPrintBoplHoldSlip() },
+						scanManager = scanManager,
+						onPackItem = prepViewModel::packItem
+					)
+				}
+
+				SubFulfillmentType.BOPIS.name -> {
+					BOPISPrepDetailScreen(
+						printViewModel = printViewModel,
+						scanManager = scanManager,
+						isOrderAssembled = false,
+						prepOrder = prepOrder,
+						holdingAreas = configVM.getHoldingLocations(),
+						currentPrepStage = prepViewModel.currentStep,
+						getHoldSlipState = prepViewModel.getHoldSlipState,
+						holdLocationState = prepViewModel.holdLocationState,
+						onPackItem = prepViewModel::packItem,
+						onPackOrder = prepViewModel::packAndGetHoldSlip,
+						onRecordHoldingLocation = ::recordHoldLocation,
+						ipPrefix = settingsVM.ipPrefix,
+						printer = settingsVM.findPrinter(PrinterName.BOPIS),
+						printerConnectionState = settingsVM.printerConnectionState,
+						onConnectPrinter = settingsVM::connectPrinter,
+						onResetPrinter = settingsVM::resetConnectionState,
+						onPrintHoldSlip = { onPrintHoldSlip(PrinterName.BOPIS) },
+						onStageCompletionCallBack = ::onStageCompletionCallBack,
+						onConfirmDecline = { declineReason, index, itemToDecline ->
+							prepViewModel.declinePackItem(declineReason, index, itemToDecline)
+						}
+					)
+				}
+
+				SubFulfillmentType.SAME_DAY.name -> {
+					SDDPrepDetailsScreen(
+						printViewModel = printViewModel,
+						scanManager = scanManager,
+						prepOrder = prepOrder,
+						holdingAreas = configVM.getHoldingLocations(),
+						currentPrepStage = prepViewModel.currentStep,
+						getHoldSlipState = prepViewModel.getHoldSlipState,
+						holdLocationState = prepViewModel.holdLocationState,
+						onPackItem = prepViewModel::packItem,
+						onPackOrder = {
+							// Print placeholder for passing through package data
+							println("aaa PackageData: $it")
+							prepViewModel.packAndGetHoldSlip()
+						},
+						onRecordHoldingLocation = ::recordHoldLocation,
+						ipPrefix = settingsVM.ipPrefix,
+						printer = settingsVM.findPrinter(PrinterName.SDD),
+						printerConnectionState = settingsVM.printerConnectionState,
+						onConnectPrinter = settingsVM::connectPrinter,
+						onResetPrinter = settingsVM::resetConnectionState,
+						onPrintHoldSlip = { onPrintHoldSlip(PrinterName.SDD) },
+						onStageCompletionCallBack = ::onStageCompletionCallBack,
+						onConfirmDecline = { declineReason, index, itemToDecline ->
+							prepViewModel.declinePackItem(declineReason, index, itemToDecline)
+						}
+					)
 				}
 
 				else -> {
-					when (prepOrder?.subFulfillmentType) {
-						SubFulfillmentType.BOPL.name -> {
-							BOPLPrepDetailsScreen(
-								prepOrder = prepOrder,
-								printer = settingsVM.findPrinter(PrinterName.BOPL),
-								startPack = prepViewModel::startPack,
-								completePackAndGetHoldSlip = prepViewModel::completePackAndGetHoldSlip,
-								onDisConnectPrinter = settingsVM::disConnectPrinter,
-								resetScreen = prepViewModel::resetHoldSlipState,
-								holdSlipState = prepViewModel.holdSlipState,
-								currentPrepStage = prepViewModel.currentStep,
-								onRecordHoldingLocation = ::recordHoldLocation,
-								ipPrefix = settingsVM.ipPrefix,
-								printerConnectionState = settingsVM.printerConnectionState,
-								onConnectPrinter = settingsVM::connectPrinter,
-								onResetPrinter = settingsVM::resetConnectionState,
-								onStageCompletionCallBack = ::onStageCompletionCallBack,
-								holdingAreas = configVM.getHoldingLocations(),
-								printerList = settingsVM.printersList,
-								onPrintHoldSlip = { onPrintHoldSlip(PrinterName.BOPL) },
-								scanManager = scanManager,
-								onPackItem = prepViewModel::packItem
-					)
-						}
-						SubFulfillmentType.BOPIS.name -> {
-							BOPISPrepDetailScreen(
-								scanManager = scanManager,
-								isOrderAssembled = false,
-								prepOrder = prepOrder,
-								holdingAreas = configVM.getHoldingLocations(),
-								currentPrepStage = prepViewModel.currentStep,
-								holdSlipState = prepViewModel.holdSlipState,
-								holdLocationState = prepViewModel.holdLocationState,
-								onPackItem = prepViewModel::packItem,
-								onPackOrder = prepViewModel::packAndGetHoldSlip,
-								onRecordHoldingLocation = ::recordHoldLocation,
-								ipPrefix = settingsVM.ipPrefix,
-								printer = settingsVM.findPrinter(PrinterName.BOPIS),
-								printerConnectionState = settingsVM.printerConnectionState,
-								onConnectPrinter = settingsVM::connectPrinter,
-								onResetPrinter = settingsVM::resetConnectionState,
-								onPrintHoldSlip = { onPrintHoldSlip(PrinterName.BOPIS) },
-								onStageCompletionCallBack = ::onStageCompletionCallBack,
-								onConfirmDecline = { declineReason, index, itemToDecline ->
-									prepViewModel.declinePackItem(declineReason, index, itemToDecline)
-								}
-				)
-			}
-
-						SubFulfillmentType.SAME_DAY.name -> {
-							SDDPrepDetailsScreen(
-								scanManager = scanManager,
-								prepOrder = prepOrder,
-								holdingAreas = configVM.getHoldingLocations(),
-								currentPrepStage = prepViewModel.currentStep,
-								holdSlipState = prepViewModel.holdSlipState,
-								holdLocationState = prepViewModel.holdLocationState,
-								onPackItem = prepViewModel::packItem,
-								onPackOrder = {
-									// Print placeholder for passing through package data
-									println("aaa PackageData: $it")
-									prepViewModel.packAndGetHoldSlip()
-								},
-								onRecordHoldingLocation = ::recordHoldLocation,
-								ipPrefix = settingsVM.ipPrefix,
-								printer = settingsVM.findPrinter(PrinterName.SDD),
-								printerConnectionState = settingsVM.printerConnectionState,
-								onConnectPrinter = settingsVM::connectPrinter,
-								onResetPrinter = settingsVM::resetConnectionState,
-								onPrintHoldSlip = { onPrintHoldSlip(PrinterName.SDD) },
-								onStageCompletionCallBack = ::onStageCompletionCallBack,
-								onConfirmDecline = { declineReason, index, itemToDecline ->
-									prepViewModel.declinePackItem(declineReason, index, itemToDecline)
+					LaunchedEffect(Unit) {
+						Toast.makeText(
+							ctx,
+							"Failure retrieving order to prep.",
+							Toast.LENGTH_SHORT
+						).show()
+						onFailure()
 					}
-				)
-			}
-						else -> {
-							LaunchedEffect(Unit) {
-								Toast.makeText(
-									ctx,
-									"Failure retrieving order to prep.",
-									Toast.LENGTH_SHORT
-								).show()
-								onFailure()
-		}
-	}
-}
-
 				}
-	}
-}
-
+			}
+		}
 	}
 }

@@ -5,8 +5,8 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nextuple.nsf.R
 import com.karumi.shot.ScreenshotTest
+import com.nextuple.nsf.R
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +20,8 @@ class AppNavBarTest : ScreenshotTest {
 
 	@Before
 	@Throws(Exception::class)
-	fun setUp() { }
+	fun setUp() {
+	}
 
 	@Test
 	fun should_display_the_items_icon() {
@@ -33,7 +34,12 @@ class AppNavBarTest : ScreenshotTest {
 
 		composeTestRule.apply {
 			setContent {
-				AppNavBar(items = listOf(item), isSelected = { false }, tasksUnassigned = listOf(0), onSelect = {})
+				AppNavBar(
+					items = listOf(item),
+					isSelected = { false },
+					tasksUnassigned = listOf(0),
+					onSelect = {}
+				)
 			}
 
 			onNodeWithTag("navigationBarItemIcon_test", useUnmergedTree = true)
@@ -53,7 +59,12 @@ class AppNavBarTest : ScreenshotTest {
 
 		composeTestRule.apply {
 			setContent {
-				AppNavBar(items = listOf(item), isSelected = { false }, tasksUnassigned = listOf(0), onSelect = {})
+				AppNavBar(
+					items = listOf(item),
+					isSelected = { false },
+					tasksUnassigned = listOf(0),
+					onSelect = {}
+				)
 			}
 
 			onNodeWithTag("navigationBarItemLabel_test", useUnmergedTree = true)

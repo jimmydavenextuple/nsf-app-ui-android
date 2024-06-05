@@ -28,16 +28,16 @@ import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun PrimaryButton(
-    modifier: Modifier = Modifier,
-    text: String,
+	modifier: Modifier = Modifier,
+	text: String,
 	buttonColor: Color = BrandColor.PINK_NT,
 	contentColor: Color = BrandColor.GRAY_50,
-    buttonShape: Shape = RoundedCornerShape(4.dp),
-    enabled: Boolean = true,
-    textSize: TextUnit = 14.sp,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-    buttonState: ButtonState = ButtonState.DEFAULT,
-    onButtonClick: () -> Unit
+	buttonShape: Shape = RoundedCornerShape(4.dp),
+	enabled: Boolean = true,
+	textSize: TextUnit = 14.sp,
+	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+	buttonState: ButtonState = ButtonState.DEFAULT,
+	onButtonClick: () -> Unit
 ) {
 	Button(
 		modifier = modifier
@@ -65,12 +65,14 @@ fun PrimaryButton(
 					contentDescription = "done icon"
 				)
 			}
+
 			ButtonState.LOADING -> {
 				CircularProgressIndicator(
 					modifier = Modifier.size(30.dp),
 					color = contentColor
 				)
 			}
+
 			else -> {
 				Text(
 					text = text,

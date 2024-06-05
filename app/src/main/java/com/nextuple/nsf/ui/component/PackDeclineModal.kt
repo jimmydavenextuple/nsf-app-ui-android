@@ -149,7 +149,11 @@ fun PackDeclineModal(
 }
 
 @Composable
-private fun RadioButtonRow(declineReason: String, selectedOption: String, onOptionSelected: (declineReason: String) -> Unit) {
+private fun RadioButtonRow(
+	declineReason: String,
+	selectedOption: String,
+	onOptionSelected: (declineReason: String) -> Unit
+) {
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()

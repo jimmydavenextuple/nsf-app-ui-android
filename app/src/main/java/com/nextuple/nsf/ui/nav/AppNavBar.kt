@@ -47,10 +47,10 @@ data class AppNavBarItem(
 
 @Composable
 fun AppNavBar(
-    items: List<AppNavBarItem>,
-    isSelected: (route: String) -> Boolean,
-    onSelect: (route: String) -> Unit,
-    tasksUnassigned: List<Int>
+	items: List<AppNavBarItem>,
+	isSelected: (route: String) -> Boolean,
+	onSelect: (route: String) -> Unit,
+	tasksUnassigned: List<Int>
 ) {
 	Row(
 		modifier = Modifier
@@ -76,10 +76,10 @@ fun AppNavBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RowScope.AppNavItem(
-    item: AppNavBarItem,
-    isSelected: (route: String) -> Boolean,
-    onSelect: (route: String) -> Unit,
-    interactionSource: MutableInteractionSource
+	item: AppNavBarItem,
+	isSelected: (route: String) -> Boolean,
+	onSelect: (route: String) -> Unit,
+	interactionSource: MutableInteractionSource
 ) {
 	val isRouteSelected = isSelected(item.route)
 
@@ -93,7 +93,8 @@ fun RowScope.AppNavItem(
 				indication = null
 			) {
 				onSelect(item.route)
-			}.let {
+			}
+			.let {
 				if (isRouteSelected) it.background(color = BrandColor.GRAY_50) else it
 			},
 		verticalArrangement = Arrangement.Center,
@@ -122,7 +123,7 @@ fun RowScope.AppNavItem(
 			Icon(
 				modifier = Modifier
 					.testTag("navigationBarItemIcon_${item.label}")
-					.size(20.dp)
+					.size(22.dp)
 					.align(Alignment.Center),
 				imageVector = ImageVector.vectorResource(id = item.iconResId),
 				tint = if (isRouteSelected) BrandColor.BLUE_300_NT else BrandColor.GRAY_900,

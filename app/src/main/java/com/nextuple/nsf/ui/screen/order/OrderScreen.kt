@@ -207,3 +207,51 @@ fun PreviewOrderScreen() {
 		onSelectTab = {}
 	) { _, _ -> }
 }
+
+@Composable
+@PreviewPdt
+fun PreviewOrderScreen_Swish() {
+	OrderScreen(
+		getOrders = { _ -> },
+		getOrderDetails = {},
+		getOrderDetailsCompletion = {},
+		readyOrders = emptyList(),
+		inProgressOrders = emptyList(),
+		orderTypeFilters = listOf(
+			Filter("bopis"),
+			Filter("bopl"),
+			Filter("sdd")
+		),
+		orderStatusFilters = listOf(
+			Filter("pack"),
+			Filter("stage"),
+			Filter("dispense")
+		),
+		selectedTab = OrderScreenTab.READY,
+		onSelectTab = {}
+	) { _, _ -> }
+}
+
+@Composable
+@PreviewPdt
+fun PreviewOrderScreen_inProgressTab() {
+	OrderScreen(
+		getOrders = { _ -> },
+		getOrderDetails = {},
+		getOrderDetailsCompletion = {},
+		readyOrders = emptyList(),
+		inProgressOrders = emptyList(),
+		orderTypeFilters = listOf(
+			Filter("bopis"),
+			Filter("bopl"),
+			Filter("sdd")
+		),
+		orderStatusFilters = listOf(
+			Filter("pack"),
+			Filter("stage"),
+			Filter("dispense")
+		),
+		selectedTab = OrderScreenTab.IN_PROGRESS,
+		onSelectTab = {}
+	) { _, _ -> }
+}

@@ -215,6 +215,19 @@ fun PreviewBoplMultiUnitModal() {
 	)
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewBoplMultiUnitModal_PlaceHoldSplit() {
+	BOPLMultiUnitModal(
+		onDismissRequest = {},
+		packItems = listOf(),
+		athlete = "Yuji Itadori",
+		orderNum = "000000000000",
+		isStep2Active = true,
+		toggleStep2 = {}
+	)
+}
+
 private val PACK_TASK_ITEM = PackTaskItem(
 	sku = "2345",
 	primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),

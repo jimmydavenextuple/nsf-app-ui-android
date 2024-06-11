@@ -26,7 +26,8 @@
     <string name="connect_printer">Connect Printer</string>
     <string name="connect_printer_subtitle">Type the printer IP address number located on the printer.</string>
     <string name="contents">Order Contents</string>
-    <string name="login_text_label">Login ID</string>
+    <string name="login_node_id_text_label">Store #</string>
+    <string name="login_user_id_text_label">User #</string>
     <string name="store_no_label">Store Number</string>
     <string name="dropdown_menu_feedback">Feedback</string>
     <string name="dropdown_menu_logout">Logout</string>

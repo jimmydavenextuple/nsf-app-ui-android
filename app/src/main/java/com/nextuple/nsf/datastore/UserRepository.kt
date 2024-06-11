@@ -15,12 +15,12 @@ class UserRepository @Inject constructor(
 ) {
 	val userFlow: Flow<User> = userDataStore.data.map { it.toUser() }
 
-	suspend fun updateUser(firstName: String, lastName: String, dks: String) {
+	suspend fun updateUser(firstName: String, lastName: String, userId: String) {
 		userDataStore.updateData {
 			it.toBuilder()
 				.setFirstName(firstName)
 				.setLastName(lastName)
-				.setDks(dks)
+				.setDks(userId)
 				.setLastActiveTime(getProtoTimestamp())
 				.build()
 		}

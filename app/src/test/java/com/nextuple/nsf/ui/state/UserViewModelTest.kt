@@ -81,10 +81,10 @@ class UserViewModelTest {
 
 	@Test
 	fun `login, on success, should populate user and enter success state`() = runTest {
-		val user = User(firstName = "first", lastName = "last", dks = "dks123")
+		val user = User(firstName = "first", lastName = "last", userId = "dks123")
 
-		every { runBlocking { userService.login(dks = user.dks) } } returns Result.Success(user)
-		vm.login(dks = user.dks)
+		every { runBlocking { userService.login(dks = user.userId) } } returns Result.Success(user)
+		vm.login(dks = user.userId)
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoggedIn, vm.viewState)
@@ -118,7 +118,7 @@ class UserViewModelTest {
 			User(
 				firstName = "first",
 				lastName = "last",
-				dks = "dks123"
+				userId = "dks123"
 			)
 		)
 		justRun { runBlocking { userService.logout() } }

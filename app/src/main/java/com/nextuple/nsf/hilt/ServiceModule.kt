@@ -60,12 +60,10 @@ internal object ServiceModule {
 	fun provideUserService(
 		userApi: UserApi,
 		logService: LogService,
-		deviceService: DeviceService,
 		userRepository: UserRepository
 	): UserService = UserService(
 		userApi = userApi,
 		logService = logService,
-		deviceService = deviceService,
 		userRepository = userRepository
 	)
 

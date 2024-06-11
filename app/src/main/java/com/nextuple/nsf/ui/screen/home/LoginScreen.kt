@@ -49,11 +49,11 @@ import com.nextuple.nsf.ui.util.ScanManager
 
 @Composable
 fun LoginScreen(
-	isInvalid: Boolean,
-	resetIsInvalid: () -> Unit,
+	isFormInvalid: Boolean,
+	resetIsFormInvalid: () -> Unit,
 	errorMessage: String?,
 	showProgressBar: Boolean,
-	onSubmitDks: (dks: String) -> Unit,
+	onSubmit: (nodeId: String, userId: String) -> Unit,
 	isLoggedIn: Boolean,
 	onLoggedIn: () -> Unit,
 	scanManager: ScanManager,
@@ -67,7 +67,11 @@ fun LoginScreen(
 	val ctx = LocalContext.current
 	val focusManager = LocalFocusManager.current
 
-	var dks by remember {
+	var nodeId by remember {
+		mutableStateOf("")
+	}
+
+	var userId by remember {
 		mutableStateOf(
 			if (BuildConfig.DEBUG && BuildConfig.AUTO_FILL_DKS) {
 				BuildConfig.DKS.lowercase()
@@ -84,10 +88,18 @@ fun LoginScreen(
 			haptics = haptics,
 			isInValidSymbology = isInValidSymbology,
 			onScanLogin = {
-				dks = it.lowercase()
-				onSubmitDks(dks)
+				userId = it.lowercase()
+				onSubmit(nodeId, userId)
 			}
 		)
+	}
+
+	if(!errorMessage.isNullOrEmpty() && !isFormInvalid) {
+		Toast.makeText(
+			LocalContext.current,
+			errorMessage,
+			Toast.LENGTH_LONG
+		).show()
 	}
 
 	Box(
@@ -134,33 +146,48 @@ fun LoginScreen(
 			TopLabeledTextField(
 				modifier = Modifier
 					.padding(top = 24.dp),
-				labelText = stringResource(id = R.string.login_text_label),
-				fieldValue = dks,
-				isInvalid = isInvalid,
+				labelText = stringResource(id = R.string.login_node_id_text_label),
+				fieldValue = nodeId,
+				isInvalid = nodeId.isEmpty() && isFormInvalid,
 				onValueChange = {
-					dks = it.trim()
-					if (isInvalid) {
-						resetIsInvalid()
-					}
+					resetIsFormInvalid()
+					nodeId = it.trim()
 				},
-				errorMessage = errorMessage.orEmpty(),
+				errorMessage = errorMessage.orEmpty() + ' ' + stringResource(id = R.string.login_node_id_text_label),
 				keyboardActions = KeyboardActions(onDone = {
 					focusManager.clearFocus()
-					onSubmitDks(dks)
+					onSubmit(nodeId, userId)
+				})
+			)
+			TopLabeledTextField(
+				modifier = Modifier
+					.padding(top = 6.dp),
+				labelText = stringResource(id = R.string.login_user_id_text_label),
+				fieldValue = userId,
+				isInvalid = userId.isEmpty() && isFormInvalid,
+				onValueChange = {
+					resetIsFormInvalid()
+					userId = it.trim()
+				},
+				errorMessage = errorMessage.orEmpty() + ' ' + stringResource(id = R.string.login_user_id_text_label),
+				keyboardActions = KeyboardActions(onDone = {
+					focusManager.clearFocus()
+					onSubmit(nodeId, userId)
 				})
 			)
 			PrimaryButton(
 				modifier = Modifier
-					.width(width = 152.dp),
+					.width(width = 152.dp)
+					.padding(top = 12.dp),
 				text = stringResource(id = R.string.login_text).uppercase(),
-				enabled = dks.isNotBlank(),
+				enabled = nodeId.isNotBlank() && userId.isNotBlank(),
 				buttonState = if (showProgressBar) {
 					ButtonState.LOADING
 				} else {
 					ButtonState.DEFAULT
 				},
 				onButtonClick = {
-					onSubmitDks(dks)
+					onSubmit(nodeId, userId)
 				}
 			)
 		}
@@ -217,11 +244,11 @@ private fun ScanLoginEffect(
 @PreviewPdt
 private fun PreviewLoginScreen() {
 	LoginScreen(
-		isInvalid = false,
-		resetIsInvalid = {},
+		isFormInvalid = false,
+		resetIsFormInvalid = {},
 		errorMessage = null,
 		showProgressBar = false,
-		onSubmitDks = {},
+		onSubmit = { _, _ -> },
 		isLoggedIn = false,
 		onLoggedIn = {},
 		scanManager = NoOpScanManager(),
@@ -234,11 +261,11 @@ private fun PreviewLoginScreen() {
 @PreviewPdt
 private fun PreviewLoginErrorScreen() {
 	LoginScreen(
-		isInvalid = true,
-		resetIsInvalid = {},
+		isFormInvalid = true,
+		resetIsFormInvalid = {},
 		errorMessage = "Log in Error",
 		showProgressBar = false,
-		onSubmitDks = {},
+		onSubmit = { _, _ -> },
 		isLoggedIn = false,
 		onLoggedIn = {},
 		scanManager = NoOpScanManager(),

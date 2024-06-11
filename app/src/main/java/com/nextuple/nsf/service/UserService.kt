@@ -6,39 +6,39 @@ import com.nextuple.nsf.retrofit.dto.LoginRequest
 import com.nextuple.nsf.service.LogService.Companion.EVENT_LOGIN
 import com.nextuple.nsf.service.LogService.Companion.EVENT_LOGIN_RES
 import com.nextuple.nsf.service.LogService.Companion.EVENT_LOGOUT
+import com.nextuple.nsf.service.dto.Brand
 import com.nextuple.nsf.service.dto.Result
 import com.nextuple.nsf.service.dto.Result.Companion.fromApiResponse
 import com.nextuple.nsf.service.dto.Result.Companion.generalError
+import com.nextuple.nsf.service.dto.Store
 import com.nextuple.nsf.service.dto.User
 
 class UserService(
 	private val userApi: UserApi,
 	private val logService: LogService,
-	private val deviceService: DeviceService,
 	private val userRepository: UserRepository
 ) {
-	suspend fun login(dks: String): Result<User> {
-		val store = deviceService.getStore() ?: return generalError()
+	suspend fun login(nodeId: String, userId: String): Result<User> {
 
 		// Include common props for this one since they don't officially populate until result.
 		logService.trackEvent(
 			EVENT_LOGIN,
-			mapOf(
-				"dks" to dks,
-				"storeId" to store.id,
-				"storeBrand" to store.brand.chainName
-			)
+            mapOf(
+                "userId" to userId,
+                "nodeId" to nodeId,
+                "nodeBrand" to Brand.NT_BRAND_A.toString()
+            )
 		)
 
-		val res = userApi.login(LoginRequest(dks = dks, store = store.id))
+		val res = userApi.login(LoginRequest(nodeId = nodeId, userId = userId))
 		return runCatching {
 			fromApiResponse(res) {
 				it!!
 				User(
 					firstName = it.firstName,
 					lastName = it.lastName,
-					dks = dks,
-					store = store
+					userId = userId,
+					store = Store(id = nodeId, brand = Brand.NT_BRAND_A)
 				).also { user ->
 					logService.setUser(user)
 					logService.trackEvent(EVENT_LOGIN_RES)
@@ -49,7 +49,7 @@ class UserService(
 				userRepository.updateUser(
 					firstName = it.data.firstName,
 					lastName = it.data.lastName,
-					dks = it.data.dks
+					userId = it.data.userId
 				)
 			}
 		}.onFailure {
@@ -58,9 +58,9 @@ class UserService(
 				EVENT_LOGIN,
 				it,
 				mapOf(
-					"dks" to dks,
-					"storeId" to store.id,
-					"storeBrand" to store.brand.chainName
+					"userId" to userId,
+					"nodeId" to nodeId,
+					"nodeBrand" to Brand.NT_BRAND_A.toString()
 				)
 			)
 		}.getOrDefault(generalError())

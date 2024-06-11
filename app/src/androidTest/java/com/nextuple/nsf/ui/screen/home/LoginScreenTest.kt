@@ -27,11 +27,11 @@ class LoginScreenTest : ScreenshotTest {
 	private fun renderLoginScreen(isValid: Boolean, errorMessage: String? = null) {
 		composeTestRule.setContent {
 			LoginScreen(
-				isInvalid = isValid,
-				resetIsInvalid = {},
+				isFormInvalid = isValid,
+				resetIsFormInvalid = {},
 				errorMessage = errorMessage,
 				showProgressBar = false,
-				onSubmitDks = {},
+				onSubmit = {},
 				isLoggedIn = false,
 				onLoggedIn = {},
 				scanManager = NoOpScanManager(),

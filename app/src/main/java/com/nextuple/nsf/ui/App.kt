@@ -307,8 +307,8 @@ private fun NavGraphBuilder.composableForLogin(
 			resetIsFormInvalid = userVM::resetFromError,
 			errorMessage = userVM.errMsg,
 			showProgressBar = userVM.viewState == ViewState.LoggingIn,
-			onSubmit = { nodeId, userId ->
-				userVM.login(nodeId, userId)
+			onSubmit = { nodeNo, userId ->
+				userVM.login(nodeNo, userId)
 				settingsVM.retrieveSavedPrinters()
 			},
 			isLoggedIn = userVM.viewState == ViewState.LoggedIn,

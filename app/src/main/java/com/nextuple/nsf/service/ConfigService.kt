@@ -7,7 +7,6 @@ import com.nextuple.nsf.service.dto.Result
 import javax.inject.Inject
 
 class ConfigService @Inject constructor(
-	private val deviceService: DeviceService,
 	private val logService: LogService,
 	private val configApi: ConfigApi,
 	private val userRepository: UserRepository
@@ -15,13 +14,13 @@ class ConfigService @Inject constructor(
 	private var storeConfig: StoreConfig? = null
 
 	suspend fun getStoreConfig(): Result<StoreConfig> {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 
 		return if (storeConfig != null) {
 			Result.Success(storeConfig!!)
 		} else {
-			val res = configApi.getStoreConfig(userId = dks, store = store.id)
+			val res = configApi.getStoreConfig(userId = userId, store = store.id)
 			return runCatching {
 				Result.fromApiResponse(res) {
 					storeConfig = it
@@ -33,7 +32,7 @@ class ConfigService @Inject constructor(
 					t = it,
 					additionalProps = mapOf(
 						"store" to store.id,
-						"dks" to dks
+						"userId" to userId
 					)
 				)
 			}.getOrDefault(Result.generalError())

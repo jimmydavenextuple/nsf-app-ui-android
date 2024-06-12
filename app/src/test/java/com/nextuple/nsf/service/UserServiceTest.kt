@@ -32,16 +32,13 @@ class UserServiceTest {
 	val coroutineRule = CoroutineRule()
 
 	@InjectMockKs
-	private lateinit var service: UserService
+	private lateinit var userService: UserService
 
 	@MockK
 	private lateinit var userApi: UserApi
 
 	@MockK(relaxed = true)
 	private lateinit var logService: LogService
-
-	@MockK
-	private lateinit var deviceService: DeviceService
 
 	@MockK
 	private lateinit var userRepository: UserRepository
@@ -52,44 +49,46 @@ class UserServiceTest {
 	}
 
 	@Test
-	fun `login should call user api with the expected dks and store and update userRepo on success`() =
+	fun `login should call user api with the expected userId and store and update userRepo on success`() =
 		runTest {
-			val dks = "dks123"
+			val userId = "userId123"
 			val firstName = "firstname"
 			val lastName = "lastName"
 			val store = Store(id = "456", brand = NT_BRAND_A)
 
 			every { runBlocking { userApi.login(any()) } } returns ApiResponse.Success(
-				data = LoginData(firstName = firstName, lastName = lastName)
+				data = LoginData(
+					firstName = firstName,
+					lastName = lastName,
+					userId = userId,
+					nodeNo = store.id,
+					fullName = "$firstName $lastName"
+				)
 			)
-			every { deviceService.getStore() } returns store
-			justRun { runBlocking { userRepository.updateUser(any(), any(), any()) } }
+			justRun { runBlocking { userRepository.updateUser(any(), any(), any(), any(), any()) } }
 
-			service.login(dks = dks)
+			userService.login(nodeNo = store.id, userId = userId)
 			advanceUntilIdle()
 
 			verify {
-				runBlocking { userApi.login(req = LoginRequest(dks = dks, store = store.id)) }
-				runBlocking { userRepository.updateUser(firstName, lastName, dks) }
+				runBlocking { userApi.login(req = LoginRequest(nodeNo = store.id, userId = userId)) }
+				runBlocking {
+					userRepository.updateUser(
+						firstName = firstName,
+						lastName = lastName,
+						userId = userId,
+						nodeNo = store.id,
+						brand = store.brand.toString()
+					)
+				}
 			}
 		}
 
 	@Test
 	fun `login should return general error on api success response having null data`() = runTest {
 		every { runBlocking { userApi.login(any()) } } returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "0", brand = NT_BRAND_A)
 
-		val res = service.login(dks = "anyDks")
-		advanceUntilIdle()
-
-		assertEquals(Result.generalError(), res)
-	}
-
-	@Test
-	fun `login should return general error if getStore is null`() = runTest {
-		every { deviceService.getStore() } returns null
-
-		val res = service.login(dks = "anyDks")
+		val res = userService.login(nodeNo = "anyNodeNo", userId = "anyUserId")
 		advanceUntilIdle()
 
 		assertEquals(Result.generalError(), res)
@@ -101,7 +100,7 @@ class UserServiceTest {
 		justRun { logService.trackEvent(any()) }
 		justRun { logService.setUser(any()) }
 
-		service.logout()
+		userService.logout()
 
 		verify {
 			runBlocking { userRepository.clearUser() }

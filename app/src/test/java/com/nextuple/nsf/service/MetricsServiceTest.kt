@@ -34,13 +34,7 @@ class MetricsServiceTest {
 	private lateinit var metricsApi: MetricsApi
 
 	@MockK
-	private lateinit var deviceService: DeviceService
-
-	@MockK
 	private lateinit var userRepository: UserRepository
-
-	@MockK(relaxed = true)
-	private lateinit var logService: LogService
 
 	@Before
 	fun setUp() {
@@ -49,7 +43,7 @@ class MetricsServiceTest {
 
 	@Test
 	fun `getMetricsSummary should call metrics api with the expected store`() = runTest {
-		val dks = "dks123"
+		val userId = "userId123"
 		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
 		every {
@@ -62,20 +56,20 @@ class MetricsServiceTest {
 				bopl = MetricsSummaryResponse.OrderMetrics()
 			)
 		)
-		every { deviceService.getStore() } returns store
-		every { runBlocking { userRepository.getDks() } } returns dks
+		every { runBlocking { userRepository.getStore() } } returns store
+		every { runBlocking { userRepository.getUserId() } } returns userId
 
 		service.getMetricsSummary()
 		advanceUntilIdle()
 
 		verify {
-			runBlocking { metricsApi.getMetricsSummary(store = store.id, userId = dks) }
+			runBlocking { metricsApi.getMetricsSummary(store = store.id, userId = userId) }
 		}
 	}
 
 	@Test
 	fun `getMetricsSummary should return general error if get store is null`() = runTest {
-		every { deviceService.getStore() } returns null
+		every { runBlocking { userRepository.getStore() } } returns null
 
 		val res = service.getMetricsSummary()
 		advanceUntilIdle()
@@ -84,9 +78,9 @@ class MetricsServiceTest {
 	}
 
 	@Test
-	fun `getMetricsSummary should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `getMetricsSummary should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "456", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.getMetricsSummary()
 		advanceUntilIdle()
@@ -102,8 +96,8 @@ class MetricsServiceTest {
 			}
 		} returns ApiResponse.Success()
 
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns "dks123"
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "456", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns "userId123"
 
 		val res = service.getMetricsSummary()
 		advanceUntilIdle()

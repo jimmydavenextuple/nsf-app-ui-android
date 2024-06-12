@@ -18,27 +18,26 @@ class UserService(
 	private val logService: LogService,
 	private val userRepository: UserRepository
 ) {
-	suspend fun login(nodeId: String, userId: String): Result<User> {
-
+	suspend fun login(nodeNo: String, userId: String): Result<User> {
 		// Include common props for this one since they don't officially populate until result.
 		logService.trackEvent(
 			EVENT_LOGIN,
-            mapOf(
-                "userId" to userId,
-                "nodeId" to nodeId,
-                "nodeBrand" to Brand.NT_BRAND_A.toString()
-            )
+			mapOf(
+				"userId" to userId,
+				"nodeNo" to nodeNo,
+				"brand" to Brand.NT_BRAND_A.toString()
+			)
 		)
 
-		val res = userApi.login(LoginRequest(nodeId = nodeId, userId = userId))
+		val res = userApi.login(LoginRequest(nodeNo = nodeNo, userId = userId))
 		return runCatching {
 			fromApiResponse(res) {
 				it!!
 				User(
 					firstName = it.firstName,
 					lastName = it.lastName,
-					userId = userId,
-					store = Store(id = nodeId, brand = Brand.NT_BRAND_A)
+					userId = it.userId,
+					store = Store(id = it.nodeNo, brand = Brand.NT_BRAND_A)
 				).also { user ->
 					logService.setUser(user)
 					logService.trackEvent(EVENT_LOGIN_RES)
@@ -49,7 +48,9 @@ class UserService(
 				userRepository.updateUser(
 					firstName = it.data.firstName,
 					lastName = it.data.lastName,
-					userId = it.data.userId
+					userId = it.data.userId,
+					nodeNo = it.data.store.id,
+					brand = it.data.store.brand.toString()
 				)
 			}
 		}.onFailure {
@@ -59,8 +60,8 @@ class UserService(
 				it,
 				mapOf(
 					"userId" to userId,
-					"nodeId" to nodeId,
-					"nodeBrand" to Brand.NT_BRAND_A.toString()
+					"nodeNo" to nodeNo,
+					"brand" to Brand.NT_BRAND_A.toString()
 				)
 			)
 		}.getOrDefault(generalError())

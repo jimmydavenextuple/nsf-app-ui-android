@@ -31,7 +31,7 @@ def STORE_PASSWORD = Util.getEnv('STORE_PASSWORD')
 def KEY_ALIAS = Util.getEnv('KEY_ALIAS')
 def KEY_PASSWORD = Util.getEnv('KEY_PASSWORD')
 
-def DKS = Util.getEnv('USER')
+def USER_ID = Util.getEnv('USER')
 
 def GOAT_API_URL_LOCAL = Util.getEnv('GOAT_API_LOCAL')
 def GOAT_API_URL_DEV = Util.getEnv('GOAT_API_DEV')
@@ -70,7 +70,7 @@ android {
 		buildConfigField "String", "APP_VERSION", "\"$APK_VERSION\""
 
 		// DEBUG-only
-		buildConfigField "String", "DKS", "\"$DKS\""
+		buildConfigField "String", "USER_ID", "\"$USER_ID\""
 	}
 
 	buildTypes {
@@ -98,7 +98,7 @@ android {
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_PROD\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 
@@ -108,7 +108,7 @@ android {
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_STAGE\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 
@@ -118,7 +118,7 @@ android {
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_DEV\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 
@@ -128,7 +128,7 @@ android {
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_LOCAL\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 	}

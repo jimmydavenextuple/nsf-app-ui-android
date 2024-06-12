@@ -19,7 +19,7 @@ data class User(
 fun UserData.toUser() = User(
 	firstName = this.firstName,
 	lastName = this.lastName,
-	userId = this.dks,
+	userId = this.userId,
 	lastActiveTime = this.lastActiveTime
 	// Todo: Find way to implement store
 )

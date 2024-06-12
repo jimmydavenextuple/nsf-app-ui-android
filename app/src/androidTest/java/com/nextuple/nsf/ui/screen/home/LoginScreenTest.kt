@@ -18,8 +18,8 @@ class LoginScreenTest : ScreenshotTest {
 	}
 
 	@Test
-	fun loginScreenErrorInvalidDKS() {
-		renderLoginScreen(true, "Invalid Id.")
+	fun loginScreenErrorInvalidUserId() {
+		renderLoginScreen(true, "Invalid User Id")
 
 		compareScreenshot(composeTestRule)
 	}
@@ -31,7 +31,7 @@ class LoginScreenTest : ScreenshotTest {
 				resetIsFormInvalid = {},
 				errorMessage = errorMessage,
 				showProgressBar = false,
-				onSubmit = {},
+				onSubmit = { _, _ -> },
 				isLoggedIn = false,
 				onLoggedIn = {},
 				scanManager = NoOpScanManager(),

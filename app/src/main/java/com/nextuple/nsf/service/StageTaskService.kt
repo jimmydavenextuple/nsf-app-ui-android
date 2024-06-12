@@ -21,10 +21,10 @@ class StageTaskService(
 	): Result<StageTask?> = runCatching {
 		logService.trackEvent(EVENT_GET_HOLD_SLIP, mapOf("frNo" to fulfillmentRequestNumber))
 
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = stageTaskApi.getHoldSlip(
 			fulfillmentRequestNumber = fulfillmentRequestNumber,
-			userId = dks
+			userId = userId
 		)
 		Result.fromApiResponse(res) {
 			it!!.also { task ->
@@ -62,10 +62,10 @@ class StageTaskService(
 			)
 		)
 
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = stageTaskApi.recordHoldingLocation(
 			recordHoldingLocationRequest = req,
-			userId = dks
+			userId = userId
 		)
 		Result.fromApiResponse(res) {
 			it!!.also { task ->

@@ -179,8 +179,8 @@ fun TopLabeledTextField(
 @Preview(showBackground = true)
 private fun PreviewTopLabeledTextField() {
 	TopLabeledTextField(
-		labelText = "DKS Number",
-		fieldValue = "dks123456",
+		labelText = "User Id",
+		fieldValue = "userId123456",
 		onValueChange = {}
 	)
 }
@@ -189,10 +189,10 @@ private fun PreviewTopLabeledTextField() {
 @Preview(showBackground = true)
 private fun PreviewTopLabeledTextFieldError() {
 	TopLabeledTextField(
-		labelText = "DKS Number",
-		fieldValue = "dks123456",
+		labelText = "User Id",
+		fieldValue = "userId123456",
 		isInvalid = true,
-		errorMessage = "Invalid DKS",
+		errorMessage = "Invalid Userd Id",
 		onValueChange = {}
 	)
 }

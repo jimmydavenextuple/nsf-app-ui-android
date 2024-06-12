@@ -70,12 +70,10 @@ internal object ServiceModule {
 	@Provides
 	fun providePickService(
 		pickApi: PickApi,
-		deviceService: DeviceService,
 		logService: LogService,
 		userRepository: UserRepository
 	): PickService = PickService(
 		pickApi = pickApi,
-		deviceService = deviceService,
 		logService = logService,
 		userRepository = userRepository
 	)
@@ -84,34 +82,28 @@ internal object ServiceModule {
 	fun providePrepService(
 		packTaskApi: PackTaskApi,
 		logService: LogService,
-		deviceService: DeviceService,
 		userRepository: UserRepository
 	): PackTaskService = PackTaskService(
 		packTaskApi = packTaskApi,
 		logService = logService,
-		deviceService = deviceService,
 		userRepository = userRepository
 	)
 
 	@Provides
 	fun provideAppService(
 		infoApi: InfoApi,
-		deviceService: DeviceService,
 		userRepository: UserRepository
 	): InfoService = InfoService(
 		infoApi = infoApi,
-		deviceService = deviceService,
 		userRepository = userRepository
 	)
 
 	@Provides
 	fun provideOrderService(
 		orderApi: OrderApi,
-		deviceService: DeviceService,
 		userRepository: UserRepository
 	): OrderService = OrderService(
 		orderApi = orderApi,
-		deviceService = deviceService,
 		userRepository = userRepository
 	)
 
@@ -130,12 +122,10 @@ internal object ServiceModule {
 	@Provides
 	fun provideConfigService(
 		configApi: ConfigApi,
-		deviceService: DeviceService,
 		logService: LogService,
 		userRepository: UserRepository
 	): ConfigService = ConfigService(
 		configApi = configApi,
-		deviceService = deviceService,
 		logService = logService,
 		userRepository = userRepository
 	)

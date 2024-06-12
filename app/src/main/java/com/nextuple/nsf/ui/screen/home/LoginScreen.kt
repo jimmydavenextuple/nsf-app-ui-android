@@ -53,7 +53,7 @@ fun LoginScreen(
 	resetIsFormInvalid: () -> Unit,
 	errorMessage: String?,
 	showProgressBar: Boolean,
-	onSubmit: (nodeId: String, userId: String) -> Unit,
+	onSubmit: (nodeNo: String, userId: String) -> Unit,
 	isLoggedIn: Boolean,
 	onLoggedIn: () -> Unit,
 	scanManager: ScanManager,
@@ -67,14 +67,14 @@ fun LoginScreen(
 	val ctx = LocalContext.current
 	val focusManager = LocalFocusManager.current
 
-	var nodeId by remember {
+	var nodeNo by remember {
 		mutableStateOf("")
 	}
 
 	var userId by remember {
 		mutableStateOf(
-			if (BuildConfig.DEBUG && BuildConfig.AUTO_FILL_DKS) {
-				BuildConfig.DKS.lowercase()
+			if (BuildConfig.DEBUG && BuildConfig.AUTO_FILL_USER_ID) {
+				BuildConfig.USER_ID.lowercase()
 			} else {
 				""
 			}
@@ -89,12 +89,12 @@ fun LoginScreen(
 			isInValidSymbology = isInValidSymbology,
 			onScanLogin = {
 				userId = it.lowercase()
-				onSubmit(nodeId, userId)
+				onSubmit(nodeNo, userId)
 			}
 		)
 	}
 
-	if(!errorMessage.isNullOrEmpty() && !isFormInvalid) {
+	if (!errorMessage.isNullOrEmpty() && !isFormInvalid) {
 		Toast.makeText(
 			LocalContext.current,
 			errorMessage,
@@ -147,16 +147,16 @@ fun LoginScreen(
 				modifier = Modifier
 					.padding(top = 24.dp),
 				labelText = stringResource(id = R.string.login_node_id_text_label),
-				fieldValue = nodeId,
-				isInvalid = nodeId.isEmpty() && isFormInvalid,
+				fieldValue = nodeNo,
+				isInvalid = nodeNo.isEmpty() && isFormInvalid,
 				onValueChange = {
 					resetIsFormInvalid()
-					nodeId = it.trim()
+					nodeNo = it.trim()
 				},
-				errorMessage = errorMessage.orEmpty() + ' ' + stringResource(id = R.string.login_node_id_text_label),
+				errorMessage = stringResource(id = R.string.login_node_id_text_invalid_error),
 				keyboardActions = KeyboardActions(onDone = {
 					focusManager.clearFocus()
-					onSubmit(nodeId, userId)
+					onSubmit(nodeNo, userId)
 				})
 			)
 			TopLabeledTextField(
@@ -169,10 +169,10 @@ fun LoginScreen(
 					resetIsFormInvalid()
 					userId = it.trim()
 				},
-				errorMessage = errorMessage.orEmpty() + ' ' + stringResource(id = R.string.login_user_id_text_label),
+				errorMessage = stringResource(id = R.string.login_user_id_text_invalid_error),
 				keyboardActions = KeyboardActions(onDone = {
 					focusManager.clearFocus()
-					onSubmit(nodeId, userId)
+					onSubmit(nodeNo, userId)
 				})
 			)
 			PrimaryButton(
@@ -180,14 +180,14 @@ fun LoginScreen(
 					.width(width = 152.dp)
 					.padding(top = 12.dp),
 				text = stringResource(id = R.string.login_text).uppercase(),
-				enabled = nodeId.isNotBlank() && userId.isNotBlank(),
+				enabled = nodeNo.isNotBlank() && userId.isNotBlank(),
 				buttonState = if (showProgressBar) {
 					ButtonState.LOADING
 				} else {
 					ButtonState.DEFAULT
 				},
 				onButtonClick = {
-					onSubmit(nodeId, userId)
+					onSubmit(nodeNo, userId)
 				}
 			)
 		}

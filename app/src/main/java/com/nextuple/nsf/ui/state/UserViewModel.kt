@@ -67,20 +67,20 @@ class UserViewModel @Inject constructor(
 		onLogoutCallbacks = callbacks.toList()
 	}
 
-	fun login(nodeId: String, userId: String) = viewModelScope.launch {
-		if (nodeId.isEmpty()) {
-			errMsg = "Invalid"
+	fun login(nodeNo: String, userId: String) = viewModelScope.launch {
+		if (nodeNo.isEmpty()) {
+			errMsg = null
 			viewState = ViewState.LoginFormValidationError
 			return@launch
 		} else if (userId.isEmpty()) {
-			errMsg = "Invalid"
+			errMsg = null
 			viewState = ViewState.LoginFormValidationError
 			return@launch
 		}
 
 		viewState = ViewState.LoggingIn
 
-		when (val res = userService.login(nodeId, userId)) {
+		when (val res = userService.login(nodeNo, userId)) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = ViewState.LoggedIn

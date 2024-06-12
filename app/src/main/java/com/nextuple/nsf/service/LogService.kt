@@ -73,7 +73,7 @@ class LogService(private val app: Application) {
 
 	private fun userToProps(): Map<String, String> = user?.let {
 		mapOf(
-			"userDks" to it.userId,
+			"userId" to it.userId,
 			"userFirstName" to it.firstName,
 			"userLastName" to it.lastName,
 			"storeId" to it.store.id,

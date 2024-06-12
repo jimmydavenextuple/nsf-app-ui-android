@@ -5,7 +5,9 @@ import com.nextuple.nsf.CoroutineRule
 import com.nextuple.nsf.datastore.UserRepository
 import com.nextuple.nsf.service.ConfigService
 import com.nextuple.nsf.service.UserService
+import com.nextuple.nsf.service.dto.Brand
 import com.nextuple.nsf.service.dto.Result
+import com.nextuple.nsf.service.dto.Store
 import com.nextuple.nsf.service.dto.User
 import com.nextuple.nsf.ui.state.UserViewModel.ViewState
 import io.mockk.MockKAnnotations
@@ -54,37 +56,39 @@ class UserViewModelTest {
 	}
 
 	@Test
-	fun `login should not call API when DKS is empty and should enter error state`() = runTest {
-		vm.login(dks = "")
+	fun `login should not call API when userId is empty and should enter error state`() = runTest {
+		vm.login(nodeNo = "anyNodeNo", userId = "")
 		advanceUntilIdle()
 
-		assertEquals(ViewState.LoginError, vm.viewState)
-		assert(!vm.errMsg.isNullOrEmpty())
+		assertEquals(ViewState.LoginFormValidationError, vm.viewState)
 
 		verify(exactly = 0) {
-			runBlocking { userService.login(any()) }
+			runBlocking { userService.login(any(), any()) }
 		}
 	}
 
 	@Test
-	fun `login should call API with the provided DKS`() = runTest {
-		val dks = "testDks123"
+	fun `login should call API with the provided userId`() = runTest {
+		val userId = "userId123"
+		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
-		every { runBlocking { userService.login(any()) } } returns mockk()
-		vm.login(dks = dks)
+		every { runBlocking { userService.login(any(), any()) } } returns mockk()
+		vm.login(nodeNo = store.id, userId = userId)
 		advanceUntilIdle()
 
 		verify(exactly = 1) {
-			runBlocking { userService.login(dks) }
+			runBlocking { userService.login(nodeNo = store.id, userId = userId) }
 		}
 	}
 
 	@Test
 	fun `login, on success, should populate user and enter success state`() = runTest {
-		val user = User(firstName = "first", lastName = "last", userId = "dks123")
+		val userId = "userId123"
+		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
+		val user = User(firstName = "first", lastName = "last", userId = "userId123")
 
-		every { runBlocking { userService.login(dks = user.userId) } } returns Result.Success(user)
-		vm.login(dks = user.userId)
+		every { runBlocking { userService.login(nodeNo = store.id, userId = userId) } } returns Result.Success(user)
+		vm.login(nodeNo = store.id, userId = userId)
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoggedIn, vm.viewState)
@@ -94,8 +98,8 @@ class UserViewModelTest {
 	@Test
 	fun `login, on error, should enter error state`() = runTest {
 		val errMsg = "error message"
-		every { runBlocking { userService.login(any()) } } returns Result.Error(msg = errMsg)
-		vm.login(dks = "any")
+		every { runBlocking { userService.login(any(), any()) } } returns Result.Error(msg = errMsg)
+		vm.login(nodeNo = "anyNodeNo", userId = "anyUserId")
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoginError, vm.viewState)
@@ -114,17 +118,17 @@ class UserViewModelTest {
 
 	@Test
 	fun `logout, from logged-in state, should reset all fields to default values`() = runTest {
-		every { runBlocking { userService.login(any()) } } returns Result.Success(
+		every { runBlocking { userService.login(any(), any()) } } returns Result.Success(
 			User(
 				firstName = "first",
 				lastName = "last",
-				userId = "dks123"
+				userId = "userId123"
 			)
 		)
 		justRun { runBlocking { userService.logout() } }
 		justRun { configService.clearStoreConfig() }
 
-		vm.login(dks = "any")
+		vm.login(nodeNo = "anyNodeNo", userId = "anyUserId")
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoggedIn, vm.viewState)
@@ -146,11 +150,11 @@ class UserViewModelTest {
 	fun `logout, from error state, should reset all fields to default values`() = runTest {
 		val errMsg = "error message"
 
-		every { runBlocking { userService.login(any()) } } returns Result.Error(errMsg)
+		every { runBlocking { userService.login(any(), any()) } } returns Result.Error(errMsg)
 		justRun { runBlocking { userService.logout() } }
 		justRun { configService.clearStoreConfig() }
 
-		vm.login(dks = "any")
+		vm.login(nodeNo = "anyNodeNo", userId = "anyUserId")
 		advanceUntilIdle()
 
 		assertEquals(ViewState.LoginError, vm.viewState)

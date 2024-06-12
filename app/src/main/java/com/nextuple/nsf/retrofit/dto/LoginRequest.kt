@@ -1,6 +1,6 @@
 package com.nextuple.nsf.retrofit.dto
 
 data class LoginRequest(
-	val nodeId: String,
-	val userId: String,
+	val nodeNo: String,
+	val userId: String
 )

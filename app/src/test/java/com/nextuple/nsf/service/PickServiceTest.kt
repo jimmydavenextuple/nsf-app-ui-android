@@ -40,9 +40,6 @@ class PickServiceTest {
 	private lateinit var pickApi: PickApi
 
 	@MockK
-	private lateinit var deviceService: DeviceService
-
-	@MockK
 	private lateinit var userRepository: UserRepository
 
 	@MockK(relaxed = true)
@@ -54,8 +51,8 @@ class PickServiceTest {
 	}
 
 	@Test
-	fun `startPick should call pick api with the expected dks and store`() = runTest {
-		val dks = "dks123"
+	fun `startPick should call pick api with the expected userId and store`() = runTest {
+		val userId = "userId123"
 		val store = Store(id = "456", brand = NT_BRAND_A)
 
 		every { runBlocking { pickApi.startPick(any(), any()) } } returns ApiResponse.Success(
@@ -69,14 +66,14 @@ class PickServiceTest {
 				items = emptyList()
 			)
 		)
-		every { deviceService.getStore() } returns store
-		every { runBlocking { userRepository.getDks() } } returns dks
+		every { runBlocking { userRepository.getStore() } } returns store
+		every { runBlocking { userRepository.getUserId() } } returns userId
 
 		service.startPick()
 		advanceUntilIdle()
 
 		verify {
-			runBlocking { pickApi.startPick(store = store.id, userId = dks) }
+			runBlocking { pickApi.startPick(store = store.id, userId = userId) }
 		}
 	}
 
@@ -84,8 +81,8 @@ class PickServiceTest {
 	fun `startPick should return general error on api success response having null data`() =
 		runTest {
 			every { runBlocking { pickApi.startPick(any(), any()) } } returns ApiResponse.Success()
-			every { deviceService.getStore() } returns Store(id = "0", brand = NT_BRAND_A)
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getStore() } } returns Store(id = "0", brand = NT_BRAND_A)
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 
 			val res = service.startPick()
 			advanceUntilIdle()
@@ -95,7 +92,7 @@ class PickServiceTest {
 
 	@Test
 	fun `startPick should return general error if getStore is null`() = runTest {
-		every { deviceService.getStore() } returns null
+		every { runBlocking { userRepository.getStore() } } returns null
 
 		val res = service.startPick()
 		advanceUntilIdle()
@@ -104,9 +101,9 @@ class PickServiceTest {
 	}
 
 	@Test
-	fun `startPick should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `startPick should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "456", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.startPick()
 		advanceUntilIdle()
@@ -124,7 +121,7 @@ class PickServiceTest {
 			declineReasonText = ""
 		)
 
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every { runBlocking { pickApi.pickDecline(any(), any()) } } returns ApiResponse.Success(
 			data = PickTask(
 				id = 1,
@@ -158,7 +155,7 @@ class PickServiceTest {
 			every {
 				runBlocking { pickApi.pickDecline(any(), any()) }
 			} returns ApiResponse.Success()
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 
 			val res = service.declinePick(declineItemRequest)
 			advanceUntilIdle()
@@ -167,8 +164,8 @@ class PickServiceTest {
 		}
 
 	@Test
-	fun `declinePick should return general error if getDks is null`() = runTest {
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `declinePick should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.declinePick(
 			DeclineItemRequest(
@@ -192,7 +189,7 @@ class PickServiceTest {
 			pickedQty = 1,
 			scannedUpc = "upc"
 		)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every { runBlocking { pickApi.recordPick(any(), any()) } } returns ApiResponse.Success(
 			data = PickTask(
 				id = 1,
@@ -231,8 +228,8 @@ class PickServiceTest {
 		}
 
 	@Test
-	fun `pickItem should return general error if getDks is null`() = runTest {
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `pickItem should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.pickItem(
 			PickItemRequest(

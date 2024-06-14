@@ -27,16 +27,15 @@ import com.nextuple.nsf.service.dto.Result
 class PackTaskService(
 	private val packTaskApi: PackTaskApi,
 	private val logService: LogService,
-	private val deviceService: DeviceService,
 	private val userRepository: UserRepository
 ) {
 
 	suspend fun getPrepDetails(frNo: String): Result<PrepDetail?> = runCatching {
 		logService.trackEvent(EVENT_GET_PREP_DETAILS, mapOf("frNo" to frNo))
 
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = packTaskApi.getPrepDetails(
-			userId = dks,
+			userId = userId,
 			getPrepDetailsRequest = GetPrepDetailsRequest(frNos = listOf(frNo))
 		)
 
@@ -52,9 +51,9 @@ class PackTaskService(
 	suspend fun getPrepDetails(frNos: List<String>): Result<List<PrepDetail>?> = runCatching {
 		logService.trackEvent(EVENT_GET_PREP_DETAILS, mapOf("frNo" to frNos.joinToString { "," }))
 
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = packTaskApi.getPrepDetails(
-			userId = dks,
+			userId = userId,
 			getPrepDetailsRequest = GetPrepDetailsRequest(frNos = frNos)
 		)
 
@@ -72,10 +71,10 @@ class PackTaskService(
 	}.getOrDefault(Result.generalError())
 
 	suspend fun packByGear(upc: String): Result<PrepDetail?> = runCatching {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = packTaskApi.packByGear(
-			userId = dks,
+			userId = userId,
 			packByGearRequest = PackByGearRequest(storeNumber = store.id, upc = upc)
 		)
 		return Result.fromApiResponse(res) {
@@ -88,10 +87,10 @@ class PackTaskService(
 	}.getOrDefault(Result.generalError())
 
 	suspend fun packByOrder(frNo: String): Result<PrepDetail?> = runCatching {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = packTaskApi.packByOrder(
-			userId = dks,
+			userId = userId,
 			packByOrderRequest = PackByOrderRequest(storeNumber = store.id, frNo = frNo)
 		)
 		return Result.fromApiResponse(res) {
@@ -105,9 +104,9 @@ class PackTaskService(
 
 	suspend fun declinePackItem(req: RecordDeclineRequest): Result<RecordDeclineResponse?> =
 		runCatching {
-			val dks = userRepository.getDks() ?: return Result.generalError()
+			val userId = userRepository.getUserId() ?: return Result.generalError()
 			val res = packTaskApi.declinePackItem(
-				userId = dks,
+				userId = userId,
 				recordDeclineRequest = req
 			)
 			return Result.fromApiResponse(res) {
@@ -123,8 +122,8 @@ class PackTaskService(
 
 	suspend fun startPackTask(taskId: String): Result<PrepDetail?> = runCatching {
 		logService.trackEvent(EVENT_START_PACK_ONLY, mapOf("taskId" to taskId))
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = packTaskApi.startPackTask(taskId = taskId, userId = dks)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = packTaskApi.startPackTask(taskId = taskId, userId = userId)
 		return Result.fromApiResponse(res) {
 			it!!.also {
 				logService.trackEvent(EVENT_START_PACK_ONLY_RES, mapOf("taskId" to taskId))
@@ -136,8 +135,8 @@ class PackTaskService(
 
 	suspend fun completePackAndGetHoldSlip(taskId: String): Result<StageTask?> = runCatching {
 		logService.trackEvent(EVENT_COMPLETE_PACK, mapOf("taskId" to taskId))
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = packTaskApi.completePackAndGetHoldSlip(taskId = taskId, userId = dks)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = packTaskApi.completePackAndGetHoldSlip(taskId = taskId, userId = userId)
 		return Result.fromApiResponse(res) {
 			it!!.also { task ->
 				logService.trackEvent(EVENT_COMPLETE_PACK_RES, toStageTaskResMap(taskId, task))
@@ -149,8 +148,8 @@ class PackTaskService(
 
 	suspend fun packAndGetHoldSlip(taskId: String): Result<StageTask?> = runCatching {
 		logService.trackEvent(EVENT_PACK, mapOf("taskId" to taskId))
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = packTaskApi.packAndGetHoldSlip(taskId = taskId, userId = dks)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = packTaskApi.packAndGetHoldSlip(taskId = taskId, userId = userId)
 		return Result.fromApiResponse(res) {
 			it!!.also { task ->
 				logService.trackEvent(EVENT_PACK_RES, toStageTaskResMap(taskId, task))

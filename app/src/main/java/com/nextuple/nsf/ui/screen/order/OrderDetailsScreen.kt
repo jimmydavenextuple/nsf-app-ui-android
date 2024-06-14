@@ -625,7 +625,7 @@ fun OrderDetailsPreview() {
 		orderDetailsResponse = OrderDetailsResponse(
 			orderNumber = "10000023",
 			packedOnDate = "",
-			packedByUserId = "dks0523923",
+			packedByUserId = "userId0523923",
 			orderStatusText = "Aged",
 			athleteDetail = AthleteDetail(
 				athleteFirstName = "Erica",

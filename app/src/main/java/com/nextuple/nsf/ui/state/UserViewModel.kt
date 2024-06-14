@@ -27,7 +27,7 @@ class UserViewModel @Inject constructor(
 
 	sealed class ViewState {
 		/**
-		 * The user is logged out or has yet to log in.
+		 * The user is logged out or is yet to log in.
 		 */
 		object LoggedOut : ViewState()
 
@@ -40,6 +40,11 @@ class UserViewModel @Inject constructor(
 		 * The user is currently logged in.
 		 */
 		object LoggedIn : ViewState()
+
+		/**
+		 * There was an error validating the login form.
+		 */
+		object LoginFormValidationError : ViewState()
 
 		/**
 		 * There was an error logging the user in.
@@ -62,16 +67,20 @@ class UserViewModel @Inject constructor(
 		onLogoutCallbacks = callbacks.toList()
 	}
 
-	fun login(dks: String) = viewModelScope.launch {
-		if (dks.isEmpty()) {
-			errMsg = "Invalid Id."
-			viewState = ViewState.LoginError
+	fun login(nodeNo: String, userId: String) = viewModelScope.launch {
+		if (nodeNo.isEmpty()) {
+			errMsg = null
+			viewState = ViewState.LoginFormValidationError
+			return@launch
+		} else if (userId.isEmpty()) {
+			errMsg = null
+			viewState = ViewState.LoginFormValidationError
 			return@launch
 		}
 
 		viewState = ViewState.LoggingIn
 
-		when (val res = userService.login(appendDksPrefixIfNeeded(dks))) {
+		when (val res = userService.login(nodeNo, userId)) {
 			is Result.Success -> {
 				errMsg = null
 				viewState = ViewState.LoggedIn
@@ -87,9 +96,9 @@ class UserViewModel @Inject constructor(
 	fun resetFromError() = logout()
 
 	fun logout() = viewModelScope.launch {
+		errMsg = null
 		userService.logout()
 		viewState = ViewState.LoggedOut
-		errMsg = null
 		configService.clearStoreConfig()
 		onLogoutCallbacks.forEach { callback -> callback() }
 	}
@@ -113,10 +122,4 @@ class UserViewModel @Inject constructor(
 	}
 
 	fun isLoggedIn() = viewState == ViewState.LoggedIn
-	private fun appendDksPrefixIfNeeded(dks: String): String =
-		if (!dks.lowercase().startsWith("dks") && dks.all { it.isDigit() }) {
-			"dks$dks"
-		} else {
-			dks
-		}
 }

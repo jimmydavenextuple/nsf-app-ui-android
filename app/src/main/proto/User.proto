@@ -7,6 +7,8 @@ import "google/protobuf/timestamp.proto";
 message UserData {
     string firstName = 1;
     string lastName = 2;
-    string dks = 3;
-    google.protobuf.Timestamp lastActiveTime = 4;
+    string userId = 3;
+    string nodeNo = 4;
+    string brand = 5;
+    google.protobuf.Timestamp lastActiveTime = 6;
 }

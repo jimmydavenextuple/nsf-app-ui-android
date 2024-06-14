@@ -7,7 +7,7 @@ import com.nextuple.nsf.service.dto.Brand.UNKNOWN
 data class User(
 	val firstName: String = "",
 	val lastName: String = "",
-	val dks: String = "",
+	val userId: String = "",
 	val store: Store = Store(id = "0", brand = UNKNOWN),
 	val lastActiveTime: Timestamp = Timestamp.getDefaultInstance()
 ) {
@@ -19,7 +19,7 @@ data class User(
 fun UserData.toUser() = User(
 	firstName = this.firstName,
 	lastName = this.lastName,
-	dks = this.dks,
+	userId = this.userId,
 	lastActiveTime = this.lastActiveTime
 	// Todo: Find way to implement store
 )

@@ -361,7 +361,7 @@ private fun UserInfo(
 					maxLines = 1
 				)
 				Text(
-					text = user?.dks.orEmpty().uppercase(),
+					text = user?.userId.orEmpty().uppercase(),
 					color = BrandColor.GRAY_50,
 					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Light,
@@ -385,7 +385,7 @@ fun PreviewAppTopBarMain() {
 		user = User(
 			firstName = "Anna",
 			lastName = "Heisey",
-			dks = "dks0564797"
+			userId = "userId0564797"
 		),
 		items = listOf(
 			AppTopBarDropdownMenuItems(label = "Settings", R.drawable.ic_settings),
@@ -405,7 +405,7 @@ fun PreviewAppTopBarSettings() {
 		user = User(
 			firstName = "Laurancefff",
 			lastName = "Alexander",
-			dks = "dks0564792"
+			userId = "userId0564792"
 		),
 		items = listOf()
 	)
@@ -421,7 +421,7 @@ fun PreviewAppTopBarPickDetailsBopis() {
 		user = User(
 			firstName = "Anna",
 			lastName = "Heisey",
-			dks = "dks0564797"
+			userId = "userId0564797"
 		),
 		items = listOf()
 	)
@@ -437,7 +437,7 @@ fun PreviewAppTopBarPickDetailsBopl() {
 		user = User(
 			firstName = "Anna",
 			lastName = "Heisey",
-			dks = "dks0564797"
+			userId = "userId0564797"
 		),
 		items = listOf()
 	)

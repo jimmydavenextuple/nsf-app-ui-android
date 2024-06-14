@@ -54,7 +54,7 @@ class InfoViewModelTest {
 	}
 
 	@Test
-	fun `storeOverview for empty dks`() = runTest {
+	fun `storeOverview for empty userId`() = runTest {
 		val errMsg = "Invalid Id."
 		every { runBlocking { infoService.getStoreOverview() } } returns Result.Error(msg = errMsg)
 		vm.getStoreOverview()

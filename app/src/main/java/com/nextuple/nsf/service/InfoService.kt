@@ -12,14 +12,13 @@ import com.nextuple.nsf.util.SubFulfillmentType
 
 class InfoService(
 	private val infoApi: InfoApi,
-	private val deviceService: DeviceService,
 	private val userRepository: UserRepository
 ) {
 
 	suspend fun getStoreOverview(): Result<StoreOverviewResponse?> {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = infoApi.getStoreOverview(store = store.id, userId = dks)
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = infoApi.getStoreOverview(store = store.id, userId = userId)
 
 		return runCatching {
 			Result.fromApiResponse(res) {
@@ -35,9 +34,9 @@ class InfoService(
 	}
 
 	suspend fun getUserPickTasks(): Result<GetUserPickTasksResponse?> {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = infoApi.getUserPickTasks(store = store.id, userId = dks)
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = infoApi.getUserPickTasks(store = store.id, userId = userId)
 		return runCatching {
 			Result.fromApiResponse(res) {
 				it!!
@@ -48,9 +47,9 @@ class InfoService(
 	}
 
 	suspend fun getUserPrepTasks(): Result<GetUserPrepTasksResponse?> {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = infoApi.getUserPrepTasks(store = store.id, userId = dks)
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = infoApi.getUserPrepTasks(store = store.id, userId = userId)
 		return runCatching {
 			Result.fromApiResponse(res) {
 				it!!
@@ -61,15 +60,15 @@ class InfoService(
 	}
 
 	suspend fun getDeclineCodes(): Result<GetDeclineCodesResponse> {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 
 		val res = infoApi.getDeclineCodes(
 			brand = store.brand.chainName,
 			store = store.id,
 			fulfillmentType = FulfillmentType.BOPIS.name,
 			subFulfillmentType = SubFulfillmentType.BOPIS.name,
-			userId = dks
+			userId = userId
 		)
 
 		return runCatching {

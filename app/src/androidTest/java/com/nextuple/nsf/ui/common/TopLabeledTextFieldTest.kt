@@ -26,8 +26,8 @@ class TopLabeledTextFieldTest : ScreenshotTest {
 	@Test
 	fun should_display_label_text_and_field_text() {
 		val testModifier = Modifier
-		val labelText = "DKS Number"
-		val fieldValue = "dks123456"
+		val labelText = "User Id"
+		val fieldValue = "userId123456"
 
 		composeTestRule.apply {
 			setContent {

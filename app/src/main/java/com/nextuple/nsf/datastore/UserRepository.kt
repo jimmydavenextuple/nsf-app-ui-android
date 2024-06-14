@@ -2,6 +2,8 @@ package com.nextuple.nsf.datastore
 
 import androidx.datastore.core.DataStore
 import com.nextuple.nsf.UserData
+import com.nextuple.nsf.service.dto.Brand
+import com.nextuple.nsf.service.dto.Store
 import com.nextuple.nsf.service.dto.User
 import com.nextuple.nsf.service.dto.toUser
 import com.nextuple.nsf.util.TimeUtils.getProtoTimestamp
@@ -15,12 +17,14 @@ class UserRepository @Inject constructor(
 ) {
 	val userFlow: Flow<User> = userDataStore.data.map { it.toUser() }
 
-	suspend fun updateUser(firstName: String, lastName: String, dks: String) {
+	suspend fun updateUser(firstName: String, lastName: String, userId: String, nodeNo: String, brand: String) {
 		userDataStore.updateData {
 			it.toBuilder()
 				.setFirstName(firstName)
 				.setLastName(lastName)
-				.setDks(dks)
+				.setUserId(userId)
+				.setNodeNo(nodeNo)
+				.setBrand(brand)
 				.setLastActiveTime(getProtoTimestamp())
 				.build()
 		}
@@ -40,5 +44,14 @@ class UserRepository @Inject constructor(
 		}
 	}
 
-	suspend fun getDks(): String? = userDataStore.data.firstOrNull()?.dks
+	suspend fun getUserId(): String? = userDataStore.data.firstOrNull()?.userId
+
+	suspend fun getStore(): Store? =
+		userDataStore.data.firstOrNull()?.nodeNo?.let {
+			userDataStore.data.firstOrNull()?.brand?.let { it1 ->
+				Brand.toBrand(
+					it1
+				)
+			}?.let { it2 -> Store(id = it, brand = it2) }
+		}
 }

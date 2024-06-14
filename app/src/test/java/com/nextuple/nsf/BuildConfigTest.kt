@@ -6,8 +6,8 @@ import org.junit.Test
 class BuildConfigTest {
 
 	@Test
-	fun `AUTO_FILL_DKS should be false`() {
-		assertFalse(BuildConfig.AUTO_FILL_DKS)
+	fun `AUTO_FILL_USER_ID should be false`() {
+		assertFalse(BuildConfig.AUTO_FILL_USER_ID)
 	}
 
 	@Test

@@ -34,7 +34,7 @@ class LogServiceTest {
 		val user = User(
 			firstName = "testFirst",
 			lastName = "testLast",
-			dks = "testDks",
+			userId = "testUserId",
 			store = Store(id = "1", brand = NT_BRAND_A)
 		)
 		val device = Device(
@@ -55,7 +55,7 @@ class LogServiceTest {
 		val user = User(
 			firstName = "testFirst",
 			lastName = "testLast",
-			dks = "testDks",
+			userId = "testUserId",
 			store = Store(id = "1", brand = NT_BRAND_A)
 		)
 		val device = Device(

@@ -9,7 +9,6 @@ import com.nextuple.nsf.service.dto.Result
 
 class OrderService(
 	private val orderApi: OrderApi,
-	private val deviceService: DeviceService,
 	private val userRepository: UserRepository
 ) {
 
@@ -19,8 +18,8 @@ class OrderService(
 		orderStatusFilter: List<String>? = null,
 		minOrderStatus: String? = null
 	): Result<List<OrderDetailsResponse>> {
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = orderApi.getOrders(
 			store = store.id,
 			query = query,
@@ -28,7 +27,7 @@ class OrderService(
 			orderStatusFilter = orderStatusFilter,
 			minOrderStatus = minOrderStatus,
 			pastDays = null,
-			userId = dks
+			userId = userId
 		)
 		return runCatching {
 			Result.fromApiResponse(res) {
@@ -40,10 +39,10 @@ class OrderService(
 	}
 
 	suspend fun getOrderDetails(fulfillmentRequestNumber: String): Result<OrderDetailsResponse> {
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = orderApi.orderDetails(
 			fulfillmentRequestNumber = fulfillmentRequestNumber,
-			userId = dks
+			userId = userId
 		)
 		return runCatching {
 			Result.fromApiResponse(res) {
@@ -66,8 +65,8 @@ class OrderService(
 			shouldTranslateReason = shouldTranslateReason,
 			action = action
 		)
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = orderApi.recordDecline(userId = dks, recordDeclineRequest = request)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = orderApi.recordDecline(userId = userId, recordDeclineRequest = request)
 		return runCatching {
 			Result.fromApiResponse(res) {
 				it!!
@@ -78,9 +77,9 @@ class OrderService(
 	}
 
 	suspend fun pickupExtend(fulfillmentRequestNumber: String): Result<OrderDetailsResponse> {
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res =
-			orderApi.pickupExtend(userId = dks, fulfillmentRequestNumber = fulfillmentRequestNumber)
+			orderApi.pickupExtend(userId = userId, fulfillmentRequestNumber = fulfillmentRequestNumber)
 
 		return runCatching {
 			Result.fromApiResponse(res) {
@@ -92,8 +91,8 @@ class OrderService(
 	}
 
 	suspend fun pickupRemoveCheckIn(taskId: String): Result<OrderDetailsResponse> {
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = orderApi.pickupRemoveCheckIn(userId = dks, taskId = taskId)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = orderApi.pickupRemoveCheckIn(userId = userId, taskId = taskId)
 
 		return runCatching {
 			Result.fromApiResponse(res) {
@@ -105,9 +104,9 @@ class OrderService(
 	}
 
 	suspend fun startPickupTask(fulfillmentRequestNumber: String): Result<OrderDetailsResponse> {
-		val dks = userRepository.getDks() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = orderApi.startPickupTask(
-			userId = dks,
+			userId = userId,
 			fulfillmentRequestNumber = fulfillmentRequestNumber
 		)
 
@@ -121,8 +120,8 @@ class OrderService(
 	}
 
 	suspend fun completePickupTask(taskId: String): Result<OrderDetailsResponse> {
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = orderApi.completePickupTask(userId = dks, taskId = taskId)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = orderApi.completePickupTask(userId = userId, taskId = taskId)
 
 		return runCatching {
 			Result.fromApiResponse(res) {

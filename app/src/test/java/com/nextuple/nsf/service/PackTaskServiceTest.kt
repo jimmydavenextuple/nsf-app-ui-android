@@ -67,7 +67,7 @@ class PackTaskServiceTest {
 			)
 		)
 
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every {
 			runBlocking {
 				packTaskApi.packAndGetHoldSlip(
@@ -98,7 +98,7 @@ class PackTaskServiceTest {
 					)
 				}
 			} returns ApiResponse.Success()
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 
 			val res = service.packAndGetHoldSlip(taskId = "taskId")
 			advanceUntilIdle()
@@ -107,8 +107,8 @@ class PackTaskServiceTest {
 		}
 
 	@Test
-	fun `packAndGetHoldSlip should return general error if getDks is null`() = runTest {
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `packAndGetHoldSlip should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.packAndGetHoldSlip(taskId = "taskId")
 		advanceUntilIdle()
@@ -124,7 +124,7 @@ class PackTaskServiceTest {
 			fulfillmentRequestNumber = "xx90000000",
 			items = emptyList()
 		)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every {
 			runBlocking {
 				packTaskApi.getPrepDetails(
@@ -155,7 +155,7 @@ class PackTaskServiceTest {
 					)
 				}
 			} returns ApiResponse.Success()
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 
 			val res = service.getPrepDetails(frNo = "xx900000")
 			advanceUntilIdle()
@@ -164,8 +164,8 @@ class PackTaskServiceTest {
 		}
 
 	@Test
-	fun `getPrepDetails, single fr, should return general error if getDks is null`() = runTest {
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `getPrepDetails, single fr, should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.getPrepDetails(frNo = "xx900000")
 		advanceUntilIdle()
@@ -181,7 +181,7 @@ class PackTaskServiceTest {
 			fulfillmentRequestNumber = "xx90000000",
 			items = emptyList()
 		)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every {
 			runBlocking {
 				packTaskApi.getPrepDetails(
@@ -212,7 +212,7 @@ class PackTaskServiceTest {
 					)
 				}
 			} returns ApiResponse.Success()
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 
 			val res = service.getPrepDetails(frNos = listOf("xx900000"))
 			advanceUntilIdle()
@@ -221,8 +221,8 @@ class PackTaskServiceTest {
 		}
 
 	@Test
-	fun `getPrepDetails, fr list, should return general error if getDks is null`() = runTest {
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `getPrepDetails, fr list, should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.getPrepDetails(frNos = listOf("xx900000"))
 		advanceUntilIdle()
@@ -238,8 +238,8 @@ class PackTaskServiceTest {
 			fulfillmentRequestNumber = "xx90000000",
 			items = emptyList()
 		)
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every { runBlocking { packTaskApi.packByGear(any(), any()) } } returns ApiResponse.Success(
 			data = prepDetail
 		)
@@ -263,8 +263,8 @@ class PackTaskServiceTest {
 					)
 				}
 			} returns ApiResponse.Success()
-			every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getStore() } } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 
 			val res = service.packByGear(upc = "upc")
 			advanceUntilIdle()
@@ -274,7 +274,7 @@ class PackTaskServiceTest {
 
 	@Test
 	fun `packByGear should return general error if getStore is null`() = runTest {
-		every { deviceService.getStore() } returns null
+		every { runBlocking { userRepository.getStore() } } returns null
 
 		val res = service.packByGear(upc = "upc")
 		advanceUntilIdle()
@@ -283,9 +283,9 @@ class PackTaskServiceTest {
 	}
 
 	@Test
-	fun `packByGear should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `packByGear should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.packByGear(upc = "upc")
 		advanceUntilIdle()
@@ -301,8 +301,8 @@ class PackTaskServiceTest {
 			fulfillmentRequestNumber = FR_NO,
 			items = emptyList()
 		)
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every { runBlocking { packTaskApi.packByOrder(any(), any()) } } returns ApiResponse.Success(
 			data = prepDetail
 		)
@@ -324,8 +324,8 @@ class PackTaskServiceTest {
 					)
 				}
 			} returns ApiResponse.Success()
-			every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getStore() } } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 			val res = service.packByOrder(frNo = FR_NO)
 			advanceUntilIdle()
 			Assert.assertEquals(Result.generalError(), res)
@@ -333,16 +333,16 @@ class PackTaskServiceTest {
 
 	@Test
 	fun `packByOrder should return general error if getStore is null`() = runTest {
-		every { deviceService.getStore() } returns null
+		every { runBlocking { userRepository.getStore() } } returns null
 		val res = service.packByOrder(frNo = FR_NO)
 		advanceUntilIdle()
 		Assert.assertEquals(Result.generalError(), res)
 	}
 
 	@Test
-	fun `packByOrder should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "0", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `packByOrder should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "0", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns null
 		val res = service.packByOrder(frNo = FR_NO)
 		advanceUntilIdle()
 		Assert.assertEquals(Result.generalError(), res)

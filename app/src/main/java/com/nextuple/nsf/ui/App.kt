@@ -303,12 +303,12 @@ private fun NavGraphBuilder.composableForLogin(
 ) {
 	composable(Screen.LOGIN.route) {
 		LoginScreen(
-			isInvalid = userVM.viewState == ViewState.LoginError,
-			resetIsInvalid = userVM::resetFromError,
+			isFormInvalid = userVM.viewState == ViewState.LoginFormValidationError,
+			resetIsFormInvalid = userVM::resetFromError,
 			errorMessage = userVM.errMsg,
 			showProgressBar = userVM.viewState == ViewState.LoggingIn,
-			onSubmitDks = {
-				userVM.login(it)
+			onSubmit = { nodeNo, userId ->
+				userVM.login(nodeNo, userId)
 				settingsVM.retrieveSavedPrinters()
 			},
 			isLoggedIn = userVM.viewState == ViewState.LoggedIn,

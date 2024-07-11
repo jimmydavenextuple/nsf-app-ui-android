@@ -2,12 +2,13 @@ package com.nextuple.nsf.ui.screen.home
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -21,17 +22,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.BuildConfig
@@ -40,7 +44,6 @@ import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.TopLabeledTextField
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.Haptics
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.OnDataScanned
@@ -104,48 +107,73 @@ fun LoginScreen(
 
 	Box(
 		modifier = Modifier.fillMaxSize()
+			.alpha(.8f)
+			.background(
+				brush = Brush.verticalGradient(
+					colors = listOf(
+						Color(0xFFF9B719), // Start color
+						Color(0xFFB72467) // End color
+					)
+				)
+			)
 	) {
 		Column(
 			modifier = Modifier
-				.align(Alignment.Center)
-				.width(IntrinsicSize.Max),
+				.align(Alignment.TopStart)
+				.fillMaxWidth()
+				.padding(10.dp),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center
 		) {
-			val annotatedText = buildAnnotatedString {
-				withStyle(style = SpanStyle(color = BrandColor.PINK_NT)) {
-					append("Nextuple")
-				}
-				append("\n")
-				withStyle(style = SpanStyle(color = BrandColor.YELLOW_NT)) {
-					append("Store")
-				}
-				append("\n")
-				withStyle(style = SpanStyle(color = BrandColor.BLUE_300_NT)) {
-					append("Fulfillment")
-				}
-			}
 			Text(
-				text = annotatedText,
+				text = "Store",
+				modifier = Modifier
+					.align(Alignment.Start)
+					.padding(top = 20.dp)
+					.clickable {
+						Toast
+							.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_SHORT)
+							.show()
+					},
+				style = TextStyle(
+					fontWeight = FontWeight.ExtraBold,
+					fontStyle = FontStyle.Normal,
+					letterSpacing = 1.5.sp,
+					fontSize = 50.sp,
+					color = BrandColor.WHITE,
+					shadow = Shadow(
+						color = Color.Black,
+						offset = Offset(3f, 3f),
+						blurRadius = 2f
+					)
+				)
+			)
+			Text(
+				text = "Fulfillment",
 				modifier = Modifier
 					.align(Alignment.Start)
 					.clickable {
 						Toast
-							.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_LONG)
+							.makeText(ctx, BuildConfig.APP_VERSION, Toast.LENGTH_SHORT)
 							.show()
 					},
 				style = TextStyle(
-					fontFamily = FontFamily.ARCHIVO,
-					fontWeight = FontWeight.Bold,
+					fontWeight = FontWeight.ExtraBold,
 					fontStyle = FontStyle.Normal,
 					letterSpacing = 1.5.sp,
 					fontSize = 50.sp,
-					color = BrandColor.GRAY_900
+					color = BrandColor.WHITE,
+					shadow = Shadow(
+						color = Color.Black,
+						offset = Offset(3f, 3f),
+						blurRadius = 2f
+					)
 				)
 			)
 			TopLabeledTextField(
 				modifier = Modifier
-					.padding(top = 24.dp),
+					.padding(top = 2.dp),
+				labelColor = Color.White,
 				labelText = stringResource(id = R.string.login_node_id_text_label),
 				fieldValue = nodeNo,
 				isInvalid = nodeNo.isEmpty() && isFormInvalid,
@@ -162,6 +190,7 @@ fun LoginScreen(
 			TopLabeledTextField(
 				modifier = Modifier
 					.padding(top = 6.dp),
+				labelColor = Color.White,
 				labelText = stringResource(id = R.string.login_user_id_text_label),
 				fieldValue = userId,
 				isInvalid = userId.isEmpty() && isFormInvalid,
@@ -178,8 +207,9 @@ fun LoginScreen(
 			PrimaryButton(
 				modifier = Modifier
 					.width(width = 152.dp)
-					.padding(top = 12.dp),
+					.padding(top = 5.dp),
 				text = stringResource(id = R.string.login_text).uppercase(),
+				buttonColor = Color(0xFF0060AA),
 				enabled = nodeNo.isNotBlank() && userId.isNotBlank(),
 				buttonState = if (showProgressBar) {
 					ButtonState.LOADING
@@ -192,26 +222,14 @@ fun LoginScreen(
 			)
 		}
 
-		Text(
-			modifier = Modifier
-				.align(Alignment.BottomStart)
-				.padding(24.dp),
-			text = "NSF ${BuildConfig.APP_VERSION}",
-			fontSize = 10.sp,
-			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight(700),
-			color = BrandColor.GRAY_900,
-			letterSpacing = 1.5.sp
-		)
-
 		Box(
 			modifier = Modifier.fillMaxSize(),
 			contentAlignment = Alignment.TopEnd
 		) {
 			Image(
 				modifier = Modifier
-					.padding(top = 18.dp, end = 12.dp)
-					.height(40.dp),
+					.padding(top = 10.dp, end = 10.dp)
+					.height(30.dp),
 				painter = painterResource(R.drawable.nextuple_fulllogo),
 				contentDescription = null,
 				contentScale = ContentScale.FillHeight

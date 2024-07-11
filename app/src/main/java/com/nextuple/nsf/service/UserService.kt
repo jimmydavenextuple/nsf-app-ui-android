@@ -50,7 +50,7 @@ class UserService(
 					lastName = it.data.lastName,
 					userId = it.data.userId,
 					nodeNo = it.data.store.id,
-					brand = it.data.store.brand.toString()
+					brand = it.data.store.brand.chainName
 				)
 			}
 		}.onFailure {

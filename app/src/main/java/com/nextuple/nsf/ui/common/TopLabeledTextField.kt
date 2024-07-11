@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 /**
  * TODO: Make this a bit more generic, customizable, and add tests.
@@ -49,6 +48,7 @@ import com.nextuple.nsf.ui.theme.FontFamily
 @Composable
 fun TopLabeledTextField(
 	modifier: Modifier = Modifier,
+	labelColor: Color = BrandColor.GRAY_900,
 	labelText: String,
 	fieldValue: String,
 	isPrefixEnabled: Boolean = false,
@@ -67,16 +67,15 @@ fun TopLabeledTextField(
 		color = if (isInvalid) errorColor else BrandColor.GRAY_700
 	)
 
-	Column(modifier = modifier) {
+	Column(modifier = modifier.background(color = Color.Transparent)) {
 		Text(
 			modifier = Modifier
 				.fillMaxWidth()
 				.testTag("TopLabeledTextFieldLabelText"),
 			text = labelText,
 			textAlign = TextAlign.Start,
-			color = if (isInvalid) errorColor else BrandColor.GRAY_900,
-			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight.Normal,
+			color = if (isInvalid) errorColor else labelColor,
+			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
 			fontSize = 12.sp
 		)
@@ -91,7 +90,11 @@ fun TopLabeledTextField(
 					border = borderStroke,
 					shape = textFieldShape
 				)
-				.background(color = if (isInvalid) BrandColor.RED_100 else Color.White),
+				.background(
+					color = if (isInvalid) BrandColor.RED_100 else Color.White,
+					// rounded corner to match with the OutlinedTextField
+					shape = textFieldShape
+				),
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Spacer(modifier = Modifier.width(8.dp))
@@ -167,9 +170,8 @@ fun TopLabeledTextField(
 			modifier = Modifier.padding(horizontal = 8.dp),
 			text = if (isInvalid) errorMessage else "",
 			color = errorColor,
-			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight.Normal,
-			fontStyle = FontStyle.Normal,
+			fontWeight = FontWeight.Bold,
+			fontStyle = FontStyle.Italic,
 			fontSize = 11.sp
 		)
 	}

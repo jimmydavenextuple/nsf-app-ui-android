@@ -55,7 +55,6 @@ class MainActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-
 		logService.start()
 		logService.setDevice(deviceService.getDevice())
 

@@ -117,6 +117,7 @@ private fun PackTabContainer(
 	) {
 		Column(horizontalAlignment = Alignment.CenterHorizontally) {
 			Image(
+				modifier = Modifier.fillMaxWidth(),
 				painter = painterResource(id = drawable.scan_to_pack),
 				contentDescription = ""
 			)

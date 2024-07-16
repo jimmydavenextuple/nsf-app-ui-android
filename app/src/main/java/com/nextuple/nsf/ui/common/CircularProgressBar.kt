@@ -252,7 +252,7 @@ private fun DisplayImage(
 	modifier: Modifier
 ) {
 	Image(
-		painter = painterResource(id = R.drawable.circular_progress_question_mark),
+		painter = painterResource(id = R.drawable.ic_circular_progress_question_mark),
 		contentDescription = null,
 		modifier = modifier.testTag("CircularProgressBarCenterImage")
 	)

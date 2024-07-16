@@ -180,12 +180,12 @@ fun BOPLMultiUnitModal(
 					Row(
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(top = 8.dp, bottom = 24.dp),
+							.padding(20.dp),
 						horizontalArrangement = Arrangement.Center
 					) {
 						PrimaryButton(
 							modifier = Modifier
-								.fillMaxWidth(.6f)
+								.fillMaxWidth()
 								.height(40.dp),
 							text = stringResource(id = R.string.ok)
 						) {

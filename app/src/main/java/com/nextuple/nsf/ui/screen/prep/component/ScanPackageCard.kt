@@ -48,7 +48,7 @@ fun ScanPackageCard(
 					)
 				)
 					Image(
-						modifier = Modifier.padding(top = 8.dp),
+						modifier = Modifier.padding(top = 10.dp, start = 100.dp, bottom = 10.dp),
 						imageVector = ImageVector.vectorResource(R.drawable.scan_and_hold),
 						contentDescription = "Scanning Box"
 					)

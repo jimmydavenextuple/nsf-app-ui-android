@@ -39,11 +39,11 @@ fun PackOrderCard(
 			) {
 				Image(
 					modifier = Modifier.padding(vertical = 10.dp),
-					imageVector = ImageVector.vectorResource(R.drawable.pack_and_hold),
+					imageVector = ImageVector.vectorResource(R.drawable.scan_pack_and_hold),
 					contentDescription = stringResource(id = R.string.pack_order)
 				)
 				Text(
-					modifier = Modifier.padding(horizontal = 16.dp),
+					modifier = Modifier.padding(horizontal = 10.dp),
 					text = stringResource(id = R.string.pack_info),
 					style = TextStyle(
 						fontSize = 12.sp,

@@ -135,13 +135,13 @@ fun OrderScreen(
 				EmptyStateScreen(
 					title = stringResource(R.string.empty_ready_title),
 					body = stringResource(R.string.empty_ready_body),
-					imageVector = ImageVector.vectorResource(id = R.drawable.ic_stop_watch)
+					imageVector = ImageVector.vectorResource(id = R.drawable.applause)
 				)
 			} else if (inProgressOrders.isEmpty() && selectedTab == OrderScreenTab.IN_PROGRESS) {
 				EmptyStateScreen(
 					title = stringResource(R.string.empty_in_progress_title),
 					body = stringResource(R.string.empty_in_progress_body),
-					imageVector = ImageVector.vectorResource(id = R.drawable.ic_basketball_hoop)
+					imageVector = ImageVector.vectorResource(id = R.drawable.applause)
 				)
 			}
 			OrderCardList(

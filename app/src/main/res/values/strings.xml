@@ -181,10 +181,10 @@
     <string name="filters_category_order_type">Fulfillment Type</string>
     <string name="filters_category_order_status">Status</string>
     <string name="apply_filters">APPLY FILTERS</string>
-    <string name="empty_ready_title">Was that the wind?</string>
-    <string name="empty_ready_body">Or just you delivering all your ready orders super fast? Excellent work!</string>
-    <string name="empty_in_progress_title">Swish!</string>
-    <string name="empty_in_progress_body">There are no in progress orders right now. Keep up the great work!</string>
+    <string name="empty_ready_title">Wow!</string>
+    <string name="empty_ready_body">That was fast, excellent work delivering those orders. Great job!</string>
+    <string name="empty_in_progress_title">Nothing to see here :-)</string>
+    <string name="empty_in_progress_body">All the current orders are done, there\'s nothing to process right now. Good job!</string>
 
     <string name="bopis_pick_uph">bopis pick uph</string>
     <string name="units_worked_in_time">units worked in time</string>

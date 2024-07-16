@@ -37,8 +37,8 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 
 		Text(
 			modifier = Modifier
-				.width(202.dp)
-				.padding(top = 16.dp),
+				.width(215.dp)
+				.padding(top = 10.dp),
 			text = title,
 			fontSize = 20.sp,
 			fontWeight = FontWeight.Bold,
@@ -47,8 +47,8 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 		)
 		Text(
 			modifier = Modifier
-				.width(202.dp)
-				.padding(top = 8.dp),
+				.width(300.dp)
+				.padding(top = 10.dp),
 			text = body,
 			fontSize = 14.sp,
 			lineHeight = 16.sp,

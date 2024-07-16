@@ -120,7 +120,7 @@ fun LoginScreen(
 			modifier = Modifier
 				.padding(50.dp, 100.dp, 0.dp, 100.dp)
 				.matchParentSize(),
-			painter = painterResource(id = R.drawable.nextuple_building_blocks),
+			painter = painterResource(id = R.drawable.logo_nextuple_building_blocks),
 			contentDescription = null,
 			contentScale = ContentScale.FillBounds,
 		)

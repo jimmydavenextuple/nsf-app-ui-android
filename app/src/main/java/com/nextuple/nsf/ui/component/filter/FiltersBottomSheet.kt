@@ -126,7 +126,7 @@ fun FiltersBottomSheet(
 				contentAlignment = Alignment.Center
 			) {
 				PrimaryButton(
-					modifier = Modifier.fillMaxWidth(.7f),
+					modifier = Modifier.fillMaxWidth(),
 					text = stringResource(string.apply_filters),
 					onButtonClick = {
 						onApplyFilters(orderTypes, orderStatuses)

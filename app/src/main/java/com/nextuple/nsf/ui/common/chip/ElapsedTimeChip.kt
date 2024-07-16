@@ -37,7 +37,7 @@ fun ElapsedTimeChip(
 	OrderStatusChip(
 		modifier = modifier,
 		statusText = elapsedTime.formatTime(),
-		backgroundColor = BrandColor.PINK_NT
+		backgroundColor = BrandColor.DARK_BLUE
 	)
 }
 

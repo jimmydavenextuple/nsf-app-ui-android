@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun ImageModal(
@@ -56,14 +55,12 @@ fun ImageModal(
 					Column {
 						Text(
 							text = brandName,
-							fontFamily = FontFamily.ARCHIVO,
 							fontSize = 14.sp,
 							fontWeight = FontWeight(700),
 							letterSpacing = 1.5.sp
 						)
 						Text(
 							text = productName,
-							fontFamily = FontFamily.ARCHIVO,
 							fontSize = 12.sp,
 							fontWeight = FontWeight(400),
 							letterSpacing = 1.5.sp
@@ -97,7 +94,6 @@ fun ImageModal(
 				Text(
 					text = "Pinch to zoom.\n" +
 						"Tap anywhere outside the modal to close.",
-					fontFamily = FontFamily.ARCHIVO,
 					fontSize = 10.sp,
 					fontWeight = FontWeight(400),
 					letterSpacing = 1.5.sp

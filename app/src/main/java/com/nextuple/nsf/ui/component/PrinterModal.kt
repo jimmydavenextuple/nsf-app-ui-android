@@ -50,6 +50,7 @@ fun PrinterModal(
 			TopLabeledTextField(
 				modifier = Modifier.fillMaxWidth(0.5f),
 				labelText = stringResource(id = R.string.printer_ip),
+				hintText = "",
 				fieldValue = ipInput,
 				prefixText = ipPrefix ?: "",
 				isPrefixEnabled = true,

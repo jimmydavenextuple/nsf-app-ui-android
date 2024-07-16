@@ -57,7 +57,7 @@ fun FiltersHeader(
 					.align(Alignment.CenterVertically)
 					.clickable { onStartFiltersSelection() },
 				imageVector = ImageVector.vectorResource(id = R.drawable.ic_filters),
-				tint = if (hasNoSelection) BrandColor.GRAY_900 else BrandColor.BLUE_300_NT,
+				tint = if (hasNoSelection) BrandColor.GRAY_900 else BrandColor.DARK_BLUE,
 				contentDescription = "Select Filters"
 			)
 			if (hasNoSelection) {

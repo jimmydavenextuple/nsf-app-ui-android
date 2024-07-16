@@ -8,21 +8,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun HeaderText(modifier: Modifier = Modifier, title: String, value: String) {
 	Column(modifier = modifier) {
 		Text(
 			text = title,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			fontSize = 14.sp,
 			letterSpacing = 1.5.sp
 		)
 		Text(
 			text = value,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Normal,
 			fontSize = 14.sp,
 			letterSpacing = 0.5.sp,

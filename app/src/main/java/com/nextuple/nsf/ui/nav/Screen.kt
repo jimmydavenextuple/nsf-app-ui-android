@@ -7,7 +7,7 @@ enum class Screen(
 	val isSearchEnabled: Boolean = false
 ) {
 	LOGIN(route = "login"),
-	HOME(title = "Fulfill", route = "home", isSearchEnabled = true),
+	HOME(title = "Store Fulfillment", route = "home", isSearchEnabled = true),
 	PICK(title = "Pick Orders", route = "pick", isSearchEnabled = true),
 	PREP(
 		title = "Prep",

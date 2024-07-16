@@ -52,7 +52,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.service.dto.User
 import com.nextuple.nsf.ui.common.OmniTextField
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.SubFulfillmentType
@@ -67,7 +66,7 @@ data class AppTopBarDropdownMenuItems(
 @Composable
 fun AppTopBar(
 	modifier: Modifier = Modifier,
-	backgroundColor: Color = BrandColor.BLUE_300_NT,
+	backgroundColor: Color = BrandColor.VERY_DARY_GREY_BLACK,
 	dropdownBackgroundColor: Color = BrandColor.BLUE_300_NT,
 	screen: Screen,
 	user: User?,
@@ -145,16 +144,14 @@ private fun ScreenTitle(
 	val titleTextStyle = if (screen == Screen.HOME) {
 		TextStyle(
 			color = BrandColor.GRAY_50,
-			fontFamily = FontFamily.SANS,
 			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
 			letterSpacing = 1.sp,
-			fontSize = 32.sp
+			fontSize = 20.sp
 		)
 	} else {
 		TextStyle(
 			color = BrandColor.GRAY_50,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
 			letterSpacing = 0.5.sp,
@@ -272,7 +269,6 @@ private fun UserProfile(
 									fontWeight = FontWeight.Bold,
 									fontStyle = FontStyle.Normal,
 									letterSpacing = 0.5.sp,
-									fontFamily = FontFamily.ARCHIVO
 								)
 							},
 							leadingIcon = {
@@ -319,13 +315,12 @@ private fun UserInfo(
 					modifier = Modifier
 						.drawBehind {
 							drawCircle(
-								color = BrandColor.BLUE_800_NT,
+								color = BrandColor.DARK_BLUE,
 								radius = this.size.maxDimension - 8
 							)
 						},
 					text = user.getInitials().orEmpty(),
 					color = BrandColor.GRAY_50,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
 					fontStyle = FontStyle.Normal,
 					fontSize = 16.sp,
@@ -351,7 +346,6 @@ private fun UserInfo(
 				Text(
 					text = user?.getFullName().orEmpty(),
 					color = BrandColor.GRAY_50,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
 					fontStyle = FontStyle.Normal,
 					fontSize = 14.sp,
@@ -363,7 +357,6 @@ private fun UserInfo(
 				Text(
 					text = user?.userId.orEmpty().uppercase(),
 					color = BrandColor.GRAY_50,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Light,
 					fontStyle = FontStyle.Normal,
 					letterSpacing = 0.5.sp,

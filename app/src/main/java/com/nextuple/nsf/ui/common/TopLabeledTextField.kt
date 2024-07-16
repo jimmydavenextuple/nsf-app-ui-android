@@ -50,13 +50,14 @@ fun TopLabeledTextField(
 	modifier: Modifier = Modifier,
 	labelColor: Color = BrandColor.GRAY_900,
 	labelText: String,
+	hintText: String,
 	fieldValue: String,
 	isPrefixEnabled: Boolean = false,
 	prefixText: String = "",
 	isInvalid: Boolean = false,
 	onValueChange: (newValue: String) -> Unit,
 	errorMessage: String = "",
-	textFieldShape: Shape = RoundedCornerShape(4.dp),
+	textFieldShape: Shape = RoundedCornerShape(8.dp),
 	keyboardActions: KeyboardActions = KeyboardActions { }
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
@@ -140,6 +141,14 @@ fun TopLabeledTextField(
 					singleLine = true,
 					visualTransformation = VisualTransformation.None,
 					interactionSource = interactionSource,
+					placeholder = {
+						Text(
+							text = hintText,
+							fontSize = 12.sp,
+							color = BrandColor.VERY_DARY_GREY,
+							letterSpacing = 1.sp
+						)
+					},
 					colors = TextFieldDefaults.colors(
 						focusedContainerColor = containerColor,
 						unfocusedContainerColor = containerColor,
@@ -181,6 +190,7 @@ fun TopLabeledTextField(
 @Preview(showBackground = true)
 private fun PreviewTopLabeledTextField() {
 	TopLabeledTextField(
+		hintText = "User Id",
 		labelText = "User Id",
 		fieldValue = "userId123456",
 		onValueChange = {}
@@ -191,7 +201,8 @@ private fun PreviewTopLabeledTextField() {
 @Preview(showBackground = true)
 private fun PreviewTopLabeledTextFieldError() {
 	TopLabeledTextField(
-		labelText = "User Id",
+		hintText = "User Id",
+		labelText  = "User Id",
 		fieldValue = "userId123456",
 		isInvalid = true,
 		errorMessage = "Invalid Userd Id",
@@ -203,6 +214,7 @@ private fun PreviewTopLabeledTextFieldError() {
 @Preview(showBackground = true)
 private fun PreviewTopLabeledTextFieldPrefix() {
 	TopLabeledTextField(
+		hintText = "Printer IP",
 		labelText = "Printer IP",
 		fieldValue = "101",
 		isPrefixEnabled = true,
@@ -215,6 +227,7 @@ private fun PreviewTopLabeledTextFieldPrefix() {
 @Preview(showBackground = true)
 private fun PreviewTopLabeledTextFieldPrefixError() {
 	TopLabeledTextField(
+		hintText = "Printer IP",
 		labelText = "Printer IP",
 		fieldValue = "101",
 		isPrefixEnabled = true,

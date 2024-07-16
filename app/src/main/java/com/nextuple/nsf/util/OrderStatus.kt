@@ -15,17 +15,17 @@ enum class OrderStatus(
 ) {
 	READY(
 		statusText = "Ready",
-		statusColor = BrandColor.BLUE_300_NT,
+		statusColor = BrandColor.DARK_BLUE,
 		iconDrawable = R.drawable.ic_check
 	),
 	COMPLETED(
 		statusText = "Completed",
-		statusColor = BrandColor.BLUE_300_NT,
+		statusColor = BrandColor.DARK_BLUE,
 		iconDrawable = R.drawable.ic_check
 	),
 	EXTENDED(
 		statusText = "Extended",
-		statusColor = BrandColor.BLUE_300_NT,
+		statusColor = BrandColor.DARK_BLUE,
 		iconDrawable = R.drawable.ic_extended
 	),
 
@@ -43,32 +43,32 @@ enum class OrderStatus(
 
 	INCOMING(
 		statusText = "Incoming",
-		statusColor = BrandColor.BLUE_300_NT,
+		statusColor = BrandColor.DARK_BLUE,
 		iconDrawable = R.drawable.ic_incoming
 	),
 	LATE(statusText = "Late", statusColor = BrandColor.BLUE_700, iconDrawable = R.drawable.ic_late),
 
-	PACK(statusText = "Pack", statusColor = BrandColor.PINK_NT, iconDrawable = R.drawable.ic_pack),
+	PACK(statusText = "Pack", statusColor = BrandColor.DARK_BLUE, iconDrawable = R.drawable.ic_pack),
 	BEING_PACKED(
 		statusText = "Being Packed",
-		statusColor = BrandColor.BLUE_300_NT,
+		statusColor = BrandColor.DARK_BLUE,
 		iconDrawable = R.drawable.ic_pack
 	),
 	STAGE(
 		statusText = "Stage",
-		statusColor = BrandColor.PINK_NT,
+		statusColor = BrandColor.DARK_BLUE,
 		iconDrawable = R.drawable.ic_stage
 	),
 	BEING_STAGED(
 		statusText = "Being Staged",
-		statusColor = BrandColor.BLUE_300_NT,
+		statusColor = BrandColor.DARK_BLUE,
 		iconDrawable = R.drawable.ic_stage
 	),
 
-	IN_PROGRESS(statusText = "In Progress", statusColor = BrandColor.PINK_NT),
-	CHECKED_IN(statusText = "Checked In", statusColor = BrandColor.PINK_NT),
+	IN_PROGRESS(statusText = "In Progress", statusColor = BrandColor.DARK_BLUE),
+	CHECKED_IN(statusText = "Checked In", statusColor = BrandColor.DARK_BLUE),
 
-	DEFAULT(statusText = "", statusColor = BrandColor.PINK_NT);
+	DEFAULT(statusText = "", statusColor = BrandColor.DARK_BLUE);
 
 	companion object {
 		private val COMPLETE_STATUS = listOf(

@@ -20,7 +20,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.component.ExpandableStepCard
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 
 @Composable
@@ -43,17 +42,16 @@ fun ScanPackageCard(
 				Text(
 					text = stringResource(R.string.scan_place_hold),
 					style = TextStyle(
-						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 12.sp,
 						fontWeight = FontWeight(400),
 						lineHeight = 13.06.sp
 					)
 				)
-				Image(
-					modifier = Modifier.padding(top = 8.dp),
-					imageVector = ImageVector.vectorResource(R.drawable.ic_scan_box),
-					contentDescription = "Scanning Box"
-				)
+					Image(
+						modifier = Modifier.padding(top = 8.dp),
+						imageVector = ImageVector.vectorResource(R.drawable.scan_and_hold),
+						contentDescription = "Scanning Box"
+					)
 				DetailedCallToAction(
 					modifier = Modifier
 						.align(Alignment.CenterHorizontally),

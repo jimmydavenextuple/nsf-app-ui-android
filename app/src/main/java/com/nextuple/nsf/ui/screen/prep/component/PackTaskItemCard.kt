@@ -41,7 +41,6 @@ import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.ScanIcon
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -116,7 +115,6 @@ fun PackTaskItemCard(
 					modifier = Modifier.padding(bottom = 6.dp),
 					text = packTaskItem.productName,
 					fontSize = 14.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
 					letterSpacing = 0.5.sp,
 					maxLines = 1,
@@ -182,7 +180,6 @@ private fun TextInfo(label: String, value: String) {
 	Text(
 		text = "$label: $value",
 		fontSize = 12.sp,
-		fontFamily = FontFamily.ARCHIVO,
 		fontWeight = FontWeight.Normal,
 		letterSpacing = 0.5.sp
 	)

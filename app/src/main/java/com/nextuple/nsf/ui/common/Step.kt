@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun Step(
@@ -105,7 +104,6 @@ fun Step(
 			Text(
 				text = text,
 				color = color,
-				fontFamily = FontFamily.SANS,
 				fontSize = 20.sp,
 				fontWeight = FontWeight(700)
 			)

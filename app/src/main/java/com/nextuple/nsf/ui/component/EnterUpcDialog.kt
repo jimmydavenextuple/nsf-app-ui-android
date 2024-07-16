@@ -17,13 +17,14 @@ fun EnterUpcDialog(
 	var upc by remember { mutableStateOf("") }
 	InfoModal(
 		title = "Enter A UPC",
-		buttonText = "Scan",
+		buttonText = "Scan".uppercase(),
 		buttonClick = { onUpcSubmit(upc) },
 		crossIconClick = { onDismissRequest() },
 		onDismissRequest = { onDismissRequest() },
 		visualContent = {
 			TopLabeledTextField(
 				labelText = "",
+				hintText = "",
 				fieldValue = upc,
 				onValueChange = { newValue -> upc = newValue }
 			)

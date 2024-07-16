@@ -35,7 +35,6 @@ import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.screen.prep.BOPLPrepStep
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun MatchHoldSlipsCard(
@@ -122,7 +121,7 @@ fun BOPLExtra(onReprintHoldSlip: () -> Unit, goToNextScreen: () -> Unit) {
 		Row {
 			Image(
 				modifier = Modifier.size(height = 188.dp, width = 168.dp),
-				painter = painterResource(id = R.drawable.ic_bopl_treadmill),
+				painter = painterResource(id = R.drawable.place_hold_slip_on_unit),
 				contentDescription = ""
 			)
 		}
@@ -131,7 +130,6 @@ fun BOPLExtra(onReprintHoldSlip: () -> Unit, goToNextScreen: () -> Unit) {
 				text = AnnotatedString(stringResource(id = R.string.reprint_hold_slip)),
 				style = TextStyle(
 					fontSize = 12.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight(700),
 					color = BrandColor.BLACK,
 					textAlign = TextAlign.Center,
@@ -141,7 +139,7 @@ fun BOPLExtra(onReprintHoldSlip: () -> Unit, goToNextScreen: () -> Unit) {
 				onClick = { onReprintHoldSlip() }
 			)
 		}
-		PrimaryButton(modifier = Modifier.fillMaxWidth(.7f), text = "NEXT") {
+		PrimaryButton(modifier = Modifier.fillMaxWidth(), text = "NEXT") {
 			goToNextScreen()
 		}
 	}
@@ -215,7 +213,6 @@ fun BOPLMultiUnitExtra(
 				text = AnnotatedString(stringResource(id = R.string.reprint_hold_slip)),
 				style = TextStyle(
 					fontSize = 12.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight(700),
 					color = BrandColor.BLACK,
 					textAlign = TextAlign.Center,
@@ -226,7 +223,7 @@ fun BOPLMultiUnitExtra(
 			)
 		}
 		PrimaryButton(
-			modifier = Modifier.fillMaxWidth(.7f),
+			modifier = Modifier.fillMaxWidth(),
 			text = "NEXT",
 			enabled = packItems.filter { packTaskItem -> packTaskItem.isScanned }.size == packItems.size
 		) {

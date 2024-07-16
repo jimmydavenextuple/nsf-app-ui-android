@@ -13,7 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun OverflowChip(
@@ -24,14 +23,13 @@ fun OverflowChip(
 ) {
 	Box(
 		modifier = modifier
-			.background(color = BrandColor.BLUE_800_NT, shape = RoundedCornerShape(4.dp))
+			.background(color = BrandColor.DARK_BLUE, shape = RoundedCornerShape(4.dp))
 			.padding(8.dp),
 		contentAlignment = Alignment.Center
 	) {
 		Text(
 			text = "$overflowPrefix$overflowCount $overflowUnitText".uppercase(),
 			color = BrandColor.GRAY_50,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight(700),
 			fontSize = 10.sp,
 			letterSpacing = 1.sp

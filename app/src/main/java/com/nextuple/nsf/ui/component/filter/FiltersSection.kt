@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.common.chip.CheckableChip
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -31,7 +30,6 @@ fun FiltersSection(
 		Text(
 			text = title,
 			color = BrandColor.GRAY_700,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight(700),
 			fontSize = 12.sp,
 			letterSpacing = 1.2.sp

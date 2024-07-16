@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.testTag
@@ -24,15 +25,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun PrimaryButton(
 	modifier: Modifier = Modifier,
 	text: String,
-	buttonColor: Color = BrandColor.PINK_NT,
-	contentColor: Color = BrandColor.GRAY_50,
-	buttonShape: Shape = RoundedCornerShape(4.dp),
+	buttonColor: Color = BrandColor.DARK_BLUE,
+	contentColor: Color = BrandColor.WHITE,
+	buttonShape: Shape = RoundedCornerShape(0.dp),
 	enabled: Boolean = true,
 	textSize: TextUnit = 14.sp,
 	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
@@ -42,18 +42,19 @@ fun PrimaryButton(
 	Button(
 		modifier = modifier
 			.height(IntrinsicSize.Min)
+			.alpha(if (enabled) 1f else .65f)
 			.testTag("PrimaryButton"),
 		onClick = onButtonClick,
 		shape = buttonShape,
 		colors = ButtonDefaults.buttonColors(
 			containerColor = if (buttonState == ButtonState.DONE) {
-				BrandColor.BLUE_300_NT
+				BrandColor.DARK_BLUE
 			} else {
 				buttonColor
 			},
-			disabledContainerColor = BrandColor.GRAY_400,
+			disabledContainerColor = BrandColor.DARK_BLUE,
 			contentColor = contentColor,
-			disabledContentColor = BrandColor.GRAY_700
+			disabledContentColor = BrandColor.WHITE
 		),
 		contentPadding = contentPadding,
 		enabled = enabled
@@ -78,7 +79,6 @@ fun PrimaryButton(
 					text = text,
 					textAlign = TextAlign.Center,
 					fontSize = textSize,
-					fontFamily = FontFamily.ARCHIVO,
 					letterSpacing = 1.5.sp,
 					fontWeight = FontWeight(700)
 				)
@@ -91,4 +91,10 @@ fun PrimaryButton(
 @Composable
 fun PrimaryButtonPreview() {
 	PrimaryButton(text = "PRIMARY", enabled = true) { }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PrimaryButtonDisablePreview() {
+	PrimaryButton(text = "PRIMARY", enabled = false) { }
 }

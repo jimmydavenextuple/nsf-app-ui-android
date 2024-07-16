@@ -37,7 +37,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.common.callToAction.imageResource
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun HoldSlip(
@@ -102,7 +101,6 @@ fun HoldSlip(
 					style = TextStyle(
 						fontSize = 15.sp,
 						lineHeight = 20.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight.Bold
 					)
 				)
@@ -112,7 +110,6 @@ fun HoldSlip(
 						style = TextStyle(
 							fontSize = 6.sp,
 							lineHeight = 10.4.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight(700),
 							color = BrandColor.BLACK
 						)
@@ -162,7 +159,6 @@ fun HoldSlip(
 								text = "PART $packageNum/$packageNum",
 								style = TextStyle(
 									fontSize = 8.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight(700),
 									color = BrandColor.GRAY_600,
 									textAlign = TextAlign.Center,
@@ -182,7 +178,6 @@ fun HoldSlip(
 							text = "PART $packageNum/$totalPackageNum",
 							style = TextStyle(
 								fontSize = 10.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight(700),
 								color = BrandColor.GRAY_600,
 								textAlign = TextAlign.Center,

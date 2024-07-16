@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun Tab(
@@ -43,9 +42,8 @@ fun Tab(
 				Text(
 					text = count.toString(),
 					fontSize = 12.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight(700),
-					color = BrandColor.GRAY_650,
+					color = if (isSelected) BrandColor.DARK_BLUE else BrandColor.GRAY_500,
 					textAlign = TextAlign.Center,
 					letterSpacing = 1.5.sp
 				)
@@ -53,9 +51,8 @@ fun Tab(
 			Text(
 				text = title.uppercase(),
 				fontSize = 12.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(700),
-				color = BrandColor.GRAY_900,
+				color = if (isSelected) BrandColor.DARK_BLUE else BrandColor.GRAY_500,
 				textAlign = TextAlign.Center,
 				letterSpacing = 1.5.sp
 			)
@@ -64,7 +61,7 @@ fun Tab(
 			modifier = Modifier
 				.fillMaxWidth()
 				.height(4.dp)
-				.background(if (isSelected) BrandColor.BLUE_300_NT else BrandColor.GRAY_500)
+				.background(if (isSelected) BrandColor.DARK_BLUE else BrandColor.GRAY_500)
 				.align(Alignment.BottomStart)
 		)
 	}

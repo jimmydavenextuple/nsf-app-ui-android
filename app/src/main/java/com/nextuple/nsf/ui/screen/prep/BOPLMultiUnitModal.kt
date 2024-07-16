@@ -42,7 +42,6 @@ import com.nextuple.nsf.ui.common.HeaderText
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.screen.prep.component.PackTaskItemCard
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.util.StringUtils
 
 @Composable
@@ -77,7 +76,6 @@ fun BOPLMultiUnitModal(
 								text = "Scan A Unit In This Order",
 								style = TextStyle(
 									fontSize = 20.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight.SemiBold,
 									color = BrandColor.BLACK
 								)
@@ -105,7 +103,6 @@ fun BOPLMultiUnitModal(
 								style = TextStyle(
 									fontSize = 16.sp,
 									lineHeight = 20.8.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight(700),
 									color = BrandColor.BLACK,
 									letterSpacing = 0.5.sp
@@ -154,7 +151,6 @@ fun BOPLMultiUnitModal(
 							text = "Place Hold Slip $packItemsCompleted/${packItems.size} On Unit",
 							style = TextStyle(
 								fontSize = 18.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.SemiBold,
 								color = BrandColor.BLACK
 							)
@@ -177,7 +173,7 @@ fun BOPLMultiUnitModal(
 						horizontalArrangement = Arrangement.Center
 					) {
 						Image(
-							painter = painterResource(id = R.drawable.ic_bopl_treadmill),
+							painter = painterResource(id = R.drawable.place_hold_slip_on_unit),
 							contentDescription = "Place Hold Slip"
 						)
 					}

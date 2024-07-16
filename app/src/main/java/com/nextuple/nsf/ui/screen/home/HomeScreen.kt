@@ -23,7 +23,6 @@ import com.nextuple.nsf.retrofit.dto.response.MetricsSummaryResponse
 import com.nextuple.nsf.ui.state.HomeViewModel
 import com.nextuple.nsf.ui.state.MetricsSummaryData
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
 import com.nextuple.nsf.util.SubFulfillmentType
@@ -92,7 +91,6 @@ private fun MetricsHeader() {
 		Text(
 			text = "Performance Metrics",
 			style = TextStyle(
-				fontFamily = FontFamily.ARCHIVO,
 				lineHeight = 26.sp,
 				fontSize = 20.sp,
 				fontWeight = FontWeight(700)
@@ -101,7 +99,6 @@ private fun MetricsHeader() {
 		Text(
 			text = TimeUtils.formatTimeStamp(Instant.now()),
 			style = TextStyle(
-				fontFamily = FontFamily.ARCHIVO,
 				lineHeight = 12.sp,
 				fontSize = 12.sp,
 				fontWeight = FontWeight(500)

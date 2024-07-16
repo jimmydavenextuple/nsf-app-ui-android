@@ -37,7 +37,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun InfoModal(
@@ -88,7 +87,6 @@ fun InfoModal(
 						text = title,
 						style = TextStyle(
 							fontSize = 20.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.SemiBold
 						)
 					)
@@ -109,7 +107,6 @@ fun InfoModal(
 						style = TextStyle(
 							fontSize = 16.sp,
 							letterSpacing = 0.03.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Normal
 						)
 					)
@@ -126,10 +123,10 @@ fun InfoModal(
 
 				PrimaryButton(
 					modifier = Modifier
-						.fillMaxWidth(0.85f)
+						.fillMaxWidth()
 						.semantics { testTag = "InfoModalButton" },
 					text = buttonText,
-					buttonColor = BrandColor.PINK_NT,
+					buttonColor = BrandColor.DARK_BLUE,
 					onButtonClick = {
 						buttonClick.invoke(shouldShowAgain)
 					},
@@ -155,7 +152,7 @@ fun CheckboxComponent(
 			checked = checkedState,
 			onCheckedChange = onCheckedChange,
 			colors = CheckboxDefaults.colors(
-				checkedColor = BrandColor.PINK_NT,
+				checkedColor = BrandColor.DARK_BLUE,
 				uncheckedColor = BrandColor.GRAY_600
 			),
 			modifier = Modifier.absoluteOffset(x = (-12).dp)
@@ -165,7 +162,6 @@ fun CheckboxComponent(
 			style = TextStyle(
 				fontSize = 14.sp,
 				letterSpacing = 0.03.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight.Normal
 			),
 			modifier = Modifier

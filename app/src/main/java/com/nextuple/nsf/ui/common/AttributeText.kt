@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun AttributeText(
@@ -38,7 +37,6 @@ fun AttributeText(
 	) {
 		Text(
 			text = label.uppercase(),
-			fontFamily = FontFamily.ARCHIVO,
 			fontSize = fontSize,
 			fontWeight = FontWeight(700),
 			letterSpacing = 1.5.sp
@@ -48,7 +46,6 @@ fun AttributeText(
 		) {
 			Text(
 				text = value.orEmpty(),
-				fontFamily = FontFamily.ARCHIVO,
 				fontSize = fontSize,
 				fontWeight = FontWeight(400),
 				letterSpacing = 0.5.sp,

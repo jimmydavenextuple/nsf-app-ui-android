@@ -71,19 +71,19 @@ object AppConfig {
 			count = 0
 		),
 		AppNavBarItem(
-			iconResId = R.drawable.ic_pick,
+			iconResId = R.drawable.ic_pick_qr_code_scanner,
 			label = "Pick",
 			route = Screen.PICK.route,
 			count = 0
 		),
 		AppNavBarItem(
-			iconResId = R.drawable.ic_prep,
+			iconResId = R.drawable.ic_prep_local_mall,
 			label = "Prep",
 			route = Screen.PREP.route,
 			count = 0
 		),
 		AppNavBarItem(
-			iconResId = R.drawable.ic_orders,
+			iconResId = R.drawable.ic_order_shopping_basket,
 			label = "Orders",
 			route = Screen.ORDERS.route,
 			count = 0

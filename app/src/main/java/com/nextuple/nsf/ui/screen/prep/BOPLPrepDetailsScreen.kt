@@ -47,7 +47,6 @@ import com.nextuple.nsf.ui.state.PrepViewModel.Step.Pack
 import com.nextuple.nsf.ui.state.PrepViewModel.Step.Stage
 import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.AppMessage
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
@@ -301,7 +300,7 @@ fun BOPLPrepDetailsScreen(
 fun HoldingLocation(holdingArea: String) {
 	Column(
 		Modifier
-			.background(BrandColor.GREEN_500)
+			.background(BrandColor.DARK_BLUE)
 			.fillMaxHeight()
 			.fillMaxWidth(),
 		verticalArrangement = Arrangement.Center,
@@ -318,7 +317,6 @@ fun HoldingLocation(holdingArea: String) {
 			style = TextStyle(
 				fontSize = 16.sp,
 				lineHeight = 20.8.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(400),
 				color = BrandColor.WHITE,
 				textAlign = TextAlign.Center,
@@ -330,7 +328,6 @@ fun HoldingLocation(holdingArea: String) {
 			style = TextStyle(
 				fontSize = 16.sp,
 				lineHeight = 20.8.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(900),
 				color = BrandColor.WHITE,
 				textAlign = TextAlign.Center,

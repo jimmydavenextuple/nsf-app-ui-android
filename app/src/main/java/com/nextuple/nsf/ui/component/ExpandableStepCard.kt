@@ -28,7 +28,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.Step
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun ExpandableStepCard(
@@ -59,7 +58,6 @@ fun ExpandableStepCard(
 				if (title != null) {
 					Text(
 						text = title,
-						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 20.sp,
 						fontWeight = FontWeight.Bold,
 						letterSpacing = 0.5.sp,
@@ -68,7 +66,6 @@ fun ExpandableStepCard(
 				} else {
 					Text(
 						text = annotatedTitle,
-						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 20.sp,
 						fontWeight = FontWeight.Bold,
 						letterSpacing = 0.5.sp,
@@ -81,7 +78,7 @@ fun ExpandableStepCard(
 					Icon(
 						modifier = Modifier.padding(start = 6.dp),
 						imageVector = ImageVector.vectorResource(id = R.drawable.ic_check),
-						tint = BrandColor.BLUE_300_NT,
+						tint = BrandColor.DARK_BLUE,
 						contentDescription = "Completed Check"
 					)
 				}

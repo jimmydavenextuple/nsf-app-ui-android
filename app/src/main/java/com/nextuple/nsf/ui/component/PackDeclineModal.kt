@@ -36,7 +36,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun PackDeclineModal(
@@ -70,7 +69,6 @@ fun PackDeclineModal(
 							text = stringResource(R.string.decline_reason),
 							style = TextStyle(
 								fontSize = 20.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.SemiBold,
 								color = BrandColor.BLACK
 							)
@@ -96,7 +94,6 @@ fun PackDeclineModal(
 							text = stringResource(R.string.decline_modal_description),
 							style = TextStyle(
 								fontSize = 14.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								color = BrandColor.BLACK
 							)
 						)
@@ -112,10 +109,10 @@ fun PackDeclineModal(
 					) {
 						PrimaryButton(
 							modifier = Modifier
-								.fillMaxWidth(0.75f)
+								.fillMaxWidth()
 								.semantics { testTag = "InfoModalButton" },
 							text = stringResource(R.string.confirm_decline),
-							buttonColor = BrandColor.PINK_NT,
+							buttonColor = BrandColor.DARK_BLUE,
 							onButtonClick = {
 								when (selectedOption) {
 									"Damaged" -> onConfirmDecline("DAMAGE")
@@ -134,7 +131,7 @@ fun PackDeclineModal(
 					) {
 						SecondaryButton(
 							modifier = Modifier
-								.fillMaxWidth(0.75f)
+								.fillMaxWidth()
 								.semantics { testTag = "InfoModalButton" },
 							text = stringResource(R.string.back),
 							onButtonClick = {
@@ -174,7 +171,6 @@ private fun RadioButtonRow(
 			text = declineReason,
 			style = TextStyle(
 				fontSize = 14.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(400),
 				color = BrandColor.BLACK
 			)

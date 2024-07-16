@@ -2,6 +2,7 @@ package com.nextuple.nsf.ui.screen.prep.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +21,6 @@ import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun PackOrderCard(
@@ -38,8 +38,8 @@ fun PackOrderCard(
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Image(
-					modifier = Modifier.padding(vertical = 8.dp),
-					imageVector = ImageVector.vectorResource(R.drawable.pack_order),
+					modifier = Modifier.padding(vertical = 10.dp),
+					imageVector = ImageVector.vectorResource(R.drawable.pack_and_hold),
 					contentDescription = stringResource(id = R.string.pack_order)
 				)
 				Text(
@@ -47,14 +47,13 @@ fun PackOrderCard(
 					text = stringResource(id = R.string.pack_info),
 					style = TextStyle(
 						fontSize = 12.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(400),
 						color = BrandColor.BLACK,
 						letterSpacing = 0.5.sp
 					)
 				)
 				PrimaryButton(
-					modifier = Modifier.padding(vertical = 12.dp),
+					modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
 					text = stringResource(id = R.string.print_hold_slip),
 					buttonState = ButtonState.DEFAULT,
 					onButtonClick = onPackOrder

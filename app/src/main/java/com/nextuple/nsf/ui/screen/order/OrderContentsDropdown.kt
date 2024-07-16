@@ -36,7 +36,6 @@ import com.nextuple.nsf.retrofit.dto.PackedItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.common.TertiaryButton
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun OrderContentsDropdown(
@@ -60,7 +59,6 @@ fun OrderContentsDropdown(
 			) {
 				Text(
 					text = stringResource(id = string.contents),
-					fontFamily = FontFamily.ARCHIVO,
 					fontSize = 18.sp,
 					fontWeight = FontWeight(700),
 					letterSpacing = 0.5.sp
@@ -132,7 +130,6 @@ private fun PackedItemCard(modifier: Modifier = Modifier, packedItem: PackedItem
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
 				fontSize = 14.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight.Bold,
 				letterSpacing = 0.5.sp
 			)
@@ -164,7 +161,6 @@ private fun OrderTextInfo(label: String, value: String) {
 		maxLines = 1,
 		overflow = TextOverflow.Ellipsis,
 		fontSize = 12.sp,
-		fontFamily = FontFamily.ARCHIVO,
 		fontWeight = FontWeight.Normal,
 		letterSpacing = 0.5.sp
 	)

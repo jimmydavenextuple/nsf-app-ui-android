@@ -42,7 +42,6 @@ import com.nextuple.nsf.ui.component.PrinterModal
 import com.nextuple.nsf.ui.state.CancelReasonData
 import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.FRStatus
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -543,7 +542,6 @@ fun AgedCancel(
 				.background(BrandColor.ORANGE_50)
 				.padding(horizontal = 16.dp, vertical = 12.dp),
 			text = stringResource(id = R.string.aged_cancel_info),
-			fontFamily = FontFamily.ARCHIVO,
 			fontSize = 12.sp,
 			fontWeight = FontWeight(400),
 			letterSpacing = 0.5.sp
@@ -552,7 +550,7 @@ fun AgedCancel(
 		PrimaryButton(
 			modifier = Modifier
 				.align(Alignment.CenterHorizontally)
-				.fillMaxWidth(0.7f)
+				.fillMaxWidth()
 				.padding(vertical = 8.dp),
 			text = stringResource(id = R.string.aged_cancel),
 			onButtonClick = { onAgedCancel() }

@@ -38,7 +38,6 @@ import com.nextuple.nsf.R.string
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.chip.CheckableChip
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +79,6 @@ fun FiltersBottomSheet(
 					color = BrandColor.BLACK,
 					style = TextStyle(
 						fontSize = 18.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(700)
 					)
 				)

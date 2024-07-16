@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.PreviewPdt
 
 @Composable
@@ -42,7 +41,6 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 				.padding(top = 16.dp),
 			text = title,
 			fontSize = 20.sp,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			color = BrandColor.GRAY_900,
 			letterSpacing = 0.5.sp
@@ -54,7 +52,6 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 			text = body,
 			fontSize = 14.sp,
 			lineHeight = 16.sp,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Normal,
 			color = BrandColor.GRAY_900,
 			letterSpacing = 0.5.sp

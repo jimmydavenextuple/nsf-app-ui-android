@@ -39,7 +39,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.Printer
 
 @Composable
@@ -78,7 +77,6 @@ fun PrinterBOPLModal(
 								text = "Select Printer",
 								style = TextStyle(
 									fontSize = 20.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight.SemiBold,
 									color = BrandColor.BLACK
 								)
@@ -104,10 +102,10 @@ fun PrinterBOPLModal(
 						) {
 							PrimaryButton(
 								modifier = Modifier
-									.fillMaxWidth(0.75f)
+									.fillMaxWidth()
 									.semantics { testTag = "InfoModalButton" },
 								text = stringResource(id = R.string.select),
-								buttonColor = BrandColor.PINK_NT,
+								buttonColor = BrandColor.DARK_BLUE,
 								onButtonClick = {
 									connectPrinter(boplPrinter, selectedOption.ipAddress)
 									onDismissRequest()
@@ -125,7 +123,6 @@ fun PrinterBOPLModal(
 								text = AnnotatedString(stringResource(id = R.string.other_printer)),
 								style = TextStyle(
 									fontSize = 12.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight(700),
 									color = BrandColor.BLACK,
 									textAlign = TextAlign.Center,
@@ -170,7 +167,6 @@ private fun RadioButtonRow(
 			text = "${printer.printerName} Printer",
 			style = TextStyle(
 				fontSize = 14.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(400),
 				color = BrandColor.BLACK
 			)

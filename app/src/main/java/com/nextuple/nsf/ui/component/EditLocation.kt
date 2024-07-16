@@ -42,7 +42,6 @@ import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.screen.prep.component.SelectHoldingAreaCard
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.ScanManager
 import kotlin.random.Random
@@ -109,7 +108,6 @@ fun EditLocation(
 						text = "Edit Location",
 						style = TextStyle(
 							fontSize = 20.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Bold,
 							letterSpacing = 0.5.sp
 						)
@@ -174,7 +172,7 @@ fun EditLocation(
 									Image(
 										modifier = Modifier
 											.padding(top = 2.dp),
-										imageVector = ImageVector.vectorResource(R.drawable.scanning_bin),
+										imageVector = ImageVector.vectorResource(R.drawable.scan_location),
 										contentDescription = "Scanning Bin"
 									)
 									DetailedCallToAction(

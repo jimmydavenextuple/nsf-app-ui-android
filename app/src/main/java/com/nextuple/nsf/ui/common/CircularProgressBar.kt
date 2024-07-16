@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.util.StringUtils.toPercent
 
 @Composable
@@ -59,8 +58,8 @@ fun CircularProgressBar(
 	indicatorThickness: Dp = 20.dp,
 	animationDuration: Int = 1000,
 	animationDelay: Int = 0,
-	backgroundIndicatorColor: Color = BrandColor.BLUE_100_NT,
-	completedIndicatorColor: Color = BrandColor.BLUE_300_NT,
+	backgroundIndicatorColor: Color = BrandColor.GRAY_400,
+	completedIndicatorColor: Color = BrandColor.DARK_BLUE,
 	inProgressIndicatorColor: Color = BrandColor.YELLOW_NT,
 	showLegends: Boolean = false,
 	backgroundLegendText: String = "Unworked",
@@ -74,18 +73,15 @@ fun CircularProgressBar(
 	centerIconModifier: Modifier = Modifier.clickable { },
 	centerProgressTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.Bold,
-		fontFamily = FontFamily.ARCHIVO,
 		letterSpacing = 1.5.sp,
 		fontSize = MaterialTheme.typography.displayLarge.fontSize
 	),
 	centerTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.SemiBold,
-		fontFamily = FontFamily.ARCHIVO,
 		letterSpacing = 1.5.sp,
 		fontSize = MaterialTheme.typography.bodySmall.fontSize
 	),
 	legendsTextStyle: TextStyle = TextStyle(
-		fontFamily = FontFamily.ARCHIVO,
 		fontWeight = FontWeight.Medium,
 		textAlign = TextAlign.Center,
 		fontSize = 20.sp
@@ -228,19 +224,16 @@ private fun DisplayText(
 			Text(
 				text = percent.toPercent(),
 				style = centerProgressTextStyle,
-				fontFamily = FontFamily.SANS
 			)
 		} else {
 			Text(
 				text = "$completedUnits/$totalUnits",
 				style = centerProgressTextStyle,
-				fontFamily = FontFamily.SANS
 			)
 			centerText?.let {
 				Text(
 					text = centerText,
 					style = centerTextStyle,
-					fontFamily = FontFamily.ARCHIVO,
 					fontSize = 12.sp,
 					fontWeight = FontWeight.Bold,
 					color = BrandColor.GRAY_600

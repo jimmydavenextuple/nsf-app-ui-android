@@ -69,7 +69,6 @@ import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PrinterModal
 import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -168,7 +167,7 @@ fun OrderPickupScreen(
 						mutableStateOf(
 							DetailedCallToActionMode.Done(
 								BrandColor.WHITE,
-								BrandColor.BLUE_800_NT
+								BrandColor.DARK_BLUE
 							)
 						)
 					}
@@ -203,7 +202,6 @@ fun OrderPickupScreen(
 						text = AnnotatedString("Reprint A Hold Slip".uppercase()),
 						style = TextStyle(
 							fontSize = 12.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight(700),
 							color = BrandColor.BLACK,
 							textAlign = TextAlign.Center,
@@ -377,7 +375,6 @@ private fun GetOrdersContent(
 						style = TextStyle(
 							fontSize = 14.sp,
 							lineHeight = 18.2.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight(700),
 							letterSpacing = 0.5.sp
 						)
@@ -446,7 +443,7 @@ fun ColumnScope.BringToAthleteContent(
 	Spacer(modifier = Modifier.height(24.dp))
 	PrimaryButton(
 		modifier = Modifier
-			.fillMaxWidth(0.8f)
+			.fillMaxWidth()
 			.align(Alignment.CenterHorizontally),
 		text = stringResource(id = R.string.complete_pickup),
 		onButtonClick = onOrderPickupClicked
@@ -491,7 +488,7 @@ private fun PickupCompleteModal(
 					modifier = modifier
 						.border(
 							width = 2.dp,
-							color = BrandColor.BLUE_300_NT,
+							color = BrandColor.DARK_BLUE,
 							shape = RoundedCornerShape(size = 3.dp)
 						)
 						.background(
@@ -499,7 +496,7 @@ private fun PickupCompleteModal(
 							shape = RoundedCornerShape(size = 3.dp)
 						),
 					statusText = deliverySpeed,
-					statusColor = BrandColor.BLUE_300_NT,
+					statusColor = BrandColor.DARK_BLUE,
 					fontSize = 16.sp
 				)
 				Text(
@@ -507,7 +504,6 @@ private fun PickupCompleteModal(
 					text = stringResource(id = R.string.delivery_speed).uppercase(),
 					style = TextStyle(
 						fontSize = 12.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(700),
 						color = BrandColor.BLACK,
 						letterSpacing = 1.5.sp

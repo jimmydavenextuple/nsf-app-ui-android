@@ -31,7 +31,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun MultiOptionModal(
@@ -76,7 +75,6 @@ fun MultiOptionModal(
 							text = title,
 							style = TextStyle(
 								fontSize = 20.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.Bold,
 								letterSpacing = 0.5.sp
 							)
@@ -100,7 +98,6 @@ fun MultiOptionModal(
 						style = TextStyle(
 							fontSize = 16.sp,
 							letterSpacing = 0.5.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Normal
 						)
 					)
@@ -110,9 +107,9 @@ fun MultiOptionModal(
 
 				if (buttons.isNotEmpty()) {
 					PrimaryButton(
-						modifier = Modifier.fillMaxWidth(0.8f),
+						modifier = Modifier.fillMaxWidth(),
 						text = buttons[0],
-						buttonColor = BrandColor.PINK_NT,
+						buttonColor = BrandColor.DARK_BLUE,
 						onButtonClick = { buttonClick(buttons[0]) },
 						contentColor = BrandColor.GRAY_100
 					)
@@ -121,7 +118,7 @@ fun MultiOptionModal(
 
 					for (index in 1 until buttons.size) {
 						SecondaryButton(
-							modifier = Modifier.fillMaxWidth(0.8f),
+							modifier = Modifier.fillMaxWidth(),
 							text = buttons[index],
 							onButtonClick = { buttonClick(buttons[index]) }
 						)

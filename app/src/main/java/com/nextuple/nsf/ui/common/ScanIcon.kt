@@ -18,14 +18,14 @@ fun ScanIcon(
 			modifier = modifier,
 			imageVector = ImageVector.vectorResource(R.drawable.ic_check),
 			contentDescription = "scan success icon",
-			tint = BrandColor.BLUE_300
+			tint = BrandColor.DARK_BLUE
 		)
 	} else {
 		Icon(
 			modifier = modifier,
-			imageVector = ImageVector.vectorResource(R.drawable.ic_scan),
+			imageVector = ImageVector.vectorResource(R.drawable.ic_pick_qr_code_scanner),
 			contentDescription = "scan icon",
-			tint = BrandColor.PINK_NT
+			tint = BrandColor.GRAY_400
 		)
 	}
 }

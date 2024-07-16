@@ -39,7 +39,6 @@ import com.nextuple.nsf.retrofit.dto.response.athleteShortName
 import com.nextuple.nsf.retrofit.dto.response.sddShortName
 import com.nextuple.nsf.ui.common.chip.OrderStatusChip
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.util.OrderStatus
 
 @Composable
@@ -79,7 +78,6 @@ fun SDDOrderCard(
 								style = TextStyle(
 									fontSize = 18.sp,
 									lineHeight = 23.4.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight(700),
 									color = BrandColor.BLACK,
 
@@ -115,7 +113,6 @@ fun SDDOrderCard(
 							text = stringResource(R.string.sdd_pickup),
 							style = TextStyle(
 								fontSize = 12.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight(700),
 								color = BrandColor.BLACK,
 								letterSpacing = 1.5.sp
@@ -127,7 +124,6 @@ fun SDDOrderCard(
 							style = TextStyle(
 								fontSize = 12.sp,
 								lineHeight = 15.6.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight(400),
 								color = BrandColor.BLACK,
 								letterSpacing = 0.5.sp

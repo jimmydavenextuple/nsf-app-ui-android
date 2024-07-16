@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.AppMessage
 
 @Composable
@@ -67,7 +66,6 @@ fun OmniBanner(
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			val textStyle = TextStyle(
-				fontFamily = FontFamily.ARCHIVO,
 				lineHeight = 15.sp,
 				fontSize = 14.sp,
 				letterSpacing = 0.5.sp

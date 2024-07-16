@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.util.OrderStatus
 import com.nextuple.nsf.util.OrderStatus.AGED
 import com.nextuple.nsf.util.OrderStatus.BEING_PACKED
@@ -40,7 +39,7 @@ import com.nextuple.nsf.util.OrderStatus.STAGE
 fun OrderStatusChip(
 	modifier: Modifier = Modifier,
 	statusText: String,
-	backgroundColor: Color = BrandColor.PINK_NT
+	backgroundColor: Color = BrandColor.DARK_BLUE
 ) {
 	val orderStatus = OrderStatus.getByStatus(statusText)
 
@@ -91,7 +90,6 @@ fun StatusChip(
 			text = statusText,
 			color = statusColor,
 			fontSize = fontSize,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			letterSpacing = 0.5.sp
 		)

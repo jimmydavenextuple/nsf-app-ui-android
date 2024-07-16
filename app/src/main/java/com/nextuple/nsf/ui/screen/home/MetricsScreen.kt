@@ -26,7 +26,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.CircularProgressBar
 import com.nextuple.nsf.ui.common.HorizontalProgressBar
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.PreviewPdt
 import com.nextuple.nsf.util.StringUtils.formatTime
 import com.nextuple.nsf.util.StringUtils.toPercent
@@ -54,7 +53,6 @@ fun MetricsScreen(
 			text = fulfillmentType.name,
 			style = TextStyle(
 				fontWeight = FontWeight(700),
-				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 16.sp,
 				lineHeight = 20.8.sp
 			)
@@ -228,7 +226,6 @@ private fun BopisMetrics(
 	Text(
 		text = stringResource(R.string.updated_every_15_minutes),
 		style = TextStyle(
-			fontFamily = FontFamily.ARCHIVO,
 			fontSize = 10.sp,
 			fontStyle = FontStyle.Italic,
 			fontWeight = FontWeight(400),
@@ -244,7 +241,6 @@ private fun MetricsTitle(title: String) {
 		modifier = Modifier.padding(bottom = 4.dp),
 		text = title.uppercase(),
 		style = TextStyle(
-			fontFamily = FontFamily.ARCHIVO,
 			fontSize = 10.sp,
 			fontWeight = FontWeight(700),
 			lineHeight = 11.sp
@@ -253,7 +249,7 @@ private fun MetricsTitle(title: String) {
 }
 
 @Composable
-private fun MetricsBody(body: String, color: Color = BrandColor.BLUE_300_NT) {
+private fun MetricsBody(body: String, color: Color = BrandColor.DARK_BLUE) {
 	Text(
 		text = body,
 		style = metricsBodyStyle(color)
@@ -272,7 +268,7 @@ private fun determineColor(
 			subfulfillmentType = fulfillmentType
 		)
 	) {
-		MetricLevel.GOOD -> BrandColor.BLUE_300_NT
+		MetricLevel.GOOD -> BrandColor.DARK_BLUE
 		MetricLevel.MEDIUM -> BrandColor.YELLOW_400
 		MetricLevel.BAD -> BrandColor.RED_600
 	}
@@ -286,7 +282,6 @@ private fun MetricsSubscript(subscript: String) {
 		modifier = Modifier,
 		text = subscript.uppercase(),
 		style = TextStyle(
-			fontFamily = FontFamily.ARCHIVO,
 			fontSize = 8.sp,
 			fontWeight = FontWeight(700),
 			lineHeight = 8.7.sp
@@ -342,7 +337,6 @@ fun getLevel(
 }
 
 fun metricsBodyStyle(color: Color) = TextStyle(
-	fontFamily = FontFamily.SANS,
 	fontSize = 20.sp,
 	fontWeight = FontWeight(700),
 	lineHeight = 20.sp,

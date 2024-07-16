@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.common.chip.ElapsedTimeChip
 import com.nextuple.nsf.ui.common.chip.OrderStatusChip
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun InfoCard(
@@ -57,7 +56,6 @@ fun InfoCard(
 					Text(
 						modifier = Modifier.padding(bottom = 8.dp),
 						text = title,
-						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 18.sp,
 						fontWeight = FontWeight(700),
 						letterSpacing = 0.5.sp

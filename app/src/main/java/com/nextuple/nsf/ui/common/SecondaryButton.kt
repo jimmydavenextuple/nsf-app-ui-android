@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun SecondaryButton(
@@ -63,7 +62,6 @@ fun SecondaryButton(
 					text = text,
 					textAlign = TextAlign.Center,
 					fontSize = textSize,
-					fontFamily = FontFamily.ARCHIVO,
 					letterSpacing = 1.5.sp,
 					fontWeight = FontWeight.Bold
 				)

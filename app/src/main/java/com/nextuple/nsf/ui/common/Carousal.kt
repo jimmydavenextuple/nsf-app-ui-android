@@ -125,7 +125,7 @@ fun Carousel(
 		) {
 			repeat(images.size) { iteration ->
 				val color = if (pagerState.currentPage == iteration) {
-					BrandColor.PINK_NT
+					BrandColor.DARK_BLUE
 				} else {
 					BrandColor.GRAY_300
 				}

@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun TextInfo(
@@ -48,14 +47,12 @@ fun TextInfo(
 		Column {
 			Text(
 				text = label.uppercase(),
-				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 12.sp,
 				fontWeight = FontWeight(700),
 				letterSpacing = 1.5.sp
 			)
 			Text(
 				text = value.orEmpty(),
-				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 12.sp,
 				fontWeight = FontWeight(400),
 				letterSpacing = 0.5.sp,

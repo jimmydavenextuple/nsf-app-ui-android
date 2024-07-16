@@ -34,7 +34,6 @@ import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.screen.settings.getPrinterConnectIcon
 import com.nextuple.nsf.ui.screen.settings.getPrinterIcon
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.Printer
 
 @Composable
@@ -55,7 +54,6 @@ fun PrintHoldSlipCard(
 			text = "Printer".uppercase(),
 			style = TextStyle(
 				fontSize = 14.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(700),
 				letterSpacing = 1.5.sp
 			)
@@ -98,7 +96,6 @@ fun PrintHoldSlipCard(
 								maxLines = 1,
 								style = TextStyle(
 									fontWeight = FontWeight.Normal,
-									fontFamily = FontFamily.ARCHIVO,
 									fontStyle = FontStyle.Normal,
 									fontSize = 12.sp,
 									color = BrandColor.BLACK,
@@ -115,7 +112,6 @@ fun PrintHoldSlipCard(
 							maxLines = 1,
 							style = TextStyle(
 								fontWeight = FontWeight.Normal,
-								fontFamily = FontFamily.ARCHIVO,
 								fontStyle = FontStyle.Italic,
 								fontSize = 12.sp,
 								color = BrandColor.BLACK,
@@ -145,7 +141,7 @@ fun PrintHoldSlipCard(
 		) {
 			PrimaryButton(
 				modifier = Modifier
-					.fillMaxWidth(.65f)
+					.fillMaxWidth()
 					.padding(vertical = 15.dp),
 				text = if (printer.connectionStatus && !isMultiUnit) {
 					stringResource(id = R.string.print_hold_slip)
@@ -182,7 +178,7 @@ fun PrintHoldSlipCard(
 			annotatedTitle = if (isActive) {
 				buildAnnotatedString {
 					append("Print ")
-					withStyle(style = SpanStyle(color = BrandColor.ORANGE_700)) {
+					withStyle(style = SpanStyle(color = BrandColor.DARK_BLUE)) {
 						append(packItems.size.toString())
 					}
 					append(" Hold Slips")

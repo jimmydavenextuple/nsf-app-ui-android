@@ -28,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun HorizontalProgressBar(
@@ -37,7 +36,7 @@ fun HorizontalProgressBar(
 	workedCount: Int?,
 	totalCount: Int?,
 	percent: Double? = null,
-	completedColor: Color = BrandColor.BLUE_300_NT
+	completedColor: Color = BrandColor.DARK_BLUE
 ) {
 	var progress by remember { mutableStateOf(0f) }
 
@@ -51,10 +50,9 @@ fun HorizontalProgressBar(
 	) {
 		Text(
 			text = title.uppercase(),
-			color = BrandColor.BLACK,
+			color = BrandColor.DARK_BLUE,
 			fontSize = 12.sp,
 			fontWeight = FontWeight(700),
-			fontFamily = FontFamily.ARCHIVO,
 			letterSpacing = 1.5.sp
 		)
 
@@ -82,7 +80,6 @@ fun HorizontalProgressBar(
 						color = BrandColor.BLACK,
 						fontSize = 12.sp,
 						fontWeight = FontWeight(700),
-						fontFamily = FontFamily.ARCHIVO,
 						letterSpacing = 1.5.sp
 					)
 				}
@@ -108,7 +105,6 @@ fun HorizontalProgressBar(
 						color = BrandColor.WHITE,
 						fontSize = 12.sp,
 						fontWeight = FontWeight(700),
-						fontFamily = FontFamily.ARCHIVO,
 						letterSpacing = 1.5.sp
 					)
 				}

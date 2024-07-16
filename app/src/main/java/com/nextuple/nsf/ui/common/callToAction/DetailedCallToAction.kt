@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun DetailedCallToAction(
@@ -36,7 +36,7 @@ fun DetailedCallToAction(
 			.height(64.dp)
 			.background(
 				color = detailedCallToActionMode.backgroundColor,
-				shape = RoundedCornerShape(48.dp)
+				shape = RoundedCornerShape(0.dp)
 			)
 			.padding(start = 20.dp, end = 20.dp)
 			.clickable { onClick() }
@@ -76,23 +76,22 @@ private fun Info(
 	Row(
 		modifier = Modifier
 			.wrapContentSize()
+			.fillMaxWidth()
 			.padding(vertical = 16.dp)
 			.testTag("detailedCallToAction_Scan"),
 		horizontalArrangement = Arrangement.Center,
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		CallToActionIcon(detailedCallToActionMode = detailedCallToActionMode)
-
-		Text(
-			modifier = Modifier.padding(start = 4.dp),
-			text = text.uppercase(),
-			fontSize = 16.sp,
-			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight(700),
-			color = detailedCallToActionMode.contentColor,
-			letterSpacing = 1.5.sp
-		)
-	}
+			CallToActionIcon(detailedCallToActionMode = detailedCallToActionMode)
+			Text(
+				modifier = Modifier.padding(start = 4.dp),
+				text = text.uppercase(),
+				fontSize = 16.sp,
+				fontWeight = FontWeight(700),
+				color = detailedCallToActionMode.contentColor,
+				letterSpacing = 1.5.sp,
+				)
+		}
 }
 
 @Composable
@@ -109,10 +108,15 @@ private fun LoadingSpinner(detailedCallToActionMode: DetailedCallToActionMode) {
 
 @Composable
 private fun Done(detailedCallToActionMode: DetailedCallToActionMode) {
-	Box(
+	Row(
 		modifier = Modifier
-			.padding(vertical = 16.dp, horizontal = 28.dp)
-			.testTag("detailedCallToAction_Done")
+			.wrapContentSize()
+			.fillMaxWidth()
+			.padding(vertical = 16.dp)
+			.testTag("detailedCallToAction_Done"),
+		horizontalArrangement = Arrangement.Center,
+		verticalAlignment = Alignment.CenterVertically
+
 	) {
 		CallToActionIcon(detailedCallToActionMode = detailedCallToActionMode)
 	}

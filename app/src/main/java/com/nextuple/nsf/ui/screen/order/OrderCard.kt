@@ -36,7 +36,6 @@ import com.nextuple.nsf.R.string
 import com.nextuple.nsf.ui.common.ScanIcon
 import com.nextuple.nsf.ui.common.chip.OrderStatusChip
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.util.OrderStatus
 import com.nextuple.nsf.util.OrderStatus.AGED
 import com.nextuple.nsf.util.OrderStatus.CANCELED
@@ -127,7 +126,6 @@ fun AthleteDetail(
 				Text(
 					text = athleteShortName,
 					fontSize = 20.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight(700),
 					color = BrandColor.GRAY_900,
 					letterSpacing = 0.5.sp
@@ -157,7 +155,6 @@ fun AthleteDetail(
 						text = "ALT: $athleteSddShortName",
 						style = TextStyle(
 							fontSize = 10.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight(700),
 							color = BrandColor.GRAY_600,
 							textAlign = TextAlign.Right,
@@ -188,7 +185,6 @@ fun AthleteDetail(
 						.align(Alignment.End),
 					text = orderType,
 					fontSize = 12.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight(700),
 					color = BrandColor.GRAY_600,
 					letterSpacing = 1.5.sp
@@ -254,7 +250,6 @@ fun HoldingLocation(modifier: Modifier = Modifier, area: String, bin: String) {
 		Text(
 			text = stringResource(id = string.location),
 			fontSize = 12.sp,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight(700),
 			color = BrandColor.BLACK,
 			letterSpacing = 1.5.sp
@@ -262,7 +257,6 @@ fun HoldingLocation(modifier: Modifier = Modifier, area: String, bin: String) {
 		Text(
 			text = area,
 			fontSize = 14.sp,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight(400),
 			color = BrandColor.BLACK,
 			letterSpacing = 0.5.sp
@@ -271,7 +265,6 @@ fun HoldingLocation(modifier: Modifier = Modifier, area: String, bin: String) {
 			Text(
 				text = bin,
 				fontSize = 14.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(400),
 				color = BrandColor.BLACK,
 				letterSpacing = 0.5.sp

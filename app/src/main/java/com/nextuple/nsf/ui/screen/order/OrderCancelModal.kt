@@ -33,7 +33,6 @@ import com.nextuple.nsf.ui.common.InfoModal
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun OrderCancelModal(
@@ -73,7 +72,6 @@ fun OrderCancelModal(
 							text = stringResource(id = string.order_aged_cancelled_title),
 							style = TextStyle(
 								fontSize = 20.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.Bold,
 								letterSpacing = 0.5.sp
 							)
@@ -92,7 +90,6 @@ fun OrderCancelModal(
 						style = TextStyle(
 							fontSize = 16.sp,
 							letterSpacing = 0.5.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Normal
 						)
 					)
@@ -105,7 +102,7 @@ fun OrderCancelModal(
 						horizontalArrangement = Arrangement.Center
 					) {
 						Image(
-							imageVector = ImageVector.vectorResource(id = drawable.ic_return_aged),
+							imageVector = ImageVector.vectorResource(id = drawable.return_aged_to_stock),
 							contentDescription = "Return Units image"
 						)
 					}
@@ -114,7 +111,7 @@ fun OrderCancelModal(
 						text = CONFIRM,
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(5.dp)
+							.padding()
 					) {
 						onCancelComplete()
 					}
@@ -122,7 +119,7 @@ fun OrderCancelModal(
 						text = BACK,
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(10.dp)
+							.padding(top = 8.dp)
 					) {
 						onDismissRequest()
 					}

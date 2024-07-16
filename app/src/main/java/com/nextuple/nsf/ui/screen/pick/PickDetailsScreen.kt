@@ -73,7 +73,6 @@ import com.nextuple.nsf.ui.common.ScrollToReveal
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -233,7 +232,6 @@ fun PickDetailsScreen(
 								maxLines = 1,
 								overflow = TextOverflow.Ellipsis,
 								color = BrandColor.BLACK,
-								fontFamily = FontFamily.ARCHIVO,
 								fontSize = 14.sp,
 								fontWeight = FontWeight(700),
 								letterSpacing = 1.5.sp
@@ -241,8 +239,7 @@ fun PickDetailsScreen(
 							Text(
 								text = subFulfillmentType.toString(),
 								maxLines = 1,
-								color = BrandColor.GRAY_500,
-								fontFamily = FontFamily.ARCHIVO,
+								color = BrandColor.BLACK,
 								fontSize = 14.sp,
 								fontWeight = FontWeight(700),
 								letterSpacing = 1.5.sp
@@ -255,7 +252,6 @@ fun PickDetailsScreen(
 							text = currentPickTaskItem?.productName ?: "",
 							maxLines = if (clearanceColor.isNullOrEmpty()) 2 else 1,
 							overflow = TextOverflow.Ellipsis,
-							fontFamily = FontFamily.ARCHIVO,
 							fontSize = 12.sp,
 							fontWeight = FontWeight.Normal,
 							letterSpacing = 0.5.sp,
@@ -369,13 +365,7 @@ fun PickDetailsScreen(
 												symbology = "upc"
 											)
 										}
-									}
-								)
-								HorizontalDivider(
-									modifier = Modifier
-										.width(124.dp),
-									color = BrandColor.GRAY_400,
-									thickness = 2.dp
+									},
 								)
 							}
 						}
@@ -705,7 +695,6 @@ fun DeclineDetailsDialog(
 						text = "Other Decline Reason",
 						style = TextStyle(
 							fontSize = 20.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Bold,
 							letterSpacing = 0.5.sp
 						)
@@ -740,7 +729,7 @@ fun DeclineDetailsDialog(
 					PrimaryButton(
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(10.dp),
+							.padding(top = 10.dp),
 						text = "Submit".uppercase(),
 						enabled = enabled,
 						onButtonClick = {

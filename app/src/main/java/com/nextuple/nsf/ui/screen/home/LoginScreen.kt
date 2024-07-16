@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,8 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -107,16 +106,25 @@ fun LoginScreen(
 
 	Box(
 		modifier = Modifier.fillMaxSize()
-			.alpha(.8f)
 			.background(
 				brush = Brush.verticalGradient(
 					colors = listOf(
-						Color(0xFFF9B719), // Start color
-						Color(0xFFB72467) // End color
-					)
-				)
+						BrandColor.BG_GRADIENT_TOP, // Start color
+						BrandColor.STRONG_PINK // End color
+					),
+				),
+				alpha = .8f
 			)
 	) {
+		Image(
+			modifier = Modifier
+				.padding(50.dp, 100.dp, 0.dp, 100.dp)
+				.matchParentSize(),
+			painter = painterResource(id = R.drawable.nextuple_building_blocks),
+			contentDescription = null,
+			contentScale = ContentScale.FillBounds,
+		)
+
 		Column(
 			modifier = Modifier
 				.align(Alignment.TopStart)
@@ -174,7 +182,8 @@ fun LoginScreen(
 				modifier = Modifier
 					.padding(top = 2.dp),
 				labelColor = Color.White,
-				labelText = stringResource(id = R.string.login_node_id_text_label),
+				labelText = "",
+				hintText = stringResource(id = R.string.login_node_id_text_label),
 				fieldValue = nodeNo,
 				isInvalid = nodeNo.isEmpty() && isFormInvalid,
 				onValueChange = {
@@ -188,10 +197,10 @@ fun LoginScreen(
 				})
 			)
 			TopLabeledTextField(
-				modifier = Modifier
-					.padding(top = 6.dp),
+				modifier = Modifier,
 				labelColor = Color.White,
-				labelText = stringResource(id = R.string.login_user_id_text_label),
+				labelText = "",
+				hintText = stringResource(id = R.string.login_user_id_text_label),
 				fieldValue = userId,
 				isInvalid = userId.isEmpty() && isFormInvalid,
 				onValueChange = {
@@ -206,8 +215,8 @@ fun LoginScreen(
 			)
 			PrimaryButton(
 				modifier = Modifier
-					.width(width = 152.dp)
-					.padding(top = 5.dp),
+					.width(width = 110.dp)
+					.padding(top = 100.dp),
 				text = stringResource(id = R.string.login_text).uppercase(),
 				buttonColor = Color(0xFF0060AA),
 				enabled = nodeNo.isNotBlank() && userId.isNotBlank(),
@@ -218,13 +227,14 @@ fun LoginScreen(
 				},
 				onButtonClick = {
 					onSubmit(nodeNo, userId)
-				}
+				},
+				buttonShape = RoundedCornerShape(22.dp),
 			)
 		}
 
 		Box(
 			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.TopEnd
+			contentAlignment = Alignment.TopEnd,
 		) {
 			Image(
 				modifier = Modifier

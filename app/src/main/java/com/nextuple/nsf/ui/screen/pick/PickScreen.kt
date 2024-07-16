@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +42,6 @@ import com.nextuple.nsf.ui.common.Tab
 import com.nextuple.nsf.ui.component.EmptyStateScreen
 import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.Haptics
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -278,10 +279,13 @@ private fun PickupTabContainer(
 				Spacer(modifier = Modifier.height(20.dp))
 
 				PrimaryButton(
+					modifier = Modifier
+						.width(width = 200.dp),
 					text = "START PICKING",
 					enabled = tasksUnassigned != 0,
-					onButtonClick = onStartPicking
-				)
+					onButtonClick = onStartPicking,
+					buttonShape = RoundedCornerShape(22.dp),
+					)
 
 				if (showInfoModal) {
 					InfoModal(
@@ -294,7 +298,6 @@ private fun PickupTabContainer(
 						visualContent = {
 							val legendsTextStyle = TextStyle(
 								color = BrandColor.GRAY_600,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.SemiBold,
 								textAlign = TextAlign.Center,
 								fontSize = 10.sp,
@@ -304,9 +307,9 @@ private fun PickupTabContainer(
 								circleSize = 16,
 								space = 0,
 								items = listOf(
-									Legend(BrandColor.GRAY_900, "UNWORKED"),
-									Legend(BrandColor.GREEN_400, "WORKED"),
-									Legend(BrandColor.YELLOW_400, "BEING WORKED")
+									Legend(BrandColor.GRAY_400, "UNWORKED"),
+									Legend(BrandColor.DARK_BLUE, "WORKED"),
+									Legend(BrandColor.YELLOW_NT, "BEING WORKED")
 								),
 								textStyle = legendsTextStyle
 							)

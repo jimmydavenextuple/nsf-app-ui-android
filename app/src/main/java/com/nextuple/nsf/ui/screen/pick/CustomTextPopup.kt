@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import kotlinx.coroutines.delay
 
 @Composable
@@ -60,7 +59,6 @@ fun CustomTextPopup(
 				Text(
 					text = content,
 					color = Color.White,
-					fontFamily = FontFamily.ARCHIVO,
 					fontSize = 8.sp,
 					fontWeight = FontWeight(400),
 					letterSpacing = 0.5.sp

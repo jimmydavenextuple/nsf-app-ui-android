@@ -29,7 +29,6 @@ import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PackDeclineModal
 import com.nextuple.nsf.ui.screen.prep.packTaskItem
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import kotlinx.coroutines.delay
 
 @Composable
@@ -97,7 +96,6 @@ fun ScanAndPackUnitsCard(
 					text = stringResource(id = R.string.pack_info),
 					style = TextStyle(
 						fontSize = 12.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(400),
 						color = BrandColor.BLACK,
 						letterSpacing = 0.5.sp

@@ -35,8 +35,8 @@ fun ScanLocationCard(
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Image(
-					modifier = Modifier.padding(top = 8.dp),
-					imageVector = ImageVector.vectorResource(R.drawable.scanning_bin),
+					modifier = Modifier.padding(10.dp),
+					imageVector = ImageVector.vectorResource(R.drawable.scan_location),
 					contentDescription = "Scanning Bin"
 				)
 				DetailedCallToAction(

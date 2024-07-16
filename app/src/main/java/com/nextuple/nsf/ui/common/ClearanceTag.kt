@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun ClearanceTag(modifier: Modifier = Modifier, clearanceColor: String, colorDesc: String) {
@@ -70,7 +69,6 @@ fun ClearanceTag(modifier: Modifier = Modifier, clearanceColor: String, colorDes
 					text = "CLEARANCE",
 					fontSize = 10.sp,
 					color = BrandColor.BLUE_600,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
 					letterSpacing = 0.5.sp
 				)

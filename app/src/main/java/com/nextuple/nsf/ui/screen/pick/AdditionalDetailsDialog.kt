@@ -30,7 +30,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.AttributeText
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun AdditionalDetailsDialog(
@@ -61,7 +60,6 @@ fun AdditionalDetailsDialog(
 				) {
 					Text(
 						text = stringResource(R.string.additional_details),
-						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 18.sp,
 						fontWeight = FontWeight(700),
 						letterSpacing = 0.5.sp

@@ -260,29 +260,8 @@ private fun NoResultsView(
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			Image(
-				imageVector = ImageVector.vectorResource(R.drawable.umpire),
-				contentDescription = "Umpire Strike Out"
-			)
-			Text(
-				modifier = Modifier
-					.padding(top = 20.dp)
-					.width(200.dp),
-				text = stringResource(id = R.string.strike),
-				fontSize = 18.sp,
-				lineHeight = 23.4.sp,
-				fontWeight = FontWeight.Bold,
-				color = BrandColor.BLACK,
-				letterSpacing = 0.5.sp
-			)
-			Text(
-				modifier = Modifier
-					.padding(vertical = 8.dp)
-					.width(200.dp),
-				text = noSearchResultsText,
-				fontSize = 12.sp,
-				lineHeight = 16.sp,
-				color = BrandColor.BLACK,
-				letterSpacing = 0.5.sp
+				imageVector = ImageVector.vectorResource(R.drawable.no_results_empty_dish),
+				contentDescription = "No Results"
 			)
 		}
 	}

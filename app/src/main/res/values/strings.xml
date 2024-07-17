@@ -151,15 +151,15 @@
     <string name="printer_problems_info">Label failed to print: \n• Ensure printer is on. \n• Check wifi signal on mobile device.\n• Check IP Address of printer. \n• Tap CONNECT. \n\nLabel printed on multiple labels? \n• Tap CALIBRATE. \n\nStill need help? \nPlease contact the technology service desk to trouble shoot other issues. \n\ntechnologyservicedesk@dcsg.com (724) 273–3456</string>
 
     <!-- UnderConstruction   -->
-    <string name="under_construction_title">Under Construction</string>
-    <string name="under_construction_info">We are currently researching, designing, and coding the home screen of NSF.</string>
-    <string name="pick_under_construction_body">We are building SFS functionality for future releases of NSF.</string>
-    <string name="pick_under_construction_title">Caution, Work Zone</string>
-    <string name="prep_under_construction_body">We are digging into separating stage and pack so you can work these steps independently.</string>
-    <string name="prep_under_construction_title">Hard Hat Area</string>
+    <string name="under_construction_title">Work in progress</string>
+    <string name="under_construction_info">We\'re working closely with fulfillment experts and smart customers like you to bring more useful features. Check back soon!</string>
+    <string name="pick_under_construction_body">We\'re working closely with fulfillment experts and smart customers like you to bring more useful features. Check back soon!</string>
+    <string name="pick_under_construction_title">Work in progress</string>
+    <string name="prep_under_construction_body">Coming soon to an app near you: separated staging and packing, so we work like you work.</string>
+    <string name="prep_under_construction_title">Breaking news</string>
 
     <!-- Search Results -->
-    <string name="strike">Strike!</string>
+    <string name="strike">No Results!</string>
     <string name="search_results_info"> Scan a barcode or enter a name, phone number, or order number.</string>
 
     <!-- Order Pickup -->

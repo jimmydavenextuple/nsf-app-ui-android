@@ -43,6 +43,7 @@ fun OrderCardList(
 						orderType = it.fulfillmentRequestDetail.subFulfillmentType.orEmpty(),
 						athleteShortName = it.athleteDetail?.athleteShortName().orEmpty(),
 						athleteSddShortName = it.athleteDetail?.sddShortName().orEmpty(),
+						orderNo = it.orderNumber.orEmpty(),
 						athleteLocation = it.athleteCheckInDetail?.athleteLocation.orEmpty(),
 						holdingLocation = it.fulfillmentRequestDetail.holdingLocation.orEmpty(),
 						orderStatus = OrderStatus.getByStatus(it.orderStatusText.orEmpty()),

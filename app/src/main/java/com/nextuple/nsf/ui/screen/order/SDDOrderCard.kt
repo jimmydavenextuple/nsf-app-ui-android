@@ -159,6 +159,8 @@ fun SDDOrderCard(
 						athleteShortName = it.athleteDetail?.athleteShortName().orEmpty(),
 						athleteSddShortName = it.athleteDetail?.sddShortName()?.uppercase()
 							.orEmpty(),
+						orderNo = it.orderNumber?.uppercase()
+							.orEmpty(),
 						athleteLocation = "",
 						holdingLocation = it.fulfillmentRequestDetail.holdingLocation.orEmpty(),
 						orderStatus = orderStatus,

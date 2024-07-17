@@ -2,6 +2,7 @@ package com.nextuple.nsf.ui.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,9 +30,10 @@ fun SecondaryButton(
 	buttonColor: Color = Color.Transparent,
 	textColor: Color = BrandColor.GRAY_900,
 	textSize: TextUnit = 16.sp,
-	buttonShape: Shape = RoundedCornerShape(4.dp),
+	buttonShape: Shape = RoundedCornerShape(0.dp),
 	enabled: Boolean = true,
 	buttonState: ButtonState = ButtonState.DEFAULT,
+	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
 	onButtonClick: () -> Unit
 ) {
 	Button(
@@ -47,6 +49,7 @@ fun SecondaryButton(
 			contentColor = textColor,
 			disabledContentColor = BrandColor.GRAY_600
 		),
+		contentPadding = contentPadding,
 		enabled = enabled
 	) {
 		when (buttonState) {

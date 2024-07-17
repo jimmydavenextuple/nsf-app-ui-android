@@ -50,6 +50,7 @@ fun OrderCard(
 	orderType: String,
 	athleteShortName: String,
 	athleteSddShortName: String? = null,
+	orderNo: String,
 	athleteLocation: String,
 	holdingLocation: String,
 	orderStatus: OrderStatus,
@@ -63,6 +64,7 @@ fun OrderCard(
 			orderType = orderType,
 			athleteShortName = athleteShortName,
 			athleteSddShortName = athleteSddShortName,
+			orderNumber = orderNo,
 			athleteLocation = athleteLocation,
 			holdingLocation = holdingLocation,
 			orderStatus = orderStatus,
@@ -84,6 +86,7 @@ fun OrderCard(
 				orderType = orderType,
 				athleteShortName = athleteShortName,
 				athleteLocation = athleteLocation,
+				orderNumber = orderNo,
 				holdingLocation = holdingLocation,
 				orderStatus = orderStatus,
 				isReadyOrder = isReadyOrder,
@@ -99,6 +102,7 @@ fun AthleteDetail(
 	orderType: String,
 	athleteShortName: String,
 	athleteSddShortName: String? = null,
+	orderNumber: String,
 	athleteLocation: String,
 	holdingLocation: String,
 	orderStatus: OrderStatus?,
@@ -121,7 +125,7 @@ fun AthleteDetail(
 
 			Column(
 				modifier = Modifier.fillMaxHeight(),
-				verticalArrangement = Arrangement.SpaceBetween
+				verticalArrangement = Arrangement.SpaceEvenly
 			) {
 				Text(
 					text = athleteShortName,
@@ -130,6 +134,15 @@ fun AthleteDetail(
 					color = BrandColor.GRAY_900,
 					letterSpacing = 0.5.sp
 				)
+				if (orderNumber.isNotEmpty()) {
+					Text(
+						text = orderNumber,
+						fontSize = 10.sp,
+						fontWeight = FontWeight(700),
+						color = BrandColor.GRAY_600,
+						letterSpacing = 1.5.sp
+					)
+				}
 
 				// TODO: Add else with teammate name once available in API responses.
 				if (isReadyOrder) {
@@ -280,6 +293,7 @@ private fun PreviewOrderCard() {
 		modifier = Modifier.fillMaxWidth(),
 		orderType = "BOPIS",
 		athleteShortName = "Litt, L.",
+		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "Spot #2",
 		holdingLocation = "Main Holding Area Bin 2",
 		athleteSddShortName = null,
@@ -294,6 +308,7 @@ private fun PreviewOrderCardAged() {
 		modifier = Modifier.fillMaxWidth(),
 		orderType = SubFulfillmentType.BOPIS.subFulfillmentTypeName,
 		athleteShortName = "Litt, L.",
+		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
 		orderStatus = OrderStatus.AGED
@@ -307,6 +322,7 @@ private fun PreviewOrderCardReadySdd() {
 		modifier = Modifier.fillMaxWidth(),
 		orderType = SubFulfillmentType.SAME_DAY.subFulfillmentTypeName,
 		athleteShortName = "Litt, L.",
+		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
 		orderStatus = OrderStatus.READY
@@ -320,6 +336,7 @@ private fun PreviewOrderCardReady() {
 		modifier = Modifier.fillMaxWidth(),
 		orderType = SubFulfillmentType.BOPIS.subFulfillmentTypeName,
 		athleteShortName = "Litt, L.",
+		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
 		orderStatus = OrderStatus.READY
@@ -333,6 +350,7 @@ private fun PreviewOrderCardInProgress() {
 		modifier = Modifier.fillMaxWidth(),
 		orderType = SubFulfillmentType.BOPIS.subFulfillmentTypeName,
 		athleteShortName = "Litt, L.",
+		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
 		orderStatus = OrderStatus.BEING_PACKED
@@ -347,6 +365,7 @@ private fun PreviewSDDOrderCard() {
 		orderType = SubFulfillmentType.SAME_DAY.subFulfillmentTypeName,
 		athleteShortName = "Litt, C.",
 		athleteSddShortName = "Chicken L.",
+		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
 		orderStatus = CHECKED_IN
@@ -361,6 +380,7 @@ private fun PreviewSDDOrderPickupCard() {
 		orderType = SubFulfillmentType.SAME_DAY.subFulfillmentTypeName,
 		athleteShortName = "Litt, C.",
 		athleteSddShortName = "Chicken L.",
+		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
 		imageList = listOf("asdf", "asdf", "asdf"),

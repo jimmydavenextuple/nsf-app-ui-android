@@ -38,9 +38,8 @@ import coil.compose.AsyncImage
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
-import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.ScanIcon
-import com.nextuple.nsf.ui.theme.BrandColor
+import com.nextuple.nsf.ui.common.SecondaryButton
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -151,7 +150,7 @@ fun PackTaskItemCard(
 		}
 
 		if (declineEnabled) {
-			PrimaryButton(
+			SecondaryButton(
 				modifier = Modifier
 					.align(Alignment.CenterEnd)
 					.width(70.dp)
@@ -160,7 +159,6 @@ fun PackTaskItemCard(
 						translationX = 80.dp.toPx()
 					},
 				buttonShape = RoundedCornerShape(0.dp),
-				buttonColor = BrandColor.GRAY_800,
 				onButtonClick = {
 					scope.launch {
 						state.animateTo(DragAnchors.Start)

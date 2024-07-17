@@ -38,7 +38,6 @@ fun DetailedCallToAction(
 				color = detailedCallToActionMode.backgroundColor,
 				shape = RoundedCornerShape(0.dp)
 			)
-			.padding(start = 20.dp, end = 20.dp)
 			.clickable { onClick() }
 			.testTag("detailedCallToAction")
 	) {

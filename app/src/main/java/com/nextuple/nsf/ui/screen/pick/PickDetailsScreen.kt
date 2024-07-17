@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -70,6 +69,7 @@ import com.nextuple.nsf.ui.common.ImageModal
 import com.nextuple.nsf.ui.common.MultiOptionModal
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.ScrollToReveal
+import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.theme.BrandColor
@@ -307,10 +307,10 @@ fun PickDetailsScreen(
 
 						Row(
 							modifier = Modifier
-								.fillMaxWidth()
-								.fillMaxHeight(),
+								.padding(top = 20.dp)
+								.fillMaxWidth(),
 							horizontalArrangement = Arrangement.Center,
-							verticalAlignment = Alignment.Bottom
+							verticalAlignment = Alignment.Bottom,
 						) {
 							Column(
 								modifier = Modifier.fillMaxWidth(),
@@ -369,15 +369,14 @@ fun PickDetailsScreen(
 								)
 							}
 						}
+
 					}
 				},
 				secondaryContent = {
-					PrimaryButton(
+					SecondaryButton(
 						modifier = Modifier
-							.fillMaxWidth()
-							.height(72.dp),
+							.fillMaxWidth(.83f),
 						buttonShape = RoundedCornerShape(0.dp),
-						buttonColor = BrandColor.GRAY_800,
 						buttonState =
 						if (declineCodesState == GenericViewState.Loading) {
 							ButtonState.LOADING

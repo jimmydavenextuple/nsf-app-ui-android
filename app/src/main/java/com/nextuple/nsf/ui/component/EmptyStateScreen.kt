@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -36,9 +37,7 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 		)
 
 		Text(
-			modifier = Modifier
-				.width(215.dp)
-				.padding(top = 10.dp),
+			modifier = Modifier,
 			text = title,
 			fontSize = 20.sp,
 			fontWeight = FontWeight.Bold,
@@ -46,9 +45,7 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 			letterSpacing = 0.5.sp
 		)
 		Text(
-			modifier = Modifier
-				.width(300.dp)
-				.padding(top = 10.dp),
+			modifier = Modifier.fillMaxWidth(.9f),
 			text = body,
 			fontSize = 14.sp,
 			lineHeight = 16.sp,

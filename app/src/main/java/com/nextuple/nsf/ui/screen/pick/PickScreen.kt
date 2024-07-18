@@ -283,8 +283,7 @@ private fun PickupTabContainer(
 						.width(width = 200.dp),
 					text = "START PICKING",
 					enabled = tasksUnassigned != 0,
-					onButtonClick = onStartPicking,
-					buttonShape = RoundedCornerShape(22.dp),
+					onButtonClick = onStartPicking
 					)
 
 				if (showInfoModal) {
@@ -370,6 +369,22 @@ fun PreviewPickLanding() {
 		inProgressUnits = null,
 		storeOverviewState = GenericViewState.Idle,
 		startTaskStatus = GenericViewState.Idle,
+		onStartPicking = {},
+		startTaskCompletion = {},
+		resetScreen = {}
+	)
+}
+
+@Composable
+@PreviewPdt
+fun PreviewPickLandingStartPicking() {
+	PickLanding(
+		tasksUnassigned = null,
+		unitsWorked = 1,
+		totalUnits = 1,
+		inProgressUnits = null,
+		storeOverviewState = GenericViewState.Success,
+		startTaskStatus = GenericViewState.Success,
 		onStartPicking = {},
 		startTaskCompletion = {},
 		resetScreen = {}

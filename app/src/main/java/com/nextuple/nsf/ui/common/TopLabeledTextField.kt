@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -92,7 +93,7 @@ fun TopLabeledTextField(
 					shape = textFieldShape
 				)
 				.background(
-					color = if (isInvalid) BrandColor.RED_100 else Color.White,
+					color = if (isInvalid) Color(0xCCF6E1E3) else Color(0xCCFFFFFF),
 					// rounded corner to match with the OutlinedTextField
 					shape = textFieldShape
 				),
@@ -124,7 +125,8 @@ fun TopLabeledTextField(
 			BasicTextField(
 				modifier = Modifier
 					.weight(1f)
-					.testTag("TopLabeledTextFieldFieldValue"),
+					.testTag("TopLabeledTextFieldFieldValue")
+					.alpha(0.5f),
 				textStyle = textStyle,
 				value = fieldValue,
 				onValueChange = onValueChange,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -55,11 +56,12 @@ fun EditLocation(
 	scanManager: ScanManager?,
 	containers: List<StageTaskContainer>?,
 	holdingLocation: String?,
-	holdingAreas: List<String>
+	holdingAreas: List<String>,
+	selectHoldingActive: Boolean = true
 ) {
 	val context = LocalContext.current
 	var selectedHoldingArea by remember { mutableStateOf(holdingLocation ?: "") }
-	var isSelectHoldingActive by remember { mutableStateOf(true) }
+	var isSelectHoldingActive by remember { mutableStateOf(selectHoldingActive) }
 
 	LaunchedEffect(Unit) {
 		scanManager?.set { data, _ ->
@@ -171,13 +173,14 @@ fun EditLocation(
 								) {
 									Image(
 										modifier = Modifier
-											.padding(top = 2.dp),
+											.padding(top = 2.dp)
+											.height(160.dp),
 										imageVector = ImageVector.vectorResource(R.drawable.scan_location),
 										contentDescription = "Scanning Bin"
 									)
 									DetailedCallToAction(
 										modifier = Modifier
-											.padding(0.dp)
+											.padding(top = 20.dp)
 											.align(Alignment.CenterHorizontally),
 										detailedCallToActionMode = when (scanLocationState) {
 											is GenericViewState.Loading -> DetailedCallToActionMode.Loading()
@@ -222,5 +225,21 @@ fun EditLocationModalPreview() {
 		scanLocationState = GenericViewState.Idle,
 		holdingAreas = emptyList(),
 		subfulfillmentType = "BOPL"
+	)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditLocationModalPreview_ScanLocation() {
+	EditLocation(
+		onDismissRequest = {},
+		onLocationChange = { _, _ -> },
+		scanManager = null,
+		holdingLocation = "",
+		containers = emptyList(),
+		scanLocationState = GenericViewState.Success,
+		holdingAreas = emptyList(),
+		subfulfillmentType = "BOPIS",
+		selectHoldingActive = false
 	)
 }

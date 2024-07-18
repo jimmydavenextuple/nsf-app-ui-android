@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
@@ -37,7 +38,10 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 		)
 
 		Text(
-			modifier = Modifier,
+			modifier = Modifier
+				.width(215.dp)
+				.padding(top = 10.dp),
+			textAlign = TextAlign.Center,
 			text = title,
 			fontSize = 20.sp,
 			fontWeight = FontWeight.Bold,
@@ -47,6 +51,7 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 		Text(
 			modifier = Modifier.fillMaxWidth(.9f),
 			text = body,
+			textAlign = TextAlign.Center,
 			fontSize = 14.sp,
 			lineHeight = 16.sp,
 			fontWeight = FontWeight.Normal,

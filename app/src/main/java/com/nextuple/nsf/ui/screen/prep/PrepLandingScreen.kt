@@ -202,3 +202,9 @@ fun PreviewPrepLandingScreen() {
 		onClickPackByOrder = {}
 	) {}
 }
+
+@Composable
+@PreviewPdt
+fun StageTabContainerPreview() {
+	StageTabContainer()
+}

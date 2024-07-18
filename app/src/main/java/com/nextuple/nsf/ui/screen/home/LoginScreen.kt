@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -180,7 +181,7 @@ fun LoginScreen(
 			)
 			TopLabeledTextField(
 				modifier = Modifier
-					.padding(top = 2.dp),
+					.padding(top = 20.dp),
 				labelColor = Color.White,
 				labelText = "",
 				hintText = stringResource(id = R.string.login_node_id_text_label),
@@ -274,7 +275,7 @@ private fun PreviewLoginScreen() {
 	LoginScreen(
 		isFormInvalid = false,
 		resetIsFormInvalid = {},
-		errorMessage = null,
+		errorMessage = "",
 		showProgressBar = false,
 		onSubmit = { _, _ -> },
 		isLoggedIn = false,

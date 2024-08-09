@@ -35,7 +35,8 @@ class TopLabeledTextFieldTest : ScreenshotTest {
 					modifier = testModifier,
 					labelText = labelText,
 					fieldValue = fieldValue,
-					onValueChange = {}
+					onValueChange = {},
+					hintText = "Test"
 				)
 			}
 

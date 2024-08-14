@@ -33,10 +33,10 @@ def KEY_PASSWORD = Util.getEnv('KEY_PASSWORD')
 
 def USER_ID = Util.getEnv('USER')
 
-def GOAT_API_URL_LOCAL = Util.getEnv('GOAT_API_LOCAL')
-def GOAT_API_URL_DEV = Util.getEnv('GOAT_API_DEV')
-def GOAT_API_URL_STAGE = Util.getEnv('GOAT_API_STAGE')
-def GOAT_API_URL_PROD = Util.getEnv('GOAT_API_PROD')
+def GOAT_API_URL_LOCAL = Util.getEnv('GOAT_API_URL_LOCAL')
+def GOAT_API_URL_DEV = Util.getEnv('GOAT_API_URL_DEV')
+def GOAT_API_URL_DEMO = Util.getEnv('GOAT_API_URL_DEMO')
+def GOAT_API_URL_PROD = Util.getEnv('GOAT_API_URL_PROD')
 
 android {
 	namespace 'com.nextuple.nsf'
@@ -102,10 +102,10 @@ android {
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 
-		stage {
-			applicationId "com.nextuple.nsf.stage"
+		demo {
+			applicationId "com.nextuple.nsf.dev"
 
-			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_STAGE\""
+			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_DEMO\""
 
 			// DEBUG-only
 			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"

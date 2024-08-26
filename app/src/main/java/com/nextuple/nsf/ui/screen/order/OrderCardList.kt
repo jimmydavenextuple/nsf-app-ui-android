@@ -42,7 +42,7 @@ fun OrderCardList(
 							.padding(horizontal = 16.dp, vertical = 4.dp),
 						orderType = it.fulfillmentRequestDetail.subFulfillmentType.orEmpty(),
 						athleteShortName = it.athleteDetail?.athleteShortName().orEmpty(),
-						athleteSddShortName = it.athleteDetail?.sddShortName().orEmpty(),
+						sddDriverDetail = it.driverDetail,
 						orderNo = it.orderNumber.orEmpty(),
 						athleteLocation = it.athleteCheckInDetail?.athleteLocation.orEmpty(),
 						holdingLocation = it.fulfillmentRequestDetail.holdingLocation.orEmpty(),

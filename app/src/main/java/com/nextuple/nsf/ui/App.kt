@@ -429,7 +429,7 @@ private fun NavGraphBuilder.composableForOrders(
 				orderVM.resetOrderDetailsState()
 			},
 			readyOrders = orderVM.readyOrders,
-			sddReadyOrder = orderVM.sddOrderByBatchIds,
+//			sddReadyOrder = orderVM.sddOrderByBatchIds,
 			inProgressOrders = orderVM.inProgressOrders,
 			orderTypeFilters = orderVM.orderTypeFilters,
 			orderStatusFilters = orderVM.orderStatusFilters,

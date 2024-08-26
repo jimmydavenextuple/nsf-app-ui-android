@@ -1,10 +1,12 @@
 package com.nextuple.nsf.ui.screen.order
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.string
+import com.nextuple.nsf.retrofit.dto.response.DriverDetail
+import com.nextuple.nsf.retrofit.dto.response.sddShortName
 import com.nextuple.nsf.ui.common.ScanIcon
 import com.nextuple.nsf.ui.common.chip.OrderStatusChip
 import com.nextuple.nsf.ui.theme.BrandColor
@@ -49,7 +53,7 @@ fun OrderCard(
 	modifier: Modifier = Modifier,
 	orderType: String,
 	athleteShortName: String,
-	athleteSddShortName: String? = null,
+	sddDriverDetail: DriverDetail? = null,
 	orderNo: String,
 	athleteLocation: String,
 	holdingLocation: String,
@@ -59,21 +63,75 @@ fun OrderCard(
 	onClick: () -> Unit
 ) {
 	val isReadyOrder = OrderStatus.isReadyStatusText(orderStatus.statusText)
-	if (orderType == SubFulfillmentType.SAME_DAY.subFulfillmentTypeName && (orderStatus == CHECKED_IN || orderStatus == DEFAULT)) {
-		AthleteDetail(
-			orderType = orderType,
-			athleteShortName = athleteShortName,
-			athleteSddShortName = athleteSddShortName,
-			orderNumber = orderNo,
-			athleteLocation = athleteLocation,
-			holdingLocation = holdingLocation,
-			orderStatus = orderStatus,
-			indicatorSize = 4,
-			isReadyOrder = true,
-			imageList = imageList,
-			isScanned = isScanned,
-			onClick = {}
-		)
+	if (orderType == SubFulfillmentType.SAME_DAY.subFulfillmentTypeName && (orderStatus == CHECKED_IN)) {
+		Card(
+			modifier = modifier.wrapContentHeight(),
+			shape = RoundedCornerShape(12.dp),
+			onClick = onClick,
+			colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_50),
+			elevation = CardDefaults.cardElevation(3.dp)
+		) {
+			Row(
+				modifier = Modifier.padding(top = 12.dp)
+			) {
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Image(
+						modifier = Modifier
+							.padding(horizontal = 8.dp)
+							.size(24.dp),
+						painter = painterResource(id = R.drawable.ic_doordash_logo),
+						contentDescription = "doordash logo"
+					)
+					Text(
+						text = sddDriverDetail?.sddShortName()
+							.orEmpty(),
+						style = TextStyle(
+							fontSize = 18.sp,
+							lineHeight = 23.4.sp,
+							fontWeight = FontWeight(700),
+							color = BrandColor.BLACK,
+
+							letterSpacing = 0.5.sp
+						)
+					)
+				}
+				Row(modifier = Modifier, verticalAlignment = Alignment.Top) {
+					Column(
+						Modifier
+							.fillMaxWidth()
+							.padding(end = 16.dp)
+					) {
+						OrderStatusChip(
+							modifier = Modifier.align(Alignment.End),
+							statusText = orderStatus.statusText
+						)
+						Spacer(modifier = Modifier.size(2.dp))
+						if (athleteLocation.isNotEmpty()) {
+							athleteLocation.let {
+								OrderStatusChip(
+									modifier = Modifier.align(Alignment.End),
+									statusText = it
+								)
+							}
+						}
+					}
+				}
+			}
+			AthleteDetail(
+				orderType = orderType,
+				athleteShortName = athleteShortName,
+				sddDriverDetail = sddDriverDetail,
+				orderNumber = orderNo,
+				athleteLocation = athleteLocation,
+				holdingLocation = holdingLocation,
+				orderStatus = orderStatus,
+				indicatorSize = 4,
+				isReadyOrder = true,
+				imageList = imageList,
+				isScanned = isScanned,
+				onClick = onClick
+			)
+		}
 	} else {
 		Card(
 			modifier = modifier.wrapContentHeight(),
@@ -101,7 +159,7 @@ fun AthleteDetail(
 	modifier: Modifier = Modifier,
 	orderType: String,
 	athleteShortName: String,
-	athleteSddShortName: String? = null,
+	sddDriverDetail: DriverDetail? = null,
 	orderNumber: String,
 	athleteLocation: String,
 	holdingLocation: String,
@@ -162,19 +220,7 @@ fun AthleteDetail(
 			horizontalAlignment = Alignment.End
 		) {
 			Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-				if (!athleteSddShortName.isNullOrEmpty()) {
-					// SDD ALT Name
-					Text(
-						text = "ALT: $athleteSddShortName",
-						style = TextStyle(
-							fontSize = 10.sp,
-							fontWeight = FontWeight(700),
-							color = BrandColor.GRAY_600,
-							textAlign = TextAlign.Right,
-							letterSpacing = 1.5.sp
-						)
-					)
-				} else {
+				if (sddDriverDetail == null) {
 					OrderStatusChip(
 						modifier = Modifier.align(Alignment.End),
 						statusText = orderStatus?.statusText ?: ""
@@ -191,7 +237,7 @@ fun AthleteDetail(
 					)
 				}
 			}
-			if (athleteSddShortName.isNullOrEmpty()) {
+			if (sddDriverDetail == null) {
 				Text(
 					modifier = Modifier
 						.padding(end = 8.dp)
@@ -296,7 +342,7 @@ private fun PreviewOrderCard() {
 		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "Spot #2",
 		holdingLocation = "Main Holding Area Bin 2",
-		athleteSddShortName = null,
+		sddDriverDetail = null,
 		orderStatus = OrderStatus.CHECKED_IN
 	) {}
 }
@@ -364,7 +410,9 @@ private fun PreviewSDDOrderCard() {
 		modifier = Modifier.fillMaxWidth(),
 		orderType = SubFulfillmentType.SAME_DAY.subFulfillmentTypeName,
 		athleteShortName = "Litt, C.",
-		athleteSddShortName = "Chicken L.",
+		sddDriverDetail = DriverDetail(
+			name = "Chicken L.",
+		),
 		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
@@ -374,16 +422,18 @@ private fun PreviewSDDOrderCard() {
 
 @Composable
 @Preview
-private fun PreviewSDDOrderPickupCard() {
+private fun PreviewSDDOrderCardWithImages() {
 	OrderCard(
 		modifier = Modifier.fillMaxWidth(),
 		orderType = SubFulfillmentType.SAME_DAY.subFulfillmentTypeName,
 		athleteShortName = "Litt, C.",
-		athleteSddShortName = "Chicken L.",
+		sddDriverDetail = DriverDetail(
+			name = "Chicken L.",
+		),
 		orderNo = "DEV_ORDER_JUL16-7",
 		athleteLocation = "",
 		holdingLocation = "Main Holding Area Bin 2",
-		imageList = listOf("asdf", "asdf", "asdf"),
-		orderStatus = DEFAULT
+		imageList = listOf("asdf", "asdf"),
+		orderStatus = CHECKED_IN
 	) {}
 }

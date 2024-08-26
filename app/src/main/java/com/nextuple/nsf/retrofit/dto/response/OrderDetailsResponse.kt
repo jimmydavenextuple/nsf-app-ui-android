@@ -2,6 +2,7 @@ package com.nextuple.nsf.retrofit.dto.response
 
 import com.nextuple.nsf.retrofit.dto.StageTaskContainer
 import com.nextuple.nsf.retrofit.dto.Status
+import java.time.Instant
 
 data class OrderDetailsResponse(
 	/*
@@ -41,9 +42,10 @@ data class AthleteDetail(
 )
 
 data class DriverDetail(
-	val driverFirstName: String? = null,
-	val driverLastName: String? = null,
-	val batchId: String? = null
+	val batchId: String? = null,
+	val name: String? = null,
+	val checkedInTime: String? = null,
+	val carrierName: String? = null,
 )
 
 data class AthleteCheckInDetail(
@@ -85,7 +87,7 @@ fun AthleteDetail.sddShortName() =
 	"${athleteFirstName.orEmpty()} ${athleteLastName?.firstOrNull() ?: ""}."
 
 fun DriverDetail.sddShortName() =
-	"${driverFirstName.orEmpty()} ${driverLastName?.firstOrNull() ?: ""}."
+	name.orEmpty()
 
 fun AthleteDetail.athleteProxyFullName() =
 	"${athleteProxyFirstName.orEmpty()} ${athleteProxyLastName.orEmpty()}".trim()

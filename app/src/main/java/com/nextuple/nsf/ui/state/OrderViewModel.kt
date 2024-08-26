@@ -151,11 +151,11 @@ class OrderViewModel @Inject constructor(
 
 	val readyOrders by derivedStateOf {
 		orderList.orEmpty().filter {
-			OrderStatus.isReadyStatusText(it.orderStatusText) && !(
-				it.fulfillmentRequestDetail.subFulfillmentType == SubFulfillmentType.SAME_DAY.name && OrderStatus.isCheckedInStatus(
-					it.orderStatusText
-				)
-				)
+			OrderStatus.isReadyStatusText(it.orderStatusText)
+//					&& !(
+//							it.fulfillmentRequestDetail.subFulfillmentType == SubFulfillmentType.SAME_DAY.name
+//									&& OrderStatus.isCheckedInStatus(it.orderStatusText)
+//					)
 		}
 	}
 	private val sddReadyOrders by derivedStateOf {

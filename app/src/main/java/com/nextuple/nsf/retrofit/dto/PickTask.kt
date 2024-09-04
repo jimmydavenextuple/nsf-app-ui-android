@@ -8,7 +8,7 @@ data class PickTask(
 	val id: Long,
 	val fulfillmentType: FulfillmentType,
 	val subFulfillmentType: SubFulfillmentType,
-	val items: List<PickTaskItem>,
+	var items: List<PickTaskItem>,
 	val pickedQty: Int? = null,
 	val declinedQty: Int? = null,
 	val totalWorkedQty: Int,
@@ -36,7 +36,14 @@ data class PickTaskItem(
 	val clearanceColorDesc: String? = null,
 	val clearanceColorRgb: String? = null,
 	val lastReturn: Instant? = null,
-	val lastReceived: Instant? = null
+	val lastReceived: Instant? = null,
+	val substituted: String? = null,
+	val substitutedSku: String? = null,
+	var substitutionAllowed: String? = null,
+	var substitutions: List<PickTaskItem>? = null,
+	var originalItem: PickTaskItem? = null,
+	var originalItemDeclineReason: String? = null,
+	var originalItemDeclineReasonText: String? = null
 ) {
 	fun getRemainingPickQty() = qty - pickedQty - declinedQty
 }

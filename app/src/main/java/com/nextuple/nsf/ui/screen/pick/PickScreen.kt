@@ -100,6 +100,7 @@ fun PickScreen(
 
 		else -> when {
 			pickVM.pickTask != null -> {
+				pickVM.updateCurrentPickItem()
 				PickDetailsScreen(
 					scanManager = scanManager,
 					pickDeclineState = pickVM.pickDeclineState,

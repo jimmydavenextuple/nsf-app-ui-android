@@ -3,6 +3,7 @@ package com.nextuple.nsf.ui.state
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,10 +44,16 @@ open class PickViewModel @Inject constructor(
 	var currentPickItem: PickTaskItem? by mutableStateOf(null)
 		private set
 
+	var showSubstitutionModal = MutableLiveData<Boolean>(false)
+
 	fun updateCurrentPickItem() {
 		currentPickItem = pickTask?.items?.find {
 			it.pickedQty.plus(it.declinedQty) != it.qty
 		}
+	}
+
+	fun toggleShowSubstitutionModal() {
+		showSubstitutionModal.value = !showSubstitutionModal.value!!
 	}
 
 	fun resetPickScreen() {
@@ -94,7 +101,10 @@ open class PickViewModel @Inject constructor(
 
 	fun declinePick(declineReason: String, declineReasonText: String) {
 		if (!currentPickItem?.substitutionAllowed.isNullOrEmpty() && !currentPickItem?.substitutions.isNullOrEmpty()) {
-			extractedFun(declineReason, declineReasonText)
+			if (currentPickItem?.originalItem == null) {
+				setOriginalItemDeclineReason(declineReason, declineReasonText)
+			}
+			showSubstitutionModal.value = true
 		} else {
 		pickDeclineState = GenericViewState.Loading
 		viewModelScope.launch {
@@ -121,33 +131,44 @@ open class PickViewModel @Inject constructor(
 		}
 	}
 
-	private fun extractedFun(declineReason: String, declineReasonText: String) {
+	private fun setOriginalItemDeclineReason(declineReason: String, declineReasonText: String) {
+		val currentItemIdx = pickTask?.items?.indexOf(currentPickItem)
+		// create a copy of (pick task) items
+		val updatedItems = (pickTask?.items?.toMutableList() ?: emptyList()).toMutableList()
+		updatedItems[currentItemIdx!!].originalItemDeclineReason = declineReason
+		updatedItems[currentItemIdx].originalItemDeclineReasonText = declineReasonText
+		// update (pick task) items
+		pickTask?.items = updatedItems
+	}
+
+	fun onSubstitutionSelected(sku: String) {
 		val currentItemIdx = pickTask?.items?.indexOf(currentPickItem)
 		val currentItemSubstitutions = (currentPickItem?.substitutions ?: emptyList()).toMutableList()
-		if (currentItemIdx != null) {
-			// create a copy of (pick task) items
-			val updatedItems = (pickTask?.items?.toMutableList() ?: emptyList()).toMutableList()
-			// update current item to preferred substitution item
-			updatedItems[currentItemIdx] = currentItemSubstitutions.first()
-			// remove preferred substitution item from substitutions
-			currentItemSubstitutions.removeAt(0)
 
-			if (currentItemSubstitutions.isNotEmpty()) {
-				// substitutions isNotEmpty
-				// set substitutionAllowed and substitutions for current item
-				updatedItems[currentItemIdx].substitutionAllowed = "Y"
-				updatedItems[currentItemIdx].substitutions = currentItemSubstitutions
-			}
+		// create a copy of (pick task) items
+		val updatedItems = (pickTask?.items?.toMutableList() ?: emptyList()).toMutableList()
+		// update current item to selected substitution item
+		val selectedSubstitution = currentItemSubstitutions.find { it.sku == sku }!!
+		updatedItems[currentItemIdx!!] = selectedSubstitution
+		// remove selected substitution item from substitutions
+		currentItemSubstitutions.removeAt(currentItemSubstitutions.indexOf(selectedSubstitution))
 
-			if (currentPickItem?.originalItem != null) {
-				updatedItems[currentItemIdx].originalItem = currentPickItem?.originalItem
-			} else {
-				updatedItems[currentItemIdx].originalItem = currentPickItem
-				updatedItems[currentItemIdx].originalItemDeclineReason = declineReason
-				updatedItems[currentItemIdx].originalItemDeclineReasonText = declineReasonText
-			}
-			pickTask?.items = updatedItems
+		if (currentItemSubstitutions.isNotEmpty()) {
+			// substitutions isNotEmpty
+			// set substitutionAllowed and substitutions for current item
+			updatedItems[currentItemIdx].substitutionAllowed = "Y"
+			updatedItems[currentItemIdx].substitutions = currentItemSubstitutions
 		}
+
+		if (currentPickItem?.originalItem != null) {
+			updatedItems[currentItemIdx].originalItem = currentPickItem?.originalItem
+		} else {
+			updatedItems[currentItemIdx].originalItem = currentPickItem
+		}
+
+		// update (pick task) items
+		pickTask?.items = updatedItems
+		// update current (pick) item
 		updateCurrentPickItem()
 	}
 

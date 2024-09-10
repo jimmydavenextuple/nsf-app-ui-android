@@ -30,7 +30,8 @@ data class PackTaskItem(
 	@Transient
 	var isScanned: Boolean = false,
 	@Transient
-	var isDeclined: Boolean = false
+	var isDeclined: Boolean = false,
+	var originalItem: PackTaskItem? = null,
 )
 
 data class FITTask(

@@ -37,7 +37,6 @@ data class PickTaskItem(
 	val clearanceColorRgb: String? = null,
 	val lastReturn: Instant? = null,
 	val lastReceived: Instant? = null,
-	val substituted: String? = null,
 	val substitutedSku: String? = null,
 	var substitutionAllowed: String? = null,
 	var substitutions: List<PickTaskItem>? = null,

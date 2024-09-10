@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,6 +33,7 @@ import coil.compose.AsyncImage
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.drawable
 import com.nextuple.nsf.R.string
+import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.PackedItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.common.TertiaryButton
@@ -126,6 +128,7 @@ private fun PackedItemCard(modifier: Modifier = Modifier, packedItem: PackedItem
 
 		Column(modifier = Modifier.padding(top = 3.dp, bottom = 3.dp)) {
 			Text(
+				modifier = Modifier.padding(bottom = 6.dp),
 				text = packedItem.productName,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
@@ -134,6 +137,14 @@ private fun PackedItemCard(modifier: Modifier = Modifier, packedItem: PackedItem
 				letterSpacing = 0.5.sp
 			)
 
+			packedItem.originalItem?.let {
+				Text(
+					text = stringResource(id = R.string.substituted),
+					fontSize = 12.sp,
+					fontWeight = FontWeight.Bold,
+					letterSpacing = 0.5.sp,
+				)
+			}
 			packedItem.primaryAttr?.value?.let {
 				OrderTextInfo(
 					label = packedItem.primaryAttr.name,
@@ -196,7 +207,16 @@ private fun PreviewOrderContentsDropdownBopl() {
 				secondaryAttr = ProductAttribute(name = "Size", value = "M"),
 				tertiaryAttr = null,
 				qty = 1,
-				scannedUpc = "840279623926"
+				scannedUpc = "840279623926",
+				originalItem = PackTaskItem(
+					sku = "20638722",
+					primaryAttr = ProductAttribute(name = "Color", value = "Yellow/Black"),
+					secondaryAttr = null,
+					tertiaryAttr = null,
+					qty = 1,
+					productName = "Wilson OPTX AVP Tour Outdoor Volleyball",
+					productImageUrls = listOf("url")
+				)
 			)
 		)
 	)

@@ -336,6 +336,10 @@ fun OrderDetailsScreen(
 		val packedItemList = orderDetailsResponse?.fulfillmentRequestDetail?.containers?.flatMap {
 			it.packedItems
 		}
+		SubstitutionsAccordion(
+			expanded = false,
+			packedItemList = packedItemList
+		)
 		OrderContentsDropdown(
 			startExpanded = OrderStatus.isCompleteStatus(orderStatus) || orderStatus == OrderStatus.BEING_PACKED || orderStatus == OrderStatus.BEING_STAGED,
 			isBopl = orderType == SubFulfillmentType.BOPL.name,

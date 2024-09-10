@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.string
@@ -67,11 +69,13 @@ import com.nextuple.nsf.ui.common.ClearanceTag
 import com.nextuple.nsf.ui.common.HorizontalProgressBar
 import com.nextuple.nsf.ui.common.ImageModal
 import com.nextuple.nsf.ui.common.MultiOptionModal
+import com.nextuple.nsf.ui.common.MultiOptionSubstitutionModal
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.ScrollToReveal
 import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
+import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
@@ -90,6 +94,7 @@ val OTHER_REASON = "Other".uppercase()
  */
 @Composable
 fun PickDetailsScreen(
+	pickVM: PickViewModel,
 	scanManager: ScanManager,
 	pickDeclineState: GenericViewState = GenericViewState.Idle,
 	recordPickState: GenericViewState = GenericViewState.Idle,
@@ -114,12 +119,17 @@ fun PickDetailsScreen(
 	var showDeclineModal by remember {
 		mutableStateOf(false)
 	}
-	var showPickLocationModal by remember {
+	var showDetailDeclineModal by remember {
 		mutableStateOf(false)
 	}
 	var showImageModal by remember {
 		mutableStateOf(false)
 	}
+	var showPickLocationModal by remember {
+		mutableStateOf(false)
+	}
+	val showSubstitutionModal by pickVM.showSubstitutionModal.observeAsState()
+
 	val clearanceColor by remember {
 		mutableStateOf(currentPickTaskItem?.clearanceColorRgb)
 	}
@@ -133,9 +143,6 @@ fun PickDetailsScreen(
 		mutableStateOf<String?>(null)
 	}
 
-	var showDetailDeclineModal by remember {
-		mutableStateOf(false)
-	}
 	var currentIndex by remember {
 		mutableIntStateOf(0)
 	}
@@ -464,6 +471,7 @@ fun PickDetailsScreen(
 			changeCurrentIndex = { currentIndex = it }
 		)
 	}
+
 	if (showDetailDeclineModal && subFulfillmentType == SubFulfillmentType.BOPL) {
 		DeclineDetailsDialog(
 			onDismissRequest = {
@@ -474,6 +482,21 @@ fun PickDetailsScreen(
 				showDeclineModal = false
 				onDeclineReasonSelected(declineReason, declineReasonText)
 			}
+		)
+	}
+
+	if (showSubstitutionModal == true) {
+		MultiOptionSubstitutionModal(
+			title = "Substitutions Available",
+			subTitle = "The customer has approved substitutions. Please select one to pick it.",
+			buttons = currentPickTaskItem?.substitutions!!,
+			buttonClick = { displayStr ->
+				pickVM.onSubstitutionSelected(displayStr)
+				hideDecline = true
+				pickVM.toggleShowSubstitutionModal()
+			},
+			crossIconClick = { pickVM.toggleShowSubstitutionModal() },
+			onDismissRequest = { pickVM.toggleShowSubstitutionModal() }
 		)
 	}
 }
@@ -752,6 +775,7 @@ private fun DeclineDialogDialogPreview() {
 @PreviewPdt
 fun PickDetailsScreenPreview() {
 	PickDetailsScreen(
+		pickVM = hiltViewModel(),
 		scanManager = NoOpScanManager(),
 		pickDeclineState = GenericViewState.Loading,
 		fulfillmentType = BOPIS,

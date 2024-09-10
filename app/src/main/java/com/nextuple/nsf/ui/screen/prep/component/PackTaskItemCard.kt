@@ -121,6 +121,14 @@ fun PackTaskItemCard(
 				)
 
 				Column(modifier = Modifier.wrapContentHeight()) {
+					packTaskItem.originalItem?.let {
+						Text(
+							text = stringResource(id = R.string.substituted),
+							fontSize = 12.sp,
+							fontWeight = FontWeight.Bold,
+							letterSpacing = 0.5.sp,
+						)
+					}
 					packTaskItem.primaryAttr?.value?.let {
 						TextInfo(
 							label = packTaskItem.primaryAttr.name,
@@ -214,5 +222,14 @@ private val previewPackTaskItem = PackTaskItem(
 		"https://picsum.photos/1705",
 		"https://picsum.photos/1726",
 		"https://picsum.photos/1701"
+	),
+	originalItem = PackTaskItem(
+		sku = "20638722",
+		primaryAttr = ProductAttribute(name = "Color", value = "Yellow/Black"),
+		secondaryAttr = null,
+		tertiaryAttr = null,
+		qty = 1,
+		productName = "Wilson OPTX AVP Tour Outdoor Volleyball",
+		productImageUrls = listOf("url")
 	)
 )

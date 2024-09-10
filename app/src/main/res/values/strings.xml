@@ -73,6 +73,7 @@
     <string name="received_on">RECEIVED ON</string>
     <string name="packer">PACKER</string>
     <string name="stager">STAGER</string>
+    <string name="substitutions_applied">Substitutions Applied</string>
     <string name="dispenser">PICKUP TEAMMATE</string>
     <string name="order_number_or_last_name">Order #, Phone # or Last Name</string>
     <string name="order_search_label">Order Search</string>
@@ -130,6 +131,7 @@
     <string name="scan_to_pack">SCAN UPC TO PACK</string>
     <string name="pack_by_order">PACK BY ORDER</string>
     <string name="scan_pack">Scan and Pack Units</string>
+    <string name="substituted">Substituted</string>
     <string name="pack_order">Pack Order</string>
     <string name="pack_info">Package units in a properly-sized bag, then place the printed hold slip on the front.</string>
     <string name="picked_by">Picked By</string>

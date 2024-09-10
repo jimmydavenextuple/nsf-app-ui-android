@@ -1,9 +1,9 @@
 package com.nextuple.nsf.ui.state
 
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -41,10 +41,19 @@ open class PickViewModel @Inject constructor(
 	var pickTask: PickTask? by mutableStateOf(null)
 		private set
 
-	val currentPickItem: PickTaskItem? by derivedStateOf {
-		pickTask?.items?.find {
+	var currentPickItem: PickTaskItem? by mutableStateOf(null)
+		private set
+
+	var showSubstitutionModal = MutableLiveData<Boolean>(false)
+
+	fun updateCurrentPickItem() {
+		currentPickItem = pickTask?.items?.find {
 			it.pickedQty.plus(it.declinedQty) != it.qty
 		}
+	}
+
+	fun toggleShowSubstitutionModal() {
+		showSubstitutionModal.value = !showSubstitutionModal.value!!
 	}
 
 	fun resetPickScreen() {
@@ -91,14 +100,20 @@ open class PickViewModel @Inject constructor(
 	}
 
 	fun declinePick(declineReason: String, declineReasonText: String) {
+		if (currentPickItem?.substitutionAllowed == true && !currentPickItem?.substitutions.isNullOrEmpty()) {
+			if (currentPickItem?.originalItem == null) {
+				setOriginalItemDeclineReason(declineReason, declineReasonText)
+			}
+			showSubstitutionModal.value = true
+		} else {
 		pickDeclineState = GenericViewState.Loading
 		viewModelScope.launch {
 			val declineItemRequest = DeclineItemRequest(
 				taskId = pickTask?.id ?: 0,
-				sku = currentPickItem?.sku ?: "",
+				sku = currentPickItem?.originalItem?.sku ?: currentPickItem?.sku ?: "",
 				declinedQty = getDeclineQty(),
-				declineReason = declineReason,
-				declineReasonText = declineReasonText
+				declineReason = currentPickItem?.originalItemDeclineReason ?: declineReason,
+				declineReasonText = currentPickItem?.originalItemDeclineReasonText ?: declineReasonText
 			)
 			pickTask =
 				when (val response = pickService.declinePick(req = declineItemRequest)) {
@@ -112,7 +127,49 @@ open class PickViewModel @Inject constructor(
 						null
 					}
 				}
+			}
 		}
+	}
+
+	private fun setOriginalItemDeclineReason(declineReason: String, declineReasonText: String) {
+		val currentItemIdx = pickTask?.items?.indexOf(currentPickItem)
+		// create a copy of (pick task) items
+		val updatedItems = (pickTask?.items?.toMutableList() ?: emptyList()).toMutableList()
+		updatedItems[currentItemIdx!!].originalItemDeclineReason = declineReason
+		updatedItems[currentItemIdx].originalItemDeclineReasonText = declineReasonText
+		// update (pick task) items
+		pickTask?.items = updatedItems
+	}
+
+	fun onSubstitutionSelected(sku: String) {
+		val currentItemIdx = pickTask?.items?.indexOf(currentPickItem)
+		val currentItemSubstitutions = (currentPickItem?.substitutions ?: emptyList()).toMutableList()
+
+		// create a copy of (pick task) items
+		val updatedItems = (pickTask?.items?.toMutableList() ?: emptyList()).toMutableList()
+		// update current item to selected substitution item
+		val selectedSubstitution = currentItemSubstitutions.find { it.sku == sku }!!
+		updatedItems[currentItemIdx!!] = selectedSubstitution
+		// remove selected substitution item from substitutions
+		currentItemSubstitutions.removeAt(currentItemSubstitutions.indexOf(selectedSubstitution))
+
+		if (currentItemSubstitutions.isNotEmpty()) {
+			// substitutions isNotEmpty
+			// set substitutionAllowed and substitutions for current item
+			updatedItems[currentItemIdx].substitutionAllowed = true
+			updatedItems[currentItemIdx].substitutions = currentItemSubstitutions
+		}
+
+		if (currentPickItem?.originalItem != null) {
+			updatedItems[currentItemIdx].originalItem = currentPickItem?.originalItem
+		} else {
+			updatedItems[currentItemIdx].originalItem = currentPickItem
+		}
+
+		// update (pick task) items
+		pickTask?.items = updatedItems
+		// update current (pick) item
+		updateCurrentPickItem()
 	}
 
 	/**
@@ -140,7 +197,8 @@ open class PickViewModel @Inject constructor(
 			recordPickState = GenericViewState.Loading
 			val pickItemRequest = PickItemRequest(
 				taskId = pickTask?.id ?: 0,
-				sku = currentPickItem?.sku ?: "",
+				sku = currentPickItem?.originalItem?.sku ?: currentPickItem?.sku ?: "",
+				substitutedSku = if (currentPickItem?.originalItem != null) currentPickItem?.sku else null,
 				scannedUpc = upc,
 				pickedQty = 1,
 				pickedLocation = pickLocation

@@ -28,7 +28,8 @@ data class PackedItem(
 	val secondaryAttr: ProductAttribute? = null,
 	val tertiaryAttr: ProductAttribute? = null,
 	val qty: Int,
-	val scannedUpc: String? = null
+	val scannedUpc: String? = null,
+	var originalItem: PackTaskItem? = null,
 )
 
 data class Status(

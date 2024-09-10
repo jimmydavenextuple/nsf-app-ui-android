@@ -5,5 +5,6 @@ data class PickItemRequest(
 	val sku: String,
 	val scannedUpc: String,
 	val pickedQty: Int,
-	val pickedLocation: String? = null
+	val pickedLocation: String? = null,
+	val substitutedSku: String? = null
 )

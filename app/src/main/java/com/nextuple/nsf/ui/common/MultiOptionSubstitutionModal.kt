@@ -1,5 +1,6 @@
 package com.nextuple.nsf.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,22 +24,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
 import com.nextuple.nsf.R
+import com.nextuple.nsf.retrofit.dto.PickTaskItem
+import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.ui.theme.BrandColor
 
 @Composable
-fun MultiOptionModal(
+fun MultiOptionSubstitutionModal(
 	title: String?,
 	subTitle: String?,
-	buttons: List<String>,
+	buttons: List<PickTaskItem>,
 	buttonClick: (String) -> Unit,
 	crossIconClick: () -> Unit,
 	backgroundColor: Color = Color.White,
@@ -104,15 +111,17 @@ fun MultiOptionModal(
 					)
 				}
 				if (buttons.isNotEmpty()) {
-					for (index in buttons.indices) {
+					for (item in buttons) {
 						HorizontalDivider(
 							color = BrandColor.DARK_BLUE,
 							thickness = 1.dp
 						)
-						MultiOptionModalButton(
-							modifier = Modifier.fillMaxWidth(),
-							text = buttons[index],
-							onButtonClick = { buttonClick(buttons[index]) }
+						SubstitutionItemCard(
+							Modifier
+								.padding(20.dp, 16.dp, 20.dp, 16.dp)
+								.fillMaxWidth()
+								.clickable { buttonClick(item.sku) },
+							substitutionItem = item
 						)
 					}
 				}
@@ -122,12 +131,72 @@ fun MultiOptionModal(
 }
 
 @Composable
+private fun SubstitutionItemCard(
+	modifier: Modifier = Modifier,
+	substitutionItem: PickTaskItem
+) {
+	Row(
+		modifier = modifier
+	) {
+		AsyncImage(
+			model = substitutionItem.productImageUrls.firstOrNull(),
+			error = painterResource(id = R.drawable.placeholder_image),
+			placeholder = painterResource(id = R.drawable.placeholder_image),
+			contentDescription = null,
+			modifier = Modifier.size(30.dp)
+		)
+		Column(
+			modifier = Modifier
+				.align(Alignment.CenterVertically)
+				.padding(10.dp, 0.dp, 0.dp, 0.dp)
+		) {
+			Text(
+				text = substitutionItem.productName,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
+				fontSize = 14.sp,
+				fontWeight = FontWeight.Bold,
+				letterSpacing = 0.5.sp
+			)
+		}
+	}
+}
+
+@Composable
 @Preview
-fun MultiOptionModalPreview() {
-	MultiOptionModal(
+fun MultiOptionSubstitutionModalPreview() {
+	MultiOptionSubstitutionModal(
 		title = "Unit Locations",
 		subTitle = "This product has multiple locations assigned to it. Where did you pick this unit it from?",
-		buttons = listOf("F1.S1.04A", "F1.S1.04B", "OTHER"),
+		buttons = listOf(
+			PickTaskItem(
+				sku = "2345",
+				productBrand = "BOMBAS",
+				productName = "Hoka Women’s Clifton 9 Running Shoes",
+				productImageUrls = listOf(
+					"https://picsum.photos/1705",
+					"https://picsum.photos/1726",
+					"https://picsum.photos/1701"
+				),
+				productHighResImageUrls = listOf(
+					"https://picsum.photos/1705",
+					"https://picsum.photos/1726",
+					"https://picsum.photos/1701"
+				),
+				locations = listOf("F1.S1.04A"),
+				primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
+				secondaryAttr = ProductAttribute(name = "Size", value = "7.5"),
+				tertiaryAttr = ProductAttribute(name = "Style", value = "12345"),
+				onHandQty = 10,
+				upcs = listOf("4002560185162"),
+				qty = 1,
+				declinedQty = 0,
+				pickedQty = 0,
+				clearanceColorRgb = "0,175,65",
+				clearanceColorDesc = "GREEN",
+				style = null
+			)
+		),
 		buttonClick = { },
 		crossIconClick = { },
 		onDismissRequest = { }

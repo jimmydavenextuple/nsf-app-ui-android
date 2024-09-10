@@ -100,7 +100,7 @@ open class PickViewModel @Inject constructor(
 	}
 
 	fun declinePick(declineReason: String, declineReasonText: String) {
-		if (!currentPickItem?.substitutionAllowed.isNullOrEmpty() && !currentPickItem?.substitutions.isNullOrEmpty()) {
+		if (currentPickItem?.substitutionAllowed == true && !currentPickItem?.substitutions.isNullOrEmpty()) {
 			if (currentPickItem?.originalItem == null) {
 				setOriginalItemDeclineReason(declineReason, declineReasonText)
 			}
@@ -156,7 +156,7 @@ open class PickViewModel @Inject constructor(
 		if (currentItemSubstitutions.isNotEmpty()) {
 			// substitutions isNotEmpty
 			// set substitutionAllowed and substitutions for current item
-			updatedItems[currentItemIdx].substitutionAllowed = "Y"
+			updatedItems[currentItemIdx].substitutionAllowed = true
 			updatedItems[currentItemIdx].substitutions = currentItemSubstitutions
 		}
 

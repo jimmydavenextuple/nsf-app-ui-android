@@ -38,7 +38,7 @@ data class PickTaskItem(
 	val lastReturn: Instant? = null,
 	val lastReceived: Instant? = null,
 	val substitutedSku: String? = null,
-	var substitutionAllowed: String? = null,
+	var substitutionAllowed: Boolean = false,
 	var substitutions: List<PickTaskItem>? = null,
 	var originalItem: PickTaskItem? = null,
 	var originalItemDeclineReason: String? = null,

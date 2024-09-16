@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R.drawable
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun RemovableChip(
@@ -30,7 +29,7 @@ fun RemovableChip(
 ) {
 	Row(
 		modifier = modifier
-			.background(color = BrandColor.BLUE_300_NT, shape = RoundedCornerShape(4.dp))
+			.background(color = BrandColor.DARK_BLUE, shape = RoundedCornerShape(4.dp))
 			.padding(8.dp),
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -38,7 +37,6 @@ fun RemovableChip(
 		Text(
 			text = text,
 			color = BrandColor.GRAY_50,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight(700),
 			fontSize = 10.sp,
 			letterSpacing = 1.sp

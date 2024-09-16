@@ -34,9 +34,9 @@ import javax.inject.Inject
 class PrepViewModel @Inject constructor(
 	@Suppress("UNUSED_PARAMETER")
 	handler: SavedStateHandle,
-    private val infoService: InfoService,
-    private val packService: PackTaskService,
-    private val stageService: StageTaskService
+	private val infoService: InfoService,
+	private val packService: PackTaskService,
+	private val stageService: StageTaskService
 ) : ViewModel() {
 
 	sealed class Step {
@@ -45,13 +45,16 @@ class PrepViewModel @Inject constructor(
 		data object Pack : Step()
 		data object Stage : Step()
 	}
+
 	data class PrepOrder(
 		val subFulfillmentType: String,
 		val athleteName: String,
 		val orderNumber: String,
 		val pickedBy: String,
-		var packItems: List<PackTaskItem> = emptyList()
+		var packItems: List<PackTaskItem> = emptyList(),
+		val holdSlipZPL: MutableList<String> = mutableListOf()
 	)
+
 	var viewState by mutableStateOf<GenericViewState>(GenericViewState.Loading)
 		private set
 	var packTask: PackTask? by mutableStateOf(null)
@@ -73,22 +76,25 @@ class PrepViewModel @Inject constructor(
 	}
 
 	var prepOrder: PrepOrder? by mutableStateOf(null)
-	var holdSlipState: GenericViewState by mutableStateOf(GenericViewState.Idle)
+	var getHoldSlipState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 	var holdLocationState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
-	fun fetchPrepStage() = viewModelScope.launch {
+	var startPackAndGetHoldSlipState by mutableStateOf<GenericViewState>(GenericViewState.Idle)
+		private set
+
+	fun fetchCurrentStep() = viewModelScope.launch {
 		viewState = GenericViewState.Loading
 		when (val response = infoService.getUserPrepTasks()) {
 			is Result.Success -> {
 				val userPrepTasks = response.data
 				packTask = userPrepTasks?.packTask
 				stageTask = userPrepTasks?.stageTask
-	}
+			}
 
 			is Result.Error -> {
 				packTask = null
-		stageTask = null
+				stageTask = null
 				viewState = GenericViewState.Failure
 				return@launch
 			}
@@ -125,6 +131,7 @@ class PrepViewModel @Inject constructor(
 				)
 				toPrepOrder(res.data)
 			}
+
 			is Result.Error -> {
 				viewState = GenericViewState.Failure
 				return@launch
@@ -135,6 +142,7 @@ class PrepViewModel @Inject constructor(
 		}
 		viewState = GenericViewState.Success
 	}
+
 	fun packItem(scannedUpc: String): Boolean {
 		var success = false
 		val updatedPackItems = prepOrder?.packItems?.map {
@@ -148,15 +156,16 @@ class PrepViewModel @Inject constructor(
 		prepOrder = prepOrder?.copy(packItems = updatedPackItems)
 		return success
 	}
-	fun startPack() {
-		viewState = GenericViewState.Loading
+
+	fun startPackAndGetHoldSlip() {
+		startPackAndGetHoldSlipState = GenericViewState.Loading
 		viewModelScope.launch {
 			prepOrder = when (
 				val res = packService.startPackTask(taskId = packTask?.id?.toString() ?: "")
 			) {
 				is Result.Success -> {
 					if (res.data == null) {
-						viewState = GenericViewState.Failure
+						startPackAndGetHoldSlipState = GenericViewState.Failure
 						return@launch
 					}
 					updateUserPrepTasks(
@@ -166,18 +175,20 @@ class PrepViewModel @Inject constructor(
 					)
 					toPrepOrder(res.data)
 				}
+
 				is Result.Error -> {
-					viewState = GenericViewState.Failure
+					startPackAndGetHoldSlipState = GenericViewState.Failure
 					null
 				}
 			}
-			viewState = GenericViewState.Success
+			startPackAndGetHoldSlipState = GenericViewState.Success
 		}
 	}
-	fun completePackAndGetHoldSlip() = packAndGetHoldSlip(isPackStarted = true)
+
+	fun completePack() = packAndGetHoldSlip(isPackStarted = true)
 	fun packAndGetHoldSlip() = packAndGetHoldSlip(isPackStarted = false)
 	private fun packAndGetHoldSlip(isPackStarted: Boolean) {
-		holdSlipState = GenericViewState.Loading
+		getHoldSlipState = GenericViewState.Loading
 		viewModelScope.launch {
 			val taskId = packTask?.id?.toString() ?: ""
 			val res = if (isPackStarted) {
@@ -187,31 +198,34 @@ class PrepViewModel @Inject constructor(
 			}
 			stageTask = when (res) {
 				is Result.Success -> {
-					holdSlipState = GenericViewState.Success
+					getHoldSlipState = GenericViewState.Success
 					res.data
 				}
+
 				is Result.Error -> {
 					if (res.type == Result.ErrorType.NOT_FOUND) {
-						holdSlipState = GenericViewState.Failure
+						getHoldSlipState = GenericViewState.Failure
 					} else {
-						resetHoldSlipState()
+						resetGetHoldSlipState()
 					}
 					null
 				}
 			}
 		}
 	}
+
 	fun declinePackItem(declineReason: String, indexToDecline: Int, itemToDecline: PackTaskItem) {
 		packDeclineState = GenericViewState.Loading
 		viewModelScope.launch {
 			val declineItemRequest = RecordDeclineRequest(
 				fulfillmentRequestNumber = packTask!!.fulfillmentRequestNumber,
-				sku = itemToDecline.sku,
+				sku = itemToDecline.originalItem?.sku ?: itemToDecline.sku,
 				declinedUnits = 1,
 				declinedReason = declineReason,
 				shouldTranslateReason = false,
 				action = DeclineAction.PACK_DECLINE.toString()
 			)
+
 			packDeclineState = when (packService.declinePackItem(req = declineItemRequest)) {
 				is Result.Success -> {
 					val updatedPackItems = prepOrder?.packItems?.mapIndexed { i, item ->
@@ -224,12 +238,14 @@ class PrepViewModel @Inject constructor(
 					prepOrder = prepOrder?.copy(packItems = updatedPackItems)
 					GenericViewState.Success
 				}
+
 				is Result.Error -> {
 					GenericViewState.Failure
 				}
 			}
 		}
 	}
+
 	fun recordHoldingLocation(containerId: Long, holdingLocation: String) {
 		holdLocationState = GenericViewState.Loading
 		viewModelScope.launch {
@@ -241,6 +257,7 @@ class PrepViewModel @Inject constructor(
 				is Result.Success -> {
 					holdLocationState = GenericViewState.Success
 				}
+
 				is Result.Error -> {
 					if (response.type == Result.ErrorType.NOT_FOUND) {
 						holdLocationState = GenericViewState.Failure
@@ -251,18 +268,22 @@ class PrepViewModel @Inject constructor(
 			}
 		}
 	}
-	fun resetHoldSlipState() {
-		holdSlipState = GenericViewState.Idle
+
+	fun resetGetHoldSlipState() {
+		getHoldSlipState = GenericViewState.Idle
 	}
+
 	fun resetHoldLocationState() {
 		holdLocationState = GenericViewState.Idle
 	}
+
 	fun resetPrepState() {
 		stageTask = null
 		packTask = null
 		prepOrder = null
 		viewState = GenericViewState.Success
 	}
+
 	/**
 	 * TODO: Refactor away the need for this.
 	 */
@@ -276,6 +297,7 @@ class PrepViewModel @Inject constructor(
 			)
 		}
 	}
+
 	private fun toPrepOrder(res: PrepDetail): PrepOrder = PrepOrder(
 		subFulfillmentType = res.subFulfillmentType,
 		athleteName = "${res.athleteFirstName} ${res.athleteLastName}",
@@ -284,6 +306,7 @@ class PrepViewModel @Inject constructor(
 		packItems = res.items.flatMap { packTaskItem ->
 			val workableQty = packTaskItem.qty - packTaskItem.declinedQty
 			List(workableQty.coerceAtLeast(0)) { packTaskItem }
-		}
+		},
+		holdSlipZPL = res.holdSlipZPL
 	)
 }

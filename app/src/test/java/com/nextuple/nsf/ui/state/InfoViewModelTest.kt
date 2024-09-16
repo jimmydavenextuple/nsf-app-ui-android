@@ -5,6 +5,7 @@ import com.nextuple.nsf.CoroutineRule
 import com.nextuple.nsf.retrofit.dto.response.DeclineCode
 import com.nextuple.nsf.retrofit.dto.response.GetDeclineCodesResponse
 import com.nextuple.nsf.retrofit.dto.response.StoreOverviewResponse
+import com.nextuple.nsf.retrofit.dto.response.StoreOverviewResponse.PickOverview
 import com.nextuple.nsf.retrofit.dto.response.StoreOverviewResponse.PrepOverview
 import com.nextuple.nsf.service.InfoService
 import com.nextuple.nsf.service.dto.Result
@@ -53,7 +54,7 @@ class InfoViewModelTest {
 	}
 
 	@Test
-	fun `storeOverview for empty dks`() = runTest {
+	fun `storeOverview for empty userId`() = runTest {
 		val errMsg = "Invalid Id."
 		every { runBlocking { infoService.getStoreOverview() } } returns Result.Error(msg = errMsg)
 		vm.getStoreOverview()
@@ -66,8 +67,7 @@ class InfoViewModelTest {
 	fun `storeOverview, on success, should populate userSummary and enter success state`() =
 		runTest {
 			val storeOverview = StoreOverviewResponse(
-				userOverview = StoreOverviewResponse.UserOverview(),
-				pickOverview = StoreOverviewResponse.PickOverview(
+				pickOverview = PickOverview(
 					tasksWorked = 2,
 					tasksInProgress = 1,
 					tasksUnassigned = 1,
@@ -78,8 +78,7 @@ class InfoViewModelTest {
 				),
 				prepOverview = PrepOverview(
 					tasksInProgress = 0,
-					tasksUnassigned = 0,
-					prepTasks = emptyList()
+					tasksUnassigned = 0
 				)
 			)
 			every { runBlocking { infoService.getStoreOverview() } } returns Result.Success(
@@ -106,46 +105,47 @@ class InfoViewModelTest {
 	}
 
 	@Test
-	fun `getDeclineCodes, on success, should populate declineCodes and enter success state`() = runTest {
-		val declineCodes = GetDeclineCodesResponse(
-			pickDeclineCodes = listOf(
-				DeclineCode(
-					id = "",
-					displayName = ""
+	fun `getDeclineCodes, on success, should populate declineCodes and enter success state`() =
+		runTest {
+			val declineCodes = GetDeclineCodesResponse(
+				pickDeclineCodes = listOf(
+					DeclineCode(
+						id = "",
+						displayName = ""
+					),
+					DeclineCode(
+						id = "",
+						displayName = ""
+					),
+					DeclineCode(
+						id = "",
+						displayName = ""
+					)
 				),
-				DeclineCode(
-					id = "",
-					displayName = ""
-				),
-				DeclineCode(
-					id = "",
-					displayName = ""
-				)
-			),
-			pickupDeclineCodes = listOf(
-				DeclineCode(
-					id = "",
-					displayName = ""
-				),
-				DeclineCode(
-					id = "",
-					displayName = ""
-				),
-				DeclineCode(
-					id = "",
-					displayName = ""
+				pickupDeclineCodes = listOf(
+					DeclineCode(
+						id = "",
+						displayName = ""
+					),
+					DeclineCode(
+						id = "",
+						displayName = ""
+					),
+					DeclineCode(
+						id = "",
+						displayName = ""
+					)
 				)
 			)
-		)
 
-		every { runBlocking { infoService.getDeclineCodes() } } returns Result.Success(
-			declineCodes
-		)
-		vm.getDeclineCodes()
-		advanceUntilIdle()
+			every { runBlocking { infoService.getDeclineCodes() } } returns Result.Success(
+				declineCodes
+			)
+			vm.getDeclineCodes()
+			advanceUntilIdle()
 
-		Assert.assertEquals(GenericViewState.Success, vm.declineCodesState)
-		Assert.assertEquals(declineCodes, vm.declineCodes)
-		Assert.assertNull(vm.errMsg)
-	}
+			Assert.assertEquals(GenericViewState.Success, vm.declineCodesState)
+			Assert.assertEquals(declineCodes, vm.declineCodes)
+			Assert.assertNull(vm.errMsg)
+		}
 }

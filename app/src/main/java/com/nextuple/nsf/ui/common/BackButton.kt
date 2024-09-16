@@ -30,7 +30,7 @@ fun BackButton(
 			modifier = Modifier.clickable { onBackButtonClick() },
 			painter = painterResource(id = R.drawable.ic_back_arrow),
 			contentDescription = contentDescription,
-			tint = BrandColor.BLUE_300_NT
+			tint = BrandColor.DARK_BLUE
 		)
 
 		TertiaryButton(text = text) {

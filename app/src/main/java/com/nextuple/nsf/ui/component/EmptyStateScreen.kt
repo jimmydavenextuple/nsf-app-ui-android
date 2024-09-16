@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -15,11 +16,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.PreviewPdt
 
 @Composable
@@ -38,23 +39,21 @@ fun EmptyStateScreen(title: String, body: String, imageVector: ImageVector) {
 
 		Text(
 			modifier = Modifier
-				.width(202.dp)
-				.padding(top = 16.dp),
+				.width(215.dp)
+				.padding(top = 10.dp),
+			textAlign = TextAlign.Center,
 			text = title,
 			fontSize = 20.sp,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			color = BrandColor.GRAY_900,
 			letterSpacing = 0.5.sp
 		)
 		Text(
-			modifier = Modifier
-				.width(202.dp)
-				.padding(top = 8.dp),
+			modifier = Modifier.fillMaxWidth(.9f),
 			text = body,
+			textAlign = TextAlign.Center,
 			fontSize = 14.sp,
 			lineHeight = 16.sp,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Normal,
 			color = BrandColor.GRAY_900,
 			letterSpacing = 0.5.sp

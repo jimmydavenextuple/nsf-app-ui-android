@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -42,7 +43,6 @@ import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.screen.prep.component.SelectHoldingAreaCard
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.ScanManager
 import kotlin.random.Random
@@ -56,11 +56,12 @@ fun EditLocation(
 	scanManager: ScanManager?,
 	containers: List<StageTaskContainer>?,
 	holdingLocation: String?,
-	holdingAreas: List<String>
+	holdingAreas: List<String>,
+	selectHoldingActive: Boolean = true
 ) {
 	val context = LocalContext.current
 	var selectedHoldingArea by remember { mutableStateOf(holdingLocation ?: "") }
-	var isSelectHoldingActive by remember { mutableStateOf(true) }
+	var isSelectHoldingActive by remember { mutableStateOf(selectHoldingActive) }
 
 	LaunchedEffect(Unit) {
 		scanManager?.set { data, _ ->
@@ -109,7 +110,6 @@ fun EditLocation(
 						text = "Edit Location",
 						style = TextStyle(
 							fontSize = 20.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Bold,
 							letterSpacing = 0.5.sp
 						)
@@ -156,9 +156,13 @@ fun EditLocation(
 							isActive = !isSelectHoldingActive,
 							extraContent = {
 								when (scanLocationState) {
-									GenericViewState.Success -> Handler(Looper.getMainLooper()).postDelayed({
-										onDismissRequest()
-									}, 500)
+									GenericViewState.Success -> Handler(Looper.getMainLooper()).postDelayed(
+										{
+											onDismissRequest()
+										},
+										500
+									)
+
 									else -> {}
 								}
 								Column(
@@ -169,13 +173,14 @@ fun EditLocation(
 								) {
 									Image(
 										modifier = Modifier
-											.padding(top = 2.dp),
-										imageVector = ImageVector.vectorResource(R.drawable.scanning_bin),
+											.padding(top = 2.dp)
+											.height(160.dp),
+										imageVector = ImageVector.vectorResource(R.drawable.scan_location),
 										contentDescription = "Scanning Bin"
 									)
 									DetailedCallToAction(
 										modifier = Modifier
-											.padding(0.dp)
+											.padding(top = 20.dp)
 											.align(Alignment.CenterHorizontally),
 										detailedCallToActionMode = when (scanLocationState) {
 											is GenericViewState.Loading -> DetailedCallToActionMode.Loading()
@@ -186,7 +191,8 @@ fun EditLocation(
 										},
 										onClick = {
 											if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
-												val bin = "Bin ${Random.nextInt(from = 1, until = 100)}"
+												val bin =
+													"Bin ${Random.nextInt(from = 1, until = 100)}"
 
 												containers?.firstOrNull()?.id?.let {
 													onLocationChange(
@@ -219,5 +225,21 @@ fun EditLocationModalPreview() {
 		scanLocationState = GenericViewState.Idle,
 		holdingAreas = emptyList(),
 		subfulfillmentType = "BOPL"
+	)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditLocationModalPreview_ScanLocation() {
+	EditLocation(
+		onDismissRequest = {},
+		onLocationChange = { _, _ -> },
+		scanManager = null,
+		holdingLocation = "",
+		containers = emptyList(),
+		scanLocationState = GenericViewState.Success,
+		holdingAreas = emptyList(),
+		subfulfillmentType = "BOPIS",
+		selectHoldingActive = false
 	)
 }

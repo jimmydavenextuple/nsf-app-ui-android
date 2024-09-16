@@ -35,7 +35,10 @@ class DetailedCallToActionTest {
 			onNodeWithTag("detailedCallToAction_Scan", useUnmergedTree = true).assertIsDisplayed()
 			onNodeWithText(actionText, useUnmergedTree = true).assertIsDisplayed()
 
-			onNodeWithTag("detailedCallToAction_LoadingSpinner", useUnmergedTree = true).assertDoesNotExist()
+			onNodeWithTag(
+				"detailedCallToAction_LoadingSpinner",
+				useUnmergedTree = true
+			).assertDoesNotExist()
 			onNodeWithTag("detailedCallToAction_Done", useUnmergedTree = true).assertDoesNotExist()
 		}
 	}

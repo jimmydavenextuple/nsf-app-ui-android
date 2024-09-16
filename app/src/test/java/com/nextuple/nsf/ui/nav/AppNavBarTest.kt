@@ -39,7 +39,12 @@ class AppNavBarTest {
 
 		composeRule.apply {
 			setContent {
-				AppNavBar(items = listOf(item), isSelected = { false }, onSelect = {}, tasksUnassigned = listOf(0))
+				AppNavBar(
+					items = listOf(item),
+					isSelected = { false },
+					onSelect = {},
+					tasksUnassigned = listOf(0)
+				)
 			}
 
 			onNodeWithTag("navigationBarItemIcon_test", useUnmergedTree = true)
@@ -58,7 +63,12 @@ class AppNavBarTest {
 
 		composeRule.apply {
 			setContent {
-				AppNavBar(items = listOf(item), isSelected = { false }, onSelect = {}, tasksUnassigned = listOf(0))
+				AppNavBar(
+					items = listOf(item),
+					isSelected = { false },
+					onSelect = {},
+					tasksUnassigned = listOf(0)
+				)
 			}
 
 			onNodeWithTag("navigationBarItemLabel_test", useUnmergedTree = true)

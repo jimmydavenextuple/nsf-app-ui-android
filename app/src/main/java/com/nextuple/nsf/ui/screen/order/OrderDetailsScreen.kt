@@ -42,7 +42,6 @@ import com.nextuple.nsf.ui.component.PrinterModal
 import com.nextuple.nsf.ui.state.CancelReasonData
 import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.FRStatus
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -58,24 +57,34 @@ const val NO = "NO"
 const val CONFIRM = "CONFIRM"
 const val BACK = "BACK"
 
+/**
+ * @param orderDate this should be a pair where orderDate.first is the date and
+ * orderDate.second is the time of the order was placed
+ *
+ * @param packedOnDate this should be a pair where packedOnDate.first is the date and
+ * packedOnDate.second is the time of the order was packed
+ *
+ * @param pickedUpOnDate this should be a pair where pickedUpOnDate.first is the date and
+ * pickedUpOnDate.second is the time of the order was picked up
+ */
 @Composable
 fun OrderDetailsScreen(
-    printViewModel: PrintViewModel = hiltViewModel(),
+	printViewModel: PrintViewModel = hiltViewModel(),
 	viewState: GenericViewState = GenericViewState.Idle,
 	startPickupViewState: GenericViewState = GenericViewState.Idle,
 	athleteName: String,
 	athleteProxyName: String,
 	athletePhoneNumber: String,
 	orderNumber: String,
-	orderDate: String,
+	orderDate: Pair<String, String>,
 	expectedDate: String,
 	receivedDate: String,
-	packedOnDate: String,
-    pickedUpOnDate: String,
+	packedOnDate: Pair<String, String>,
+	pickedUpOnDate: Pair<String, String>,
 	holdingLocation: String,
 	holdingAreas: List<String>,
 	orderDetailsResponse: OrderDetailsResponse? = null,
-    holdSlipZpl: MutableList<String>?,
+	holdSlipZpl: MutableList<String>?,
 	declineModalOptions: List<DeclineCode>?,
 	onStartPickup: (String) -> Unit,
 	onPickupExtend: (String) -> Unit,
@@ -85,8 +94,8 @@ fun OrderDetailsScreen(
 	printer: Printer,
 	printerConnectionState: GenericViewState = GenericViewState.Idle,
 	holdSlipState: GenericViewState = GenericViewState.Idle,
-    bypassPrinter: Boolean,
-    resetGetHoldSlipState: () -> Unit,
+	bypassPrinter: Boolean,
+	resetGetHoldSlipState: () -> Unit,
 	onPrintHoldSlip: (String) -> Unit,
 	onConnectPrinter: (Printer, String) -> Unit,
 	onResetPrinter: () -> Unit,
@@ -217,20 +226,28 @@ fun OrderDetailsScreen(
 			.verticalScroll(rememberScrollState()),
 		verticalArrangement = Arrangement.spacedBy(4.dp)
 	) {
-		val athleteInfoTitles = if (orderDetailsResponse?.athleteCheckInDetail?.checkInType?.contains("curbside", true) == true) {
-			linkedMapOf(
-				stringResource(id = R.string.name) to athleteName,
-				stringResource(id = R.string.proxy_name) to athleteProxyName,
-				stringResource(id = R.string.phone_number) to athletePhoneNumber,
-				stringResource(id = R.string.car_info) to (orderDetailsResponse.athleteCheckInDetail.athleteVehicle ?: "")
-			)
-		} else {
-			linkedMapOf(
-				stringResource(id = R.string.name) to athleteName,
-				stringResource(id = R.string.proxy_name) to athleteProxyName,
-				stringResource(id = R.string.phone_number) to athletePhoneNumber
-			)
-		}
+		val athleteInfoTitles =
+			if (orderDetailsResponse?.athleteCheckInDetail?.checkInType?.contains(
+					"curbside",
+					true
+				) == true
+			) {
+				linkedMapOf(
+					stringResource(id = R.string.name) to athleteName,
+					stringResource(id = R.string.proxy_name) to athleteProxyName,
+					stringResource(id = R.string.phone_number) to athletePhoneNumber,
+					stringResource(id = R.string.car_info) to (
+						orderDetailsResponse.athleteCheckInDetail.athleteVehicle
+							?: ""
+						)
+				)
+			} else {
+				linkedMapOf(
+					stringResource(id = R.string.name) to athleteName,
+					stringResource(id = R.string.proxy_name) to athleteProxyName,
+					stringResource(id = R.string.phone_number) to athletePhoneNumber
+				)
+			}
 		InfoCard(
 			title = stringResource(id = R.string.athlete_info),
 			status = if (athleteInfoStatus.contains(orderStatus)) orderStatus.statusText else null,
@@ -278,8 +295,9 @@ fun OrderDetailsScreen(
 			val orderInfo = mutableListOf(
 				stringResource(id = R.string.order_number) to orderNumber,
 				stringResource(id = R.string.order_type) to orderType,
-				stringResource(id = R.string.order_date) to orderDate
+				stringResource(id = R.string.order_date) to orderDate.first
 			).apply {
+				if (orderType == SubFulfillmentType.SAME_DAY.name) add(stringResource(id = R.string.order_time) to orderDate.second)
 				if (orderType == SubFulfillmentType.BOPL.name) {
 					if (expectedDate.isNotEmpty()) {
 						add(stringResource(id = R.string.expected) to expectedDate)
@@ -288,15 +306,18 @@ fun OrderDetailsScreen(
 						add(stringResource(id = R.string.received_on) to receivedDate)
 					}
 				}
-				if (packedOnDate.isNotEmpty()) {
+				if (packedOnDate.first.isNotEmpty()) {
 					if (orderStatus == OrderStatus.READY || orderStatus == OrderStatus.EXTENDED) {
-						add(stringResource(id = R.string.prepped_on) to packedOnDate)
+						add(stringResource(id = R.string.prepped_on) to packedOnDate.first)
+						if (orderType == SubFulfillmentType.SAME_DAY.name) add(stringResource(id = R.string.prepped_at) to packedOnDate.second)
 					} else {
-						add(stringResource(id = R.string.packed_on) to packedOnDate)
+						add(stringResource(id = R.string.packed_on) to packedOnDate.first)
+						if (orderType == SubFulfillmentType.SAME_DAY.name) add(stringResource(id = R.string.packed_at) to packedOnDate.second)
 					}
 				}
-				if (pickedUpOnDate.isNotEmpty()) {
-					add(stringResource(id = R.string.picked_up_on) to pickedUpOnDate)
+				if (pickedUpOnDate.first.isNotEmpty()) {
+					add(stringResource(id = R.string.picked_up_on) to pickedUpOnDate.first)
+					if (orderType == SubFulfillmentType.SAME_DAY.name) add(stringResource(id = R.string.picked_up_at) to pickedUpOnDate.second)
 				}
 				if (currentHoldingLocation.isNotEmpty() && !OrderStatus.isCompleteStatus(orderStatus)) {
 					add(stringResource(id = R.string.location) to currentHoldingLocation)
@@ -315,6 +336,10 @@ fun OrderDetailsScreen(
 		val packedItemList = orderDetailsResponse?.fulfillmentRequestDetail?.containers?.flatMap {
 			it.packedItems
 		}
+		SubstitutionsAccordion(
+			expanded = false,
+			packedItemList = packedItemList
+		)
 		OrderContentsDropdown(
 			startExpanded = OrderStatus.isCompleteStatus(orderStatus) || orderStatus == OrderStatus.BEING_PACKED || orderStatus == OrderStatus.BEING_STAGED,
 			isBopl = orderType == SubFulfillmentType.BOPL.name,
@@ -403,10 +428,14 @@ fun OrderDetailsScreen(
 		).show()
 	}
 
-	if (printViewModel.holdSlipPrintState == GenericViewState.Success) {
-		Toast.makeText(context, stringResource(R.string.hold_slip_print_success), Toast.LENGTH_SHORT).show()
+	if (printViewModel.printHoldSlipState == GenericViewState.Success) {
+		Toast.makeText(
+			context,
+			stringResource(R.string.hold_slip_print_success),
+			Toast.LENGTH_SHORT
+		).show()
 		printViewModel.resetHoldSlipPrintState()
-	} else if (printViewModel.holdSlipPrintState == GenericViewState.Failure) {
+	} else if (printViewModel.printHoldSlipState == GenericViewState.Failure) {
 		Toast.makeText(context, stringResource(R.string.hold_slip_print_error), Toast.LENGTH_SHORT)
 			.show()
 		printViewModel.resetHoldSlipPrintState()
@@ -517,7 +546,6 @@ fun AgedCancel(
 				.background(BrandColor.ORANGE_50)
 				.padding(horizontal = 16.dp, vertical = 12.dp),
 			text = stringResource(id = R.string.aged_cancel_info),
-			fontFamily = FontFamily.ARCHIVO,
 			fontSize = 12.sp,
 			fontWeight = FontWeight(400),
 			letterSpacing = 0.5.sp
@@ -526,7 +554,7 @@ fun AgedCancel(
 		PrimaryButton(
 			modifier = Modifier
 				.align(Alignment.CenterHorizontally)
-				.fillMaxWidth(0.7f)
+				.fillMaxWidth()
 				.padding(vertical = 8.dp),
 			text = stringResource(id = R.string.aged_cancel),
 			onButtonClick = { onAgedCancel() }
@@ -590,16 +618,16 @@ fun OrderDetailsPreview() {
 		athleteProxyName = "Moyses Franco",
 		athletePhoneNumber = "5087695491",
 		orderNumber = "10000023",
-		orderDate = "",
+		orderDate = Pair("", ""),
 		expectedDate = "",
 		receivedDate = "",
-		packedOnDate = "",
-		pickedUpOnDate = "",
+		packedOnDate = Pair("", ""),
+		pickedUpOnDate = Pair("", ""),
 		holdingLocation = "Main Holding Area Bin 7",
 		orderDetailsResponse = OrderDetailsResponse(
 			orderNumber = "10000023",
 			packedOnDate = "",
-			packedByUserId = "dks0523923",
+			packedByUserId = "userId0523923",
 			orderStatusText = "Aged",
 			athleteDetail = AthleteDetail(
 				athleteFirstName = "Erica",

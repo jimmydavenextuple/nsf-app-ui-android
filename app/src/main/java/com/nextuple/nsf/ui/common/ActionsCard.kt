@@ -16,7 +16,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 data class ActionsCardAction(
 	val label: String,
@@ -26,10 +25,10 @@ data class ActionsCardAction(
 
 @Composable
 fun ActionsCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    primaryAction: ActionsCardAction?,
-    secondaryActions: List<ActionsCardAction>
+	modifier: Modifier = Modifier,
+	title: String,
+	primaryAction: ActionsCardAction?,
+	secondaryActions: List<ActionsCardAction>
 ) {
 	Card(
 		modifier = modifier,
@@ -45,7 +44,6 @@ fun ActionsCard(
 			Text(
 				modifier = Modifier.align(Alignment.Start),
 				text = title,
-				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 18.sp,
 				fontWeight = FontWeight(700),
 				letterSpacing = 0.5.sp
@@ -54,7 +52,7 @@ fun ActionsCard(
 				PrimaryButton(
 					modifier = Modifier
 						.align(Alignment.CenterHorizontally)
-						.fillMaxWidth(0.8f),
+						.fillMaxWidth(),
 					text = primaryAction.label.uppercase(),
 					enabled = primaryAction.isEnabled,
 					onButtonClick = primaryAction.onClick
@@ -64,7 +62,7 @@ fun ActionsCard(
 				SecondaryButton(
 					modifier = Modifier
 						.align(Alignment.CenterHorizontally)
-						.fillMaxWidth(0.8f),
+						.fillMaxWidth(),
 					text = it.label.uppercase(),
 					enabled = it.isEnabled,
 					onButtonClick = it.onClick

@@ -16,7 +16,8 @@ object TimeUtils {
 	fun calculateTimeDifferenceInSeconds(timestamp: String): Long? {
 		return try {
 			val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
-			val parsedTimestamp = LocalDateTime.parse(timestamp, formatter).atZone(ZoneOffset.UTC).toInstant()
+			val parsedTimestamp =
+				LocalDateTime.parse(timestamp, formatter).atZone(ZoneOffset.UTC).toInstant()
 			val currentTimestamp = Instant.now()
 
 			val duration = Duration.between(parsedTimestamp, currentTimestamp)
@@ -44,6 +45,7 @@ object TimeUtils {
 		val dateTime = LocalDateTime.ofInstant(timeStamp, ZoneId.systemDefault())
 		return dateTime.format(outputFormatter)
 	}
+
 	fun getProtoTimestamp(instant: Instant = Instant.now()): Timestamp =
 		Timestamp.newBuilder().setSeconds(instant.epochSecond).setNanos(instant.nano).build()
 }

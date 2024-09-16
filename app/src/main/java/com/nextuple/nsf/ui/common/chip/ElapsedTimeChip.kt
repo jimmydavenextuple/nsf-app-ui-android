@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.util.OrderStatus
 import com.nextuple.nsf.util.TimeUtils
 import com.nextuple.nsf.util.TimeUtils.formatTime
 import kotlinx.coroutines.delay
@@ -38,7 +37,7 @@ fun ElapsedTimeChip(
 	OrderStatusChip(
 		modifier = modifier,
 		statusText = elapsedTime.formatTime(),
-		backgroundColor = BrandColor.PINK_NT
+		backgroundColor = BrandColor.DARK_BLUE
 	)
 }
 

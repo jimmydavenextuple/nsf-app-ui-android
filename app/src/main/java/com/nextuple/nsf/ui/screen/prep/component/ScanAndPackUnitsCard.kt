@@ -29,20 +29,19 @@ import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PackDeclineModal
 import com.nextuple.nsf.ui.screen.prep.packTaskItem
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import kotlinx.coroutines.delay
 
 @Composable
 fun ScanAndPackUnitsCard(
-    isActive: Boolean,
-    stepNumber: String,
-    isComplete: Boolean,
-    packItems: List<PackTaskItem>?,
-    onPackItem: (String) -> Boolean = { false },
-    pickedBy: String?,
-    onAllItemsScanned: () -> Unit = {},
-    onStageCompletionCallBack: () -> Unit = {},
-    onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit
+	isActive: Boolean,
+	stepNumber: String,
+	isComplete: Boolean,
+	packItems: List<PackTaskItem>?,
+	onPackItem: (String) -> Boolean = { false },
+	pickedBy: String?,
+	onAllItemsScanned: () -> Unit = {},
+	onStageCompletionCallBack: () -> Unit = {},
+	onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit
 ) {
 	var showDeclineModal by remember {
 		mutableStateOf(false)
@@ -97,17 +96,16 @@ fun ScanAndPackUnitsCard(
 					text = stringResource(id = R.string.pack_info),
 					style = TextStyle(
 						fontSize = 12.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(400),
 						color = BrandColor.BLACK,
 						letterSpacing = 0.5.sp
 					)
 				)
 				if (!pickedBy.isNullOrEmpty()) {
-                    com.nextuple.nsf.ui.common.TextInfo(
-                        label = stringResource(id = R.string.picked_by),
-                        value = pickedBy
-                    )
+					com.nextuple.nsf.ui.common.TextInfo(
+						label = stringResource(id = R.string.picked_by),
+						value = pickedBy
+					)
 				}
 			}
 		}

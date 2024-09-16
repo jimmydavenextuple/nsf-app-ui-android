@@ -20,10 +20,10 @@ import com.nextuple.nsf.ui.util.GenericViewState
 
 @Composable
 fun ScanLocationCard(
-    isActive: Boolean,
-    stepNumber: String,
-    holdLocationState: GenericViewState,
-    onScanClick: () -> Unit = {}
+	isActive: Boolean,
+	stepNumber: String,
+	holdLocationState: GenericViewState,
+	onScanClick: () -> Unit = {}
 ) {
 	ExpandableStepCard(
 		stepNumber = stepNumber,
@@ -35,8 +35,8 @@ fun ScanLocationCard(
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Image(
-					modifier = Modifier.padding(top = 8.dp),
-					imageVector = ImageVector.vectorResource(R.drawable.scanning_bin),
+					modifier = Modifier.padding(10.dp),
+					imageVector = ImageVector.vectorResource(R.drawable.scan_location),
 					contentDescription = "Scanning Bin"
 				)
 				DetailedCallToAction(
@@ -47,6 +47,7 @@ fun ScanLocationCard(
 						is GenericViewState.Success -> {
 							DetailedCallToActionMode.Done()
 						}
+
 						else -> {
 							DetailedCallToActionMode.Scan(stringResource(id = R.string.scan_location))
 						}

@@ -1,11 +1,6 @@
 package com.nextuple.nsf.ui.screen.prep
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,29 +8,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nextuple.nsf.BuildConfig
-import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
-import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
-import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
-import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PrinterModal
 import com.nextuple.nsf.ui.screen.prep.component.PrepDetailScaffold
 import com.nextuple.nsf.ui.screen.prep.component.ScanAndPackUnitsCard
 import com.nextuple.nsf.ui.screen.prep.component.ScanLocationCard
+import com.nextuple.nsf.ui.screen.prep.component.ScanPackageCard
 import com.nextuple.nsf.ui.screen.prep.component.SelectHoldingAreaCard
 import com.nextuple.nsf.ui.state.PrepViewModel
-import com.nextuple.nsf.ui.theme.FontFamily
+import com.nextuple.nsf.ui.state.PrintViewModel
+import com.nextuple.nsf.ui.util.AppMessage
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -50,23 +35,24 @@ enum class SDDPrepStep {
 
 @Composable
 fun SDDPrepDetailsScreen(
-    scanManager: ScanManager,
-    currentPrepStage: PrepViewModel.Step,
-    prepOrder: PrepViewModel.PrepOrder,
-    onPackItem: (String) -> Boolean = { false },
-    holdSlipState: GenericViewState = GenericViewState.Idle,
-    holdLocationState: GenericViewState = GenericViewState.Idle,
-    onRecordHoldingLocation: (holdingLocation: String) -> Unit = { _ -> },
-    onStageCompletionCallBack: () -> Unit = {},
-    onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit,
-    holdingAreas: List<String>,
-    ipPrefix: String?,
-    printer: Printer,
-    printerConnectionState: GenericViewState = GenericViewState.Idle,
-    onConnectPrinter: (Printer, String) -> Unit,
-    onResetPrinter: () -> Unit,
-    onPackOrder: (String) -> Unit = {},
-    onPrintHoldSlip: () -> Unit = {}
+	printViewModel: PrintViewModel,
+	scanManager: ScanManager,
+	currentPrepStage: PrepViewModel.Step,
+	prepOrder: PrepViewModel.PrepOrder,
+	onPackItem: (String) -> Boolean = { false },
+	getHoldSlipState: GenericViewState = GenericViewState.Idle,
+	holdLocationState: GenericViewState = GenericViewState.Idle,
+	onRecordHoldingLocation: (holdingLocation: String) -> Unit = { _ -> },
+	onStageCompletionCallBack: () -> Unit = {},
+	onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit,
+	holdingAreas: List<String>,
+	ipPrefix: String?,
+	printer: Printer,
+	printerConnectionState: GenericViewState = GenericViewState.Idle,
+	onConnectPrinter: (Printer, String) -> Unit,
+	onResetPrinter: () -> Unit,
+	onPackOrder: (String) -> Unit = {},
+	onPrintHoldSlip: () -> Unit = {}
 ) {
 	val context = LocalContext.current
 	var showConnectModal by remember { mutableStateOf(false) }
@@ -76,14 +62,17 @@ fun SDDPrepDetailsScreen(
 	var activeStep by remember {
 		mutableStateOf(
 			if (currentPrepStage == PrepViewModel.Step.Stage) {
-                SDDPrepStep.HOLDING_AREA
+				SDDPrepStep.HOLDING_AREA
 			} else {
-                SDDPrepStep.PACK
+				SDDPrepStep.PACK
 			}
 		)
 	}
 
-	fun updateStep(prepStep: SDDPrepStep) { activeStep = prepStep }
+	fun updateStep(prepStep: SDDPrepStep) {
+		activeStep = prepStep
+	}
+
 	fun isStepActive(prepStep: SDDPrepStep) = activeStep == prepStep
 	fun isStepComplete(prepStep: SDDPrepStep) = activeStep.ordinal > prepStep.ordinal
 
@@ -105,9 +94,11 @@ fun SDDPrepDetailsScreen(
 				SDDPrepStep.PACK -> {
 					onPackItem(data)
 				}
+
 				SDDPrepStep.SCAN_PACKAGE -> {
 					onPackOrder(data)
 				}
+
 				SDDPrepStep.SCAN_LOCATION -> {
 					if (!data.lowercase().contains("bin")) {
 						Toast.makeText(context, "", Toast.LENGTH_LONG).show()
@@ -116,7 +107,9 @@ fun SDDPrepDetailsScreen(
 
 					onRecordHoldingLocation("$selectedHoldingArea $data")
 				}
-				SDDPrepStep.HOLDING_AREA -> { /* No Scan Action */ }
+
+				SDDPrepStep.HOLDING_AREA -> { /* No Scan Action */
+				}
 			}
 		}
 
@@ -125,9 +118,17 @@ fun SDDPrepDetailsScreen(
 		}
 	}
 
+	var appMessage: AppMessage? by remember { mutableStateOf(null) }
+	fun setOmniMessage(updatedMessage: AppMessage?) {
+		appMessage = updatedMessage
+	}
 	PrepDetailScaffold(
 		athleteName = prepOrder.athleteName,
-		orderNumber = prepOrder.orderNumber
+		orderNumber = prepOrder.orderNumber,
+		appMessage = appMessage,
+		onDismissMessage = {
+			setOmniMessage(null)
+		}
 	) {
 		// TODO: order assembled??
 		ScanAndPackUnitsCard(
@@ -141,10 +142,10 @@ fun SDDPrepDetailsScreen(
 			onConfirmDecline = onConfirmDecline,
 			onAllItemsScanned = { updateStep(SDDPrepStep.SCAN_PACKAGE) }
 		)
-		ScanPackage(
+		ScanPackageCard(
 			isStepActive = isStepActive(SDDPrepStep.SCAN_PACKAGE),
 			isComplete = isStepComplete(SDDPrepStep.SCAN_PACKAGE),
-			holdSlipState = holdSlipState,
+			holdSlipState = getHoldSlipState,
 			onScanClick = {
 				if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
 					onPackOrder("Test")
@@ -195,72 +196,36 @@ fun SDDPrepDetailsScreen(
 		)
 	}
 
-	if (holdSlipState == GenericViewState.Success && isStepActive(SDDPrepStep.SCAN_PACKAGE)) {
+	if (getHoldSlipState == GenericViewState.Success && isStepActive(SDDPrepStep.SCAN_PACKAGE)) {
 		LaunchedEffect(Unit) {
 			delay(1000)
 			handlePrintHoldSlip()
 		}
+	} else if (getHoldSlipState == GenericViewState.Failure) {
+		setOmniMessage(AppMessage.getHoldSlipError)
 	}
-}
 
-@Composable
-fun ScanPackage(
-    isStepActive: Boolean,
-    isComplete: Boolean,
-    holdSlipState: GenericViewState,
-    onScanClick: () -> Unit
-) {
-	ExpandableStepCard(
-		stepNumber = "2",
-		title = stringResource(R.string.scan_package),
-		isActive = isStepActive,
-		isComplete = isComplete,
-		extraContent = {
-			Column(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalAlignment = Alignment.CenterHorizontally
-			) {
-				Text(
-					text = stringResource(R.string.scan_place_hold),
-					style = TextStyle(
-						fontFamily = FontFamily.ARCHIVO,
-						fontSize = 12.sp,
-						fontWeight = FontWeight(400),
-						lineHeight = 13.06.sp
-					)
-				)
-				Image(
-					modifier = Modifier.padding(top = 8.dp),
-					imageVector = ImageVector.vectorResource(R.drawable.ic_scan_box),
-					contentDescription = "Scanning Box"
-				)
-				DetailedCallToAction(
-					modifier = Modifier
-						.align(Alignment.CenterHorizontally),
-					detailedCallToActionMode = when (holdSlipState) {
-						is GenericViewState.Loading -> DetailedCallToActionMode.Loading()
-						is GenericViewState.Success -> {
-							DetailedCallToActionMode.Done()
-						}
-
-						else -> {
-							DetailedCallToActionMode.Scan(stringResource(R.string.scan_package))
-						}
-					},
-					onClick = onScanClick
-				)
-			}
+	LaunchedEffect(getHoldSlipState) {
+		if (getHoldSlipState == GenericViewState.Failure) {
+			setOmniMessage(AppMessage.getHoldSlipError)
 		}
-	)
+	}
+
+	LaunchedEffect(printViewModel.printHoldSlipState) {
+		if (printViewModel.printHoldSlipState == GenericViewState.Failure) {
+			setOmniMessage(AppMessage.printHoldSlipError)
+		}
+	}
 }
 
 @PreviewPdt
 @Composable
 private fun SDDPrepDetailScreenPreview() {
 	SDDPrepDetailsScreen(
+		printViewModel = hiltViewModel(),
 		scanManager = NoOpScanManager(),
 		prepOrder = PrepViewModel.PrepOrder(
-			athleteName = "Athlete",
+			athleteName = "Customer",
 			orderNumber = "1010101010",
 			pickedBy = "Picker",
 			subFulfillmentType = "",

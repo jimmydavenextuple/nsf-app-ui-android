@@ -52,7 +52,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.service.dto.User
 import com.nextuple.nsf.ui.common.OmniTextField
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.SubFulfillmentType
@@ -66,18 +65,18 @@ data class AppTopBarDropdownMenuItems(
 
 @Composable
 fun AppTopBar(
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = BrandColor.BLUE_300_NT,
-    dropdownBackgroundColor: Color = BrandColor.BLUE_300_NT,
-    screen: Screen,
-    user: User?,
-    orderType: SubFulfillmentType?,
-    items: List<AppTopBarDropdownMenuItems>,
-    showSearchBar: Boolean = false,
-    toggleSearchBar: (Boolean) -> Unit = {},
-    scanManager: ScanManager = NoOpScanManager(),
-    onSearchAction: (String) -> Unit = {},
-    onBackAction: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	backgroundColor: Color = BrandColor.VERY_DARY_GREY_BLACK,
+	dropdownBackgroundColor: Color = BrandColor.BLUE_300_NT,
+	screen: Screen,
+	user: User?,
+	orderType: SubFulfillmentType?,
+	items: List<AppTopBarDropdownMenuItems>,
+	showSearchBar: Boolean = false,
+	toggleSearchBar: (Boolean) -> Unit = {},
+	scanManager: ScanManager = NoOpScanManager(),
+	onSearchAction: (String) -> Unit = {},
+	onBackAction: () -> Unit = {}
 ) {
 	var searchInput by remember { mutableStateOf("") }
 
@@ -136,25 +135,23 @@ fun AppTopBar(
 
 @Composable
 private fun ScreenTitle(
-    screen: Screen,
-    orderType: SubFulfillmentType?,
-    onBackAction: () -> Unit
+	screen: Screen,
+	orderType: SubFulfillmentType?,
+	onBackAction: () -> Unit
 ) {
 	val ctx = LocalContext.current
 
 	val titleTextStyle = if (screen == Screen.HOME) {
 		TextStyle(
 			color = BrandColor.GRAY_50,
-			fontFamily = FontFamily.SANS,
 			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
 			letterSpacing = 1.sp,
-			fontSize = 32.sp
+			fontSize = 20.sp
 		)
 	} else {
 		TextStyle(
 			color = BrandColor.GRAY_50,
-			fontFamily = FontFamily.ARCHIVO,
 			fontWeight = FontWeight.Bold,
 			fontStyle = FontStyle.Normal,
 			letterSpacing = 0.5.sp,
@@ -162,7 +159,7 @@ private fun ScreenTitle(
 		)
 	}
 
-	val title = if (screen == Screen.PICK_DETAILS) {
+	val title = if (screen == Screen.PICK) {
 		screen.title + when (orderType) {
 			SubFulfillmentType.BOPIS -> " Products"
 			SubFulfillmentType.BOPL -> " BOPL"
@@ -207,12 +204,12 @@ private fun ScreenTitle(
 
 @Composable
 private fun UserProfile(
-    modifier: Modifier = Modifier,
-    user: User?,
-    dropdownBackgroundColor: Color,
-    items: List<AppTopBarDropdownMenuItems>,
-    screen: Screen,
-    showSearchBar: () -> Unit = {}
+	modifier: Modifier = Modifier,
+	user: User?,
+	dropdownBackgroundColor: Color,
+	items: List<AppTopBarDropdownMenuItems>,
+	screen: Screen,
+	showSearchBar: () -> Unit = {}
 ) {
 	var isExpanded by remember { mutableStateOf(false) }
 
@@ -272,13 +269,14 @@ private fun UserProfile(
 									fontWeight = FontWeight.Bold,
 									fontStyle = FontStyle.Normal,
 									letterSpacing = 0.5.sp,
-									fontFamily = FontFamily.ARCHIVO
 								)
 							},
 							leadingIcon = {
 								if (iconResId != null) {
 									Icon(
-										modifier = Modifier.size(16.dp).padding(0.dp),
+										modifier = Modifier
+											.size(16.dp)
+											.padding(0.dp),
 										imageVector = ImageVector.vectorResource(iconResId),
 										tint = BrandColor.GRAY_50,
 										contentDescription = null
@@ -317,13 +315,12 @@ private fun UserInfo(
 					modifier = Modifier
 						.drawBehind {
 							drawCircle(
-								color = BrandColor.BLUE_800_NT,
+								color = BrandColor.DARK_BLUE,
 								radius = this.size.maxDimension - 8
 							)
 						},
 					text = user.getInitials().orEmpty(),
 					color = BrandColor.GRAY_50,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
 					fontStyle = FontStyle.Normal,
 					fontSize = 16.sp,
@@ -349,7 +346,6 @@ private fun UserInfo(
 				Text(
 					text = user?.getFullName().orEmpty(),
 					color = BrandColor.GRAY_50,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
 					fontStyle = FontStyle.Normal,
 					fontSize = 14.sp,
@@ -359,9 +355,8 @@ private fun UserInfo(
 					maxLines = 1
 				)
 				Text(
-					text = user?.dks.orEmpty().uppercase(),
+					text = user?.userId.orEmpty().uppercase(),
 					color = BrandColor.GRAY_50,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Light,
 					fontStyle = FontStyle.Normal,
 					letterSpacing = 0.5.sp,
@@ -383,7 +378,7 @@ fun PreviewAppTopBarMain() {
 		user = User(
 			firstName = "Anna",
 			lastName = "Heisey",
-			dks = "dks0564797"
+			userId = "userId0564797"
 		),
 		items = listOf(
 			AppTopBarDropdownMenuItems(label = "Settings", R.drawable.ic_settings),
@@ -403,7 +398,7 @@ fun PreviewAppTopBarSettings() {
 		user = User(
 			firstName = "Laurancefff",
 			lastName = "Alexander",
-			dks = "dks0564792"
+			userId = "userId0564792"
 		),
 		items = listOf()
 	)
@@ -414,12 +409,12 @@ fun PreviewAppTopBarSettings() {
 fun PreviewAppTopBarPickDetailsBopis() {
 	AppTopBar(
 		modifier = Modifier.fillMaxWidth(),
-		screen = Screen.PICK_DETAILS,
+		screen = Screen.PICK,
 		orderType = SubFulfillmentType.BOPIS,
 		user = User(
 			firstName = "Anna",
 			lastName = "Heisey",
-			dks = "dks0564797"
+			userId = "userId0564797"
 		),
 		items = listOf()
 	)
@@ -430,12 +425,12 @@ fun PreviewAppTopBarPickDetailsBopis() {
 fun PreviewAppTopBarPickDetailsBopl() {
 	AppTopBar(
 		modifier = Modifier.fillMaxWidth(),
-		screen = Screen.PICK_DETAILS,
+		screen = Screen.PICK,
 		orderType = SubFulfillmentType.BOPL,
 		user = User(
 			firstName = "Anna",
 			lastName = "Heisey",
-			dks = "dks0564797"
+			userId = "userId0564797"
 		),
 		items = listOf()
 	)

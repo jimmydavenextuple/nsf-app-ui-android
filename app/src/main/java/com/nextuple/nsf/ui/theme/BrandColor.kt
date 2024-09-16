@@ -45,10 +45,10 @@ object BrandColor {
 	val ORANGE_700 = Color(0xFFAC470C)
 
 	val RED_100 = Color(0xFFF6E1E3)
+	val RED_500 = Color(0xFFDD0D18)
 	val RED_600 = Color(0xFFB10715)
 
 	val YELLOW_400 = Color(0xFFF9A74A)
-
 
 	val YELLOW_NT = Color(0xfffcb918)
 	val PINK_NT = Color(0xffbf3177)
@@ -58,4 +58,13 @@ object BrandColor {
 	val BLUE_250_NT = Color(0xff63b1dc)
 	val BLUE_300_NT = Color(0Xff3299d2)
 	val BLUE_800_NT = Color(0xff19384f)
+
+
+	val DARK_BLUE = Color(0xff0060aa)
+	val BG_GRADIENT_TOP = Color(0xfff9b719)
+	val STRONG_PINK = Color(0xffB72467)
+	val VERY_DARY_GREY = Color(0xff434343)
+	val VERY_DARY_GREY_BLACK = Color(0xff262626)
+	val VERY_DARY_GREY_BLACK_USER = Color(0xff141414)
+	val DARY_MODERATE_CYAN = Color(0xff38a3a3)
 }

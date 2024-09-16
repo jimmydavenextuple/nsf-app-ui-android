@@ -34,13 +34,7 @@ class ConfigServiceTest {
 	private lateinit var configApi: ConfigApi
 
 	@MockK
-	private lateinit var deviceService: DeviceService
-
-	@MockK
 	private lateinit var userRepository: UserRepository
-
-	@MockK(relaxed = true)
-	private lateinit var logService: LogService
 
 	@Before
 	fun setUp() {
@@ -48,8 +42,8 @@ class ConfigServiceTest {
 	}
 
 	@Test
-	fun `getStoreConfig should call config api with the expected dks and store`() = runTest {
-		val dks = "dks123"
+	fun `getStoreConfig should call config api with the expected userId and store`() = runTest {
+		val userId = "userId123"
 		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
 		every {
@@ -59,20 +53,20 @@ class ConfigServiceTest {
 		} returns ApiResponse.Success(
 			data = StoreConfig()
 		)
-		every { deviceService.getStore() } returns store
-		every { runBlocking { userRepository.getDks() } } returns dks
+		every { runBlocking { userRepository.getStore() } } returns store
+		every { runBlocking { userRepository.getUserId() } } returns userId
 
 		service.getStoreConfig()
 		advanceUntilIdle()
 
 		verify {
-			runBlocking { configApi.getStoreConfig(userId = dks, store = store.id) }
+			runBlocking { configApi.getStoreConfig(userId = userId, store = store.id) }
 		}
 	}
 
 	@Test
 	fun `getStoreConfig should only call configApi once if config is not reset`() = runTest {
-		val dks = "dks123"
+		val userId = "userId123"
 		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
 		every {
@@ -82,8 +76,8 @@ class ConfigServiceTest {
 		} returns ApiResponse.Success(
 			data = StoreConfig()
 		)
-		every { deviceService.getStore() } returns store
-		every { runBlocking { userRepository.getDks() } } returns dks
+		every { runBlocking { userRepository.getStore() } } returns store
+		every { runBlocking { userRepository.getUserId() } } returns userId
 
 		service.getStoreConfig()
 		advanceUntilIdle()
@@ -92,13 +86,13 @@ class ConfigServiceTest {
 		advanceUntilIdle()
 
 		verify(exactly = 1) {
-			runBlocking { configApi.getStoreConfig(userId = dks, store = store.id) }
+			runBlocking { configApi.getStoreConfig(userId = userId, store = store.id) }
 		}
 	}
 
 	@Test
 	fun `getStoreConfig should only call configApi a second time if config is reset`() = runTest {
-		val dks = "dks123"
+		val userId = "userId123"
 		val store = Store(id = "456", brand = Brand.NT_BRAND_A)
 
 		every {
@@ -108,8 +102,8 @@ class ConfigServiceTest {
 		} returns ApiResponse.Success(
 			data = StoreConfig()
 		)
-		every { deviceService.getStore() } returns store
-		every { runBlocking { userRepository.getDks() } } returns dks
+		every { runBlocking { userRepository.getStore() } } returns store
+		every { runBlocking { userRepository.getUserId() } } returns userId
 
 		service.getStoreConfig()
 		advanceUntilIdle()
@@ -120,13 +114,13 @@ class ConfigServiceTest {
 		advanceUntilIdle()
 
 		verify(exactly = 2) {
-			runBlocking { configApi.getStoreConfig(userId = dks, store = store.id) }
+			runBlocking { configApi.getStoreConfig(userId = userId, store = store.id) }
 		}
 	}
 
 	@Test
 	fun `getStoreConfig should return general error if getStore is null`() = runTest {
-		every { deviceService.getStore() } returns null
+		every { runBlocking { userRepository.getStore() } } returns null
 
 		val res = service.getStoreConfig()
 		advanceUntilIdle()
@@ -135,9 +129,9 @@ class ConfigServiceTest {
 	}
 
 	@Test
-	fun `getStoreConfig should return general error if getDks is null`() = runTest {
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `getStoreConfig should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "456", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.getStoreConfig()
 		advanceUntilIdle()
@@ -152,8 +146,8 @@ class ConfigServiceTest {
 				configApi.getStoreConfig(any(), any())
 			}
 		} returns ApiResponse.Success()
-		every { deviceService.getStore() } returns Store(id = "456", brand = Brand.NT_BRAND_A)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getStore() } } returns Store(id = "456", brand = Brand.NT_BRAND_A)
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 
 		val res = service.getStoreConfig()
 		advanceUntilIdle()

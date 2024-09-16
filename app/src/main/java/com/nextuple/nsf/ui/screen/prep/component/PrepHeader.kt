@@ -7,17 +7,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
+import com.nextuple.nsf.ui.common.HeaderText
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.PreviewPdtWidth
 
 @Composable
@@ -47,28 +43,6 @@ fun PrepHeader(
 			modifier = Modifier,
 			thickness = 1.dp,
 			color = BrandColor.GRAY_350
-		)
-	}
-}
-
-@Composable
-fun HeaderText(modifier: Modifier = Modifier, title: String, value: String) {
-	Column(modifier = modifier) {
-		Text(
-			text = title,
-			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight.Bold,
-			fontSize = 14.sp,
-			letterSpacing = 1.5.sp
-		)
-		Text(
-			text = value,
-			fontFamily = FontFamily.ARCHIVO,
-			fontWeight = FontWeight.Normal,
-			fontSize = 14.sp,
-			letterSpacing = 0.5.sp,
-			maxLines = 1,
-			overflow = TextOverflow.Ellipsis
 		)
 	}
 }

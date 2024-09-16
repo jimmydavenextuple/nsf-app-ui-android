@@ -3,7 +3,6 @@ package com.nextuple.nsf
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -20,7 +19,6 @@ import com.nextuple.nsf.ui.App
 import com.nextuple.nsf.ui.state.ConfigViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
-import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.state.SettingsViewModel
 import com.nextuple.nsf.ui.state.UserViewModel
 import com.nextuple.nsf.ui.theme.AppTheme
@@ -36,7 +34,6 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
 	private val userVM: UserViewModel by viewModels()
-	private val pickVM: PickViewModel by viewModels()
 	private val orderVM: OrderViewModel by viewModels()
 	private val settingsVM: SettingsViewModel by viewModels()
 	private val infoVM: InfoViewModel by viewModels()
@@ -58,15 +55,10 @@ class MainActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-
 		logService.start()
 		logService.setDevice(deviceService.getDevice())
 
-		infoVM.setOnStoreOverviewCallbacks(
-			pickVM::onStoreOverview
-		)
 		userVM.setOnLogoutCallbacks(
-			pickVM::onLogout,
 			infoVM::onLogout
 		)
 		settingsVM.setIpPrefix()
@@ -81,7 +73,6 @@ class MainActivity : ComponentActivity() {
 				App(
 					infoVM = infoVM,
 					userVM = userVM,
-					pickVM = pickVM,
 					orderVM = orderVM,
 					settingsVM = settingsVM,
 					configVM = configVM,
@@ -116,11 +107,13 @@ class MainActivity : ComponentActivity() {
 				val token = task.result
 
 				// Log and toast
-				logService.trackEvent("FetchedFireBaseToken",
-					mapOf("FirebaseToken" to token))
-//				if(BuildConfig.DEBUG) {
-//					Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
-//				}
+				logService.trackEvent(
+					"FetchedFireBaseToken",
+					mapOf("FirebaseToken" to token)
+				)
+// 				if(BuildConfig.DEBUG) {
+// 					Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+// 				}
 				MyFirebaseMessagingService.sendRegistrationToServer(token)
 			}
 		)
@@ -140,6 +133,7 @@ class MainActivity : ComponentActivity() {
 		super.onPause()
 		userVM.updateUserActivity()
 	}
+
 	override fun onUserInteraction() {
 		super.onUserInteraction()
 		startSessionListener()

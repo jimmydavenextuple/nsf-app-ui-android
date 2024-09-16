@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -37,42 +40,151 @@ import com.nextuple.nsf.ui.common.Legend
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.Tab
 import com.nextuple.nsf.ui.component.EmptyStateScreen
+import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
+import com.nextuple.nsf.ui.util.Haptics
 import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.ScanManager
 
 enum class PickScreenTab(val displayName: String) {
 	PICKUP("PICKUP"),
 	SFS("SFS")
 }
 
+/**
+ * @param declineModalOptions a linked map with display string as key and decline reason as value
+ */
 @Composable
 fun PickScreen(
+	pickVM: PickViewModel,
+	scanManager: ScanManager,
+	haptics: Haptics,
 	tasksUnassigned: Int? = null,
 	unitsWorked: Int? = null,
 	totalUnits: Int? = null,
 	inProgressUnits: Int? = null,
-	hasActiveTask: Boolean = false,
-	onHasActiveTask: () -> Unit,
 	storeOverviewState: GenericViewState = GenericViewState.Idle,
-	startTaskStatus: GenericViewState = GenericViewState.Idle,
-	onStartPicking: () -> Unit = {},
-	startTaskCompletion: () -> Unit = {},
+	declineCodesState: GenericViewState,
+	declineModalOptions: LinkedHashMap<String, String>?,
+	onDeclineClick: () -> Unit,
+	isInvalidSymbology: (symbology: String) -> Boolean,
 	resetScreen: () -> Unit = {}
 ) {
-	var selectedTab by rememberSaveable { mutableStateOf(PickScreenTab.PICKUP) }
+	val ctx = LocalContext.current
 
-	if (hasActiveTask) {
-		LaunchedEffect(Unit) { onHasActiveTask() }
+	LaunchedEffect(Unit) {
+		pickVM.fetchCurrentStep()
 	}
+	when (pickVM.viewState) {
+		GenericViewState.Loading -> {
+			Box(
+				modifier = Modifier.fillMaxSize(),
+				contentAlignment = Alignment.Center
+			) {
+				CircularProgressIndicator(color = BrandColor.GRAY_900)
+			}
+		}
 
-	// handling overview when already logged in or deeplink to app
-	LaunchedEffect(storeOverviewState) {
-		if (storeOverviewState == GenericViewState.Idle) {
-			resetScreen()
+		GenericViewState.Failure -> {
+			LaunchedEffect(Unit) {
+				// TODO: Restore when Pick is no longer Home.
+// 				Toast.makeText(
+// 					ctx,
+// 					"Failure retrieving user pick tasks.",
+// 					Toast.LENGTH_SHORT
+// 				).show()
+				pickVM.resetPickState()
+			}
+		}
+
+		else -> when {
+			pickVM.pickTask != null -> {
+				pickVM.updateCurrentPickItem()
+				PickDetailsScreen(
+					pickVM = pickVM,
+					scanManager = scanManager,
+					pickDeclineState = pickVM.pickDeclineState,
+					recordPickState = pickVM.recordPickState,
+					declineCodesState = declineCodesState,
+					fulfillmentType = pickVM.pickTask?.fulfillmentType,
+					subFulfillmentType = pickVM.pickTask?.subFulfillmentType,
+					currentPickTaskItem = pickVM.currentPickItem,
+					unitsWorked = pickVM.pickTask?.totalWorkedQty ?: 0,
+					totalUnits = pickVM.pickTask?.totalQty ?: 0,
+					declineModalOptions = declineModalOptions,
+					onDeclineClick = onDeclineClick,
+					onDeclineReasonSelected = { declineReason, declineReasonText ->
+						pickVM.declinePick(declineReason, declineReasonText)
+					},
+					onCheckItemScan = { upc, symbology ->
+						if (symbology == null || isInvalidSymbology(symbology)) {
+							haptics.boop()
+							return@PickDetailsScreen false
+						}
+						if (!pickVM.matchUpc(upc)) {
+							haptics.boop()
+							haptics.vibrate(1000)
+							return@PickDetailsScreen false
+						}
+						return@PickDetailsScreen true
+					},
+					onItemPick = { upc, pickLocation ->
+						if (!pickVM.pickItem(upc, pickLocation)) {
+							haptics.boop()
+							haptics.vibrate(1000)
+						}
+					},
+					onDeclineCompletion = {
+						pickVM.resetPickDeclineState()
+						if (pickVM.currentPickItem == null) {
+							pickVM.resetPickState()
+							resetScreen()
+						}
+					},
+					onRecordPickCompletion = {
+						pickVM.resetRecordPickState()
+						if (pickVM.currentPickItem == null) {
+							pickVM.resetPickState()
+							resetScreen()
+						}
+					}
+				)
+			}
+
+			else -> {
+				PickLanding(
+					tasksUnassigned = tasksUnassigned,
+					unitsWorked = unitsWorked,
+					totalUnits = totalUnits,
+					inProgressUnits = inProgressUnits,
+					storeOverviewState = storeOverviewState,
+					startTaskStatus = pickVM.startPickState,
+					onStartPicking = pickVM::startPick,
+					startTaskCompletion = pickVM::resetPickScreen,
+					resetScreen = {
+						pickVM.resetPickScreen()
+						resetScreen()
+					}
+				)
+			}
 		}
 	}
+}
+
+@Composable
+fun PickLanding(
+	tasksUnassigned: Int?,
+	unitsWorked: Int?,
+	totalUnits: Int?,
+	inProgressUnits: Int?,
+	storeOverviewState: GenericViewState,
+	startTaskStatus: GenericViewState,
+	onStartPicking: () -> Unit,
+	startTaskCompletion: () -> Unit,
+	resetScreen: () -> Unit
+) {
+	var selectedTab by rememberSaveable { mutableStateOf(PickScreenTab.PICKUP) }
 
 	Column {
 		Row(
@@ -169,10 +281,12 @@ private fun PickupTabContainer(
 				Spacer(modifier = Modifier.height(20.dp))
 
 				PrimaryButton(
+					modifier = Modifier
+						.width(width = 200.dp),
 					text = "START PICKING",
 					enabled = tasksUnassigned != 0,
 					onButtonClick = onStartPicking
-				)
+					)
 
 				if (showInfoModal) {
 					InfoModal(
@@ -185,7 +299,6 @@ private fun PickupTabContainer(
 						visualContent = {
 							val legendsTextStyle = TextStyle(
 								color = BrandColor.GRAY_600,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.SemiBold,
 								textAlign = TextAlign.Center,
 								fontSize = 10.sp,
@@ -195,9 +308,9 @@ private fun PickupTabContainer(
 								circleSize = 16,
 								space = 0,
 								items = listOf(
-									Legend(BrandColor.GRAY_900, "UNWORKED"),
-									Legend(BrandColor.GREEN_400, "WORKED"),
-									Legend(BrandColor.YELLOW_400, "BEING WORKED")
+									Legend(BrandColor.GRAY_400, "UNWORKED"),
+									Legend(BrandColor.DARK_BLUE, "WORKED"),
+									Legend(BrandColor.YELLOW_NT, "BEING WORKED")
 								),
 								textStyle = legendsTextStyle
 							)
@@ -250,12 +363,33 @@ private fun SfsTabContainer() {
 
 @Composable
 @PreviewPdt
-fun PreviewPickScreen() {
-	PickScreen(
+fun PreviewPickLanding() {
+	PickLanding(
+		tasksUnassigned = null,
 		unitsWorked = 1,
 		totalUnits = 2,
-		hasActiveTask = false,
-		onHasActiveTask = {}
+		inProgressUnits = null,
+		storeOverviewState = GenericViewState.Idle,
+		startTaskStatus = GenericViewState.Idle,
+		onStartPicking = {},
+		startTaskCompletion = {},
+		resetScreen = {}
+	)
+}
+
+@Composable
+@PreviewPdt
+fun PreviewPickLandingStartPicking() {
+	PickLanding(
+		tasksUnassigned = null,
+		unitsWorked = 1,
+		totalUnits = 1,
+		inProgressUnits = null,
+		storeOverviewState = GenericViewState.Success,
+		startTaskStatus = GenericViewState.Success,
+		onStartPicking = {},
+		startTaskCompletion = {},
+		resetScreen = {}
 	)
 }
 

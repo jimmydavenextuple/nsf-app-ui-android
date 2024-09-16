@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -30,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.string
@@ -68,12 +69,14 @@ import com.nextuple.nsf.ui.common.ClearanceTag
 import com.nextuple.nsf.ui.common.HorizontalProgressBar
 import com.nextuple.nsf.ui.common.ImageModal
 import com.nextuple.nsf.ui.common.MultiOptionModal
+import com.nextuple.nsf.ui.common.MultiOptionSubstitutionModal
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.ScrollToReveal
+import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
+import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -91,6 +94,7 @@ val OTHER_REASON = "Other".uppercase()
  */
 @Composable
 fun PickDetailsScreen(
+	pickVM: PickViewModel,
 	scanManager: ScanManager,
 	pickDeclineState: GenericViewState = GenericViewState.Idle,
 	recordPickState: GenericViewState = GenericViewState.Idle,
@@ -115,12 +119,17 @@ fun PickDetailsScreen(
 	var showDeclineModal by remember {
 		mutableStateOf(false)
 	}
-	var showPickLocationModal by remember {
+	var showDetailDeclineModal by remember {
 		mutableStateOf(false)
 	}
 	var showImageModal by remember {
 		mutableStateOf(false)
 	}
+	var showPickLocationModal by remember {
+		mutableStateOf(false)
+	}
+	val showSubstitutionModal by pickVM.showSubstitutionModal.observeAsState()
+
 	val clearanceColor by remember {
 		mutableStateOf(currentPickTaskItem?.clearanceColorRgb)
 	}
@@ -134,9 +143,6 @@ fun PickDetailsScreen(
 		mutableStateOf<String?>(null)
 	}
 
-	var showDetailDeclineModal by remember {
-		mutableStateOf(false)
-	}
 	var currentIndex by remember {
 		mutableIntStateOf(0)
 	}
@@ -194,8 +200,7 @@ fun PickDetailsScreen(
 						.padding(start = 20.dp, end = 40.dp, top = 8.dp, bottom = 8.dp),
 					title = stringResource(id = R.string.units),
 					workedCount = unitsWorked,
-					totalCount = totalUnits,
-					completedColor = BrandColor.BLUE_300_NT
+					totalCount = totalUnits
 				)
 				Spacer(
 					modifier = Modifier
@@ -234,7 +239,6 @@ fun PickDetailsScreen(
 								maxLines = 1,
 								overflow = TextOverflow.Ellipsis,
 								color = BrandColor.BLACK,
-								fontFamily = FontFamily.ARCHIVO,
 								fontSize = 14.sp,
 								fontWeight = FontWeight(700),
 								letterSpacing = 1.5.sp
@@ -242,8 +246,7 @@ fun PickDetailsScreen(
 							Text(
 								text = subFulfillmentType.toString(),
 								maxLines = 1,
-								color = BrandColor.GRAY_500,
-								fontFamily = FontFamily.ARCHIVO,
+								color = BrandColor.BLACK,
 								fontSize = 14.sp,
 								fontWeight = FontWeight(700),
 								letterSpacing = 1.5.sp
@@ -256,7 +259,6 @@ fun PickDetailsScreen(
 							text = currentPickTaskItem?.productName ?: "",
 							maxLines = if (clearanceColor.isNullOrEmpty()) 2 else 1,
 							overflow = TextOverflow.Ellipsis,
-							fontFamily = FontFamily.ARCHIVO,
 							fontSize = 12.sp,
 							fontWeight = FontWeight.Normal,
 							letterSpacing = 0.5.sp,
@@ -266,7 +268,16 @@ fun PickDetailsScreen(
 						Spacer(modifier = Modifier.height(6.dp))
 
 						if (!clearanceColor.isNullOrEmpty() && !currentPickTaskItem?.clearanceColorDesc.isNullOrEmpty()) {
-							ClearanceTag(Modifier, clearanceColor.toString(), colorDesc = if (recordPickState == GenericViewState.Idle) currentPickTaskItem?.clearanceColorDesc ?: "" else "")
+							ClearanceTag(
+								Modifier,
+								clearanceColor.toString(),
+								colorDesc = if (recordPickState == GenericViewState.Idle) {
+									currentPickTaskItem?.clearanceColorDesc
+										?: ""
+								} else {
+									""
+								}
+							)
 						}
 
 						Spacer(modifier = Modifier.height(6.dp))
@@ -303,79 +314,76 @@ fun PickDetailsScreen(
 
 						Row(
 							modifier = Modifier
-								.fillMaxWidth()
-								.fillMaxHeight(),
+								.padding(top = 20.dp)
+								.fillMaxWidth(),
 							horizontalArrangement = Arrangement.Center,
-							verticalAlignment = Alignment.Bottom
+							verticalAlignment = Alignment.Bottom,
 						) {
-							Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+							Column(
+								modifier = Modifier.fillMaxWidth(),
+								horizontalAlignment = Alignment.CenterHorizontally
+							) {
 								DetailedCallToAction(
-							detailedCallToActionMode = when {
-								recordPickState is GenericViewState.Loading -> {
-									DetailedCallToActionMode.Loading()
-								}
-
-								recordPickState is GenericViewState.Success -> {
-									if (totalUnits != unitsWorked) {
-										Handler(Looper.getMainLooper()).postDelayed({
-											onRecordPickCompletion.invoke()
-										}, 1500)
-									} else {
-										onRecordPickCompletion.invoke()
-									}
-									DetailedCallToActionMode.Done()
-								}
-
-								pickDeclineState == GenericViewState.Success -> {
-									hideDecline = true
-
-									if (totalUnits != unitsWorked) {
-										Handler(Looper.getMainLooper()).postDelayed({
-											onDeclineCompletion.invoke()
-										}, 1500)
-									} else {
-										onDeclineCompletion.invoke()
-									}
-									DetailedCallToActionMode.Decline()
-								}
-
-								else -> {
-									val scanText =
-										if (remainingPickQty != null && remainingPickQty > 0) {
-											"Pick $remainingPickQty"
-										} else {
-											"Pick"
+									detailedCallToActionMode = when {
+										recordPickState is GenericViewState.Loading -> {
+											DetailedCallToActionMode.Loading()
 										}
 
-									DetailedCallToActionMode.Scan(scanText)
-								}
-							},
-							onClick = {
-								if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
-									onItemScan(
-										upc = currentPickTaskItem?.upcs?.firstOrNull().orEmpty(),
-										symbology = "upc"
-									)
-								}
-							}
-						)
-								HorizontalDivider(
-							modifier = Modifier
-										.width(124.dp),
-									color = BrandColor.GRAY_400,
-									thickness = 2.dp
+										recordPickState is GenericViewState.Success -> {
+											if (totalUnits != unitsWorked) {
+												Handler(Looper.getMainLooper()).postDelayed({
+													onRecordPickCompletion.invoke()
+												}, 1500)
+											} else {
+												onRecordPickCompletion.invoke()
+											}
+											DetailedCallToActionMode.Done()
+										}
+
+										pickDeclineState == GenericViewState.Success -> {
+											hideDecline = true
+
+											if (totalUnits != unitsWorked) {
+												Handler(Looper.getMainLooper()).postDelayed({
+													onDeclineCompletion.invoke()
+												}, 1500)
+											} else {
+												onDeclineCompletion.invoke()
+											}
+											DetailedCallToActionMode.Decline()
+										}
+
+										else -> {
+											val scanText =
+												if (remainingPickQty != null && remainingPickQty > 0) {
+													"Pick $remainingPickQty"
+												} else {
+													"Pick"
+												}
+
+											DetailedCallToActionMode.Scan(scanText)
+										}
+									},
+									onClick = {
+										if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
+											onItemScan(
+												upc = currentPickTaskItem?.upcs?.firstOrNull()
+													.orEmpty(),
+												symbology = "upc"
+											)
+										}
+									},
 								)
 							}
 						}
+
 					}
 				},
 				secondaryContent = {
-					PrimaryButton(
+					SecondaryButton(
 						modifier = Modifier
-							.fillMaxWidth()
-							.height(72.dp),
+							.fillMaxWidth(.83f),
 						buttonShape = RoundedCornerShape(0.dp),
-						buttonColor = BrandColor.GRAY_800,
 						buttonState =
 						if (declineCodesState == GenericViewState.Loading) {
 							ButtonState.LOADING
@@ -386,7 +394,7 @@ fun PickDetailsScreen(
 							onDeclineClick()
 							showDeclineModal = true
 						},
-						text = stringResource(id = string.decline),
+						text = stringResource(id = R.string.decline),
 						textSize = 16.sp
 					)
 				},
@@ -407,8 +415,8 @@ fun PickDetailsScreen(
 	if (showDeclineModal && declineModalOptions != null) {
 		if (subFulfillmentType != SubFulfillmentType.BOPL) {
 			MultiOptionModal(
-				title = stringResource(id = string.decline_reason),
-				subTitle = stringResource(id = string.decline_reason_subtitle),
+				title = stringResource(id = R.string.decline_reason),
+				subTitle = stringResource(id = R.string.decline_reason_subtitle),
 				buttons = declineModalOptions.keys.map { it.uppercase() },
 				buttonClick = { displayStr ->
 					val declineReason = declineModalOptions[displayStr] ?: return@MultiOptionModal
@@ -463,6 +471,7 @@ fun PickDetailsScreen(
 			changeCurrentIndex = { currentIndex = it }
 		)
 	}
+
 	if (showDetailDeclineModal && subFulfillmentType == SubFulfillmentType.BOPL) {
 		DeclineDetailsDialog(
 			onDismissRequest = {
@@ -473,6 +482,21 @@ fun PickDetailsScreen(
 				showDeclineModal = false
 				onDeclineReasonSelected(declineReason, declineReasonText)
 			}
+		)
+	}
+
+	if (showSubstitutionModal == true) {
+		MultiOptionSubstitutionModal(
+			title = "Substitutions Available",
+			subTitle = "The customer has approved substitutions. Please select one to pick it.",
+			buttons = currentPickTaskItem?.substitutions!!,
+			buttonClick = { displayStr ->
+				pickVM.onSubstitutionSelected(displayStr)
+				hideDecline = true
+				pickVM.toggleShowSubstitutionModal()
+			},
+			crossIconClick = { pickVM.toggleShowSubstitutionModal() },
+			onDismissRequest = { pickVM.toggleShowSubstitutionModal() }
 		)
 	}
 }
@@ -500,7 +524,7 @@ private fun PickImages(
 @Composable
 private fun ProductAttributes(
 	upcs: List<String>,
-    styleNum: String?,
+	styleNum: String?,
 	locations: List<String>,
 	onHandQty: Int?,
 	primaryAttr: ProductAttribute?,
@@ -567,7 +591,7 @@ private fun ProductAttributes(
 				} else {
 					null
 				},
-				label = stringResource(string.item_location),
+				label = stringResource(R.string.item_location),
 				value = locations.firstOrNull(),
 				valueMaxLines = 1
 			)
@@ -601,7 +625,7 @@ private fun ProductAttributes(
 					.onGloballyPositioned {
 						copyCoordinatesOrigin = it
 					},
-				label = stringResource(string.upc),
+				label = stringResource(R.string.upc),
 				iconImageVector = ImageVector.vectorResource(R.drawable.ic_copy_icon),
 				value = upcs.firstOrNull(),
 				valueMaxLines = 1
@@ -647,20 +671,20 @@ private fun ProductAttributes(
 				value = secondaryAttr?.value
 			)
 			if (styleNum.isNullOrEmpty()) {
-			AttributeText(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 2.dp)
-					.background(
-						color = if (tertiaryAttr?.value.isNullOrEmpty()) {
-							Color.Transparent
-						} else {
-							BrandColor.GRAY_100
-						}
-					),
-				label = tertiaryAttr?.name.orEmpty(),
-				value = tertiaryAttr?.value
-			)
+				AttributeText(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 2.dp)
+						.background(
+							color = if (tertiaryAttr?.value.isNullOrEmpty()) {
+								Color.Transparent
+							} else {
+								BrandColor.GRAY_100
+							}
+						),
+					label = tertiaryAttr?.name.orEmpty(),
+					value = tertiaryAttr?.value
+				)
 			}
 		}
 	}
@@ -693,7 +717,6 @@ fun DeclineDetailsDialog(
 						text = "Other Decline Reason",
 						style = TextStyle(
 							fontSize = 20.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Bold,
 							letterSpacing = 0.5.sp
 						)
@@ -728,7 +751,7 @@ fun DeclineDetailsDialog(
 					PrimaryButton(
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(10.dp),
+							.padding(top = 10.dp),
 						text = "Submit".uppercase(),
 						enabled = enabled,
 						onButtonClick = {
@@ -752,6 +775,7 @@ private fun DeclineDialogDialogPreview() {
 @PreviewPdt
 fun PickDetailsScreenPreview() {
 	PickDetailsScreen(
+		pickVM = hiltViewModel(),
 		scanManager = NoOpScanManager(),
 		pickDeclineState = GenericViewState.Loading,
 		fulfillmentType = BOPIS,

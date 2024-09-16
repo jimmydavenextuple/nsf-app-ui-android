@@ -31,15 +31,15 @@ class PrintViewModel @Inject constructor(
 		const val TAG_ZPL = "$TAG.pageZpl"
 	}
 
-	var holdSlipPrintState: GenericViewState by mutableStateOf(GenericViewState.Idle)
+	var printHoldSlipState: GenericViewState by mutableStateOf(GenericViewState.Idle)
 		private set
 
 	fun printHoldSlip(
-        holdSlipZPL: MutableList<String>,
-        printer: Printer,
-        bypassPrinter: Boolean
+		holdSlipZPL: MutableList<String>,
+		printer: Printer,
+		bypassPrinter: Boolean
 	) = viewModelScope.launch {
-		holdSlipPrintState = GenericViewState.Loading
+		printHoldSlipState = GenericViewState.Loading
 
 		Log.i("$TAG.Data", "PrintHoldSlip - Printer: $printer, bypassPrinter: $bypassPrinter")
 
@@ -60,16 +60,16 @@ class PrintViewModel @Inject constructor(
 						}
 					} ?: {
 						Log.e(TAG, "Issue Connecting to Printer")
-						holdSlipPrintState = GenericViewState.Failure
+						printHoldSlipState = GenericViewState.Failure
 					}
 				}
 			}
 		}.onSuccess {
 			Log.i(TAG, "Successfully printed Hold Slip")
-			holdSlipPrintState = GenericViewState.Success
+			printHoldSlipState = GenericViewState.Success
 		}.onFailure {
 			Log.e(TAG, "Hold Slip not Printed: hold slip info not found", it)
-			holdSlipPrintState = GenericViewState.Failure
+			printHoldSlipState = GenericViewState.Failure
 		}
 	}
 
@@ -77,6 +77,6 @@ class PrintViewModel @Inject constructor(
 	 * Removing existing holdSlipPrint state and default to default state.
 	 */
 	fun resetHoldSlipPrintState() {
-		holdSlipPrintState = GenericViewState.Idle
+		printHoldSlipState = GenericViewState.Idle
 	}
 }

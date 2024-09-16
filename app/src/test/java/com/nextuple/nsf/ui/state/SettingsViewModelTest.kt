@@ -1,6 +1,5 @@
 package com.nextuple.nsf.ui.state
 
-import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.nextuple.nsf.CoroutineRule
@@ -8,6 +7,8 @@ import com.nextuple.nsf.Printers
 import com.nextuple.nsf.datastore.PrintersRepository
 import com.nextuple.nsf.service.WifiService
 import com.nextuple.nsf.ui.util.GenericViewState
+import com.nextuple.nsf.ui.util.Printer
+import com.nextuple.nsf.ui.util.PrinterName
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -23,6 +24,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -71,6 +74,18 @@ class SettingsViewModelTest {
 	}
 
 	@Test
+	fun `bypassPrinter initial value = build debug value`() {
+		assertEquals(isDebug, vm.bypassPrinter)
+	}
+
+	@Test
+	fun `toggleBypassPrinter correctly toggles bypassPrinter`() {
+		assertTrue(vm.bypassPrinter)
+		vm.toggleBypassPrinter()
+		assertFalse(vm.bypassPrinter)
+	}
+
+	@Test
 	fun `setIpPrefix should get ipAddress from wifiService`() {
 		vm.setIpPrefix()
 
@@ -81,7 +96,7 @@ class SettingsViewModelTest {
 	@Test
 	fun `connect printer should update printer list on success`() = runTest {
 		val ipAddress = "198.68.72.12"
-		val printerType = PrinterName.SDD
+		val printerType = PrinterName.BOPL
 		val sddPrinter = vm.findPrinter(printerType)
 		assertEquals(false, sddPrinter.connectionStatus)
 
@@ -96,7 +111,7 @@ class SettingsViewModelTest {
 	@Test
 	fun `connect printer should not update printer list on error`() = runTest {
 		val ipAddress = "198.68.72.12"
-		val printerType = PrinterName.SDD
+		val printerType = PrinterName.BOPL
 		val sddPrinter = vm.findPrinter(printerType)
 		assertEquals(false, sddPrinter.connectionStatus)
 		// Test with isDebug set to false
@@ -113,44 +128,6 @@ class SettingsViewModelTest {
 
 		val updatedPrinter = vm.findPrinter(printerType)
 		assertEquals(false, updatedPrinter.connectionStatus)
-	}
-
-	@Test
-	fun `printBOPISHoldSlip should successfully handle valid hold slip data`() = runTest {
-		vm.toggleBypassPrinter()
-
-		mockkStatic(Base64::class)
-		every { Base64.decode(any<String>(), Base64.DEFAULT) } returns byteArrayOf()
-
-		val holdSlipList = mutableListOf("hold", "slip", "zpl")
-		vm.printBOPISHoldSlip(holdSlipList)
-		advanceUntilIdle()
-
-		verify(exactly = holdSlipList.size) {
-			Log.i("HoldSlipZPL Printout", any())
-		}
-
-		verify(exactly = 1) {
-			Log.i("holdSlipPrintSuccess", "Successfully printed BOPIS Hold Slip")
-		}
-
-		assertEquals(GenericViewState.Success, vm.holdSlipPrintState)
-	}
-
-	@Test
-	fun `printBOPISHoldSlip should set state to Failure when an exception is thrown`() = runTest {
-		mockkStatic(Base64::class)
-		every { Log.e(any(), any(), any()) } returns 0
-
-		val holdSlipList = mutableListOf<String>()
-		vm.printBOPISHoldSlip(holdSlipList)
-		advanceUntilIdle()
-
-		verify(exactly = 1) {
-			Log.e(any(), any(), any())
-		}
-
-		assertEquals(GenericViewState.Failure, vm.holdSlipPrintState)
 	}
 
 	@Test
@@ -173,13 +150,6 @@ class SettingsViewModelTest {
 	}
 
 	@Test
-	fun `resetHoldSlipPrintState should set state to Idle`() {
-		vm.resetHoldSlipPrintState()
-
-		assertEquals(GenericViewState.Idle, vm.holdSlipPrintState)
-	}
-
-	@Test
 	fun `retrieveSavedPrinters should get printers and set them correctly`() = runTest {
 		val printersListInFlow = Printers.newBuilder()
 			.addPrinterList(
@@ -196,11 +166,18 @@ class SettingsViewModelTest {
 					.setConnectionStatus(true)
 					.build()
 			)
+			.addPrinterList(
+				com.nextuple.nsf.Printer.newBuilder()
+					.setPrinterName("SDD")
+					.setIpAddress("10.0.0.2")
+					.setConnectionStatus(true)
+					.build()
+			)
 			.build()
 		val printerResult = listOf(
 			Printer(printerName = "SFS", ipAddress = "10.0.0.2", connectionStatus = true),
 			Printer(printerName = "BOPIS", ipAddress = "10.0.0.2", connectionStatus = true),
-			Printer(printerName = "SDD", connectionStatus = false),
+			Printer(printerName = "SDD", ipAddress = "10.0.0.2", connectionStatus = true),
 			Printer(printerName = "BOPL", connectionStatus = false)
 		)
 		val flowToReturn: Flow<Printers> = flow {

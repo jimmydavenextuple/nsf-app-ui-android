@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -50,7 +49,6 @@ import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
 import com.nextuple.nsf.ui.common.OmniTextField
 import com.nextuple.nsf.ui.screen.order.OrderCardList
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -65,8 +63,8 @@ fun SearchResultsScreen(
 	orderResults: List<OrderDetailsResponse>?,
 	getOrderDetails: (String) -> Unit,
 	getOrderDetailsCompletion: () -> Unit,
-    scanManager: ScanManager = NoOpScanManager(),
-    newSearch: (String) -> Unit
+	scanManager: ScanManager = NoOpScanManager(),
+	newSearch: (String) -> Unit
 ) {
 	val focusManager = LocalFocusManager.current
 	var searchInputText by remember { mutableStateOf(searchInput) }
@@ -128,11 +126,14 @@ fun SearchResultsScreen(
 						.padding(horizontal = 16.dp, vertical = 4.dp),
 					text = "${orderResults.size} matches for \"${lastSearch}\"",
 					color = BrandColor.BLACK,
-					fontFamily = FontFamily.ARCHIVO,
 					letterSpacing = 0.5.sp,
 					fontSize = 12.sp
 				)
-				OrderCardList(orderList = orderResults, getOrderDetails = getOrderDetails)
+				OrderCardList(
+					orderList = orderResults,
+					getOrderDetails = getOrderDetails,
+					sddReadyList = null
+				)
 			}
 		}
 	}
@@ -142,7 +143,6 @@ fun SearchResultsScreen(
 	}
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SearchBar(
 	modifier: Modifier = Modifier,
@@ -202,13 +202,16 @@ private fun SearchBar(
 				Text(
 					text = stringResource(id = R.string.search_results_info),
 					fontSize = 10.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					color = BrandColor.BLACK
 				)
 			}
 		}
 
-		HorizontalDivider(modifier = Modifier.padding(top = 8.dp), thickness = 1.dp, color = borderColor)
+		HorizontalDivider(
+			modifier = Modifier.padding(top = 8.dp),
+			thickness = 1.dp,
+			color = borderColor
+		)
 	}
 }
 
@@ -219,12 +222,11 @@ private fun LoadingView(modifier: Modifier = Modifier, showSearchingText: Boolea
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
-		CircularProgressIndicator(color = BrandColor.PINK_NT)
+		CircularProgressIndicator(color = BrandColor.DARK_BLUE)
 		if (showSearchingText) {
 			Text(
 				text = "Searching...",
 				fontSize = 12.sp,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight.Normal,
 				color = BrandColor.GRAY_900,
 				textAlign = TextAlign.Center,
@@ -258,31 +260,8 @@ private fun NoResultsView(
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			Image(
-				imageVector = ImageVector.vectorResource(R.drawable.umpire),
-				contentDescription = "Umpire Strike Out"
-			)
-			Text(
-				modifier = Modifier
-					.padding(top = 20.dp)
-					.width(200.dp),
-				text = stringResource(id = R.string.strike),
-				fontSize = 18.sp,
-				lineHeight = 23.4.sp,
-				fontFamily = FontFamily.ARCHIVO,
-				fontWeight = FontWeight.Bold,
-				color = BrandColor.BLACK,
-				letterSpacing = 0.5.sp
-			)
-			Text(
-				modifier = Modifier
-					.padding(vertical = 8.dp)
-					.width(200.dp),
-				text = noSearchResultsText,
-				fontSize = 12.sp,
-				lineHeight = 16.sp,
-				fontFamily = FontFamily.ARCHIVO,
-				color = BrandColor.BLACK,
-				letterSpacing = 0.5.sp
+				imageVector = ImageVector.vectorResource(R.drawable.no_results_empty_dish),
+				contentDescription = "No Results"
 			)
 		}
 	}

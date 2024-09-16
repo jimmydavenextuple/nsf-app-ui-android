@@ -2,15 +2,10 @@ package com.nextuple.nsf.service
 
 import android.app.Application
 import android.os.Build
-import com.nextuple.nsf.service.dto.Device
-import com.nextuple.nsf.service.dto.User
-//import com.microsoft.appcenter.AppCenter
-//import com.microsoft.appcenter.analytics.Analytics
-//import com.microsoft.appcenter.crashes.Crashes
-//import com.microsoft.clarity.Clarity
-//import com.microsoft.clarity.ClarityConfig
 import android.util.Log
 import com.nextuple.nsf.BuildConfig
+import com.nextuple.nsf.service.dto.Device
+import com.nextuple.nsf.service.dto.User
 
 /**
  * Other services should not be injected into this directly to avoid circular dependencies.
@@ -22,19 +17,18 @@ class LogService(private val app: Application) {
 	private var device: Device? = null
 
 	fun start() {
-//		if (!AppCenter.isConfigured()) {
-//			AppCenter.start(
-//				app,
-//				BuildConfig.APP_CENTER_KEY,
-//				Analytics::class.java,
-//				Crashes::class.java
-//			)
-//		}
+// 		if (!AppCenter.isConfigured()) {
+// 			AppCenter.start(
+// 				app,
+// 				BuildConfig.APP_CENTER_KEY,
+// 				Analytics::class.java,
+// 				Crashes::class.java
+// 			)
+// 		}
 //
-//		Clarity.initialize(app, ClarityConfig(BuildConfig.CLARITY_PROJECT_ID))
+// 		Clarity.initialize(app, ClarityConfig(BuildConfig.CLARITY_PROJECT_ID))
 
-		Log.i("LOG","Initialize logging")
-
+		Log.i("LOG", "Initialize logging")
 	}
 
 	fun setUser(user: User?) {
@@ -50,8 +44,8 @@ class LogService(private val app: Application) {
 	 * @param additionalProps additional properties not already covered under [User] and [Device]
 	 */
 	fun trackEvent(eventName: String, additionalProps: Map<String, String> = emptyMap()) {
-		Log.d(eventName,"EventProps: $additionalProps")
-		//Analytics.trackEvent(eventName, commonProps().plus(additionalProps))
+		Log.d(eventName, "EventProps: $additionalProps")
+		// Analytics.trackEvent(eventName, commonProps().plus(additionalProps))
 	}
 
 	/**
@@ -64,14 +58,14 @@ class LogService(private val app: Application) {
 		t: Throwable,
 		additionalProps: Map<String, String> = emptyMap()
 	) {
-		//Integration with
-//		Crashes.trackError(
-//			t,
-//			mapOf("attemptedAction" to attemptedAction)
-//				.plus(commonProps())
-//				.plus(additionalProps),
-//			emptyList()
-//		)
+		// Integration with
+// 		Crashes.trackError(
+// 			t,
+// 			mapOf("attemptedAction" to attemptedAction)
+// 				.plus(commonProps())
+// 				.plus(additionalProps),
+// 			emptyList()
+// 		)
 		Log.e(attemptedAction, "Action: $attemptedAction, Error: $additionalProps", t)
 	}
 
@@ -79,7 +73,7 @@ class LogService(private val app: Application) {
 
 	private fun userToProps(): Map<String, String> = user?.let {
 		mapOf(
-			"userDks" to it.dks,
+			"userId" to it.userId,
 			"userFirstName" to it.firstName,
 			"userLastName" to it.lastName,
 			"storeId" to it.store.id,

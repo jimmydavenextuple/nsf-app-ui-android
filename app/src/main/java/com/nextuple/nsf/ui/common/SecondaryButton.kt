@@ -2,6 +2,7 @@ package com.nextuple.nsf.ui.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,22 +22,24 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun SecondaryButton(
-    modifier: Modifier = Modifier,
-    text: String,
-    buttonColor: Color = Color.Transparent,
-    textColor: Color = BrandColor.GRAY_900,
-    textSize: TextUnit = 16.sp,
-    buttonShape: Shape = RoundedCornerShape(4.dp),
-    enabled: Boolean = true,
-    buttonState: ButtonState = ButtonState.DEFAULT,
-    onButtonClick: () -> Unit
+	modifier: Modifier = Modifier,
+	text: String,
+	buttonColor: Color = Color.Transparent,
+	textColor: Color = BrandColor.GRAY_900,
+	textSize: TextUnit = 16.sp,
+	buttonShape: Shape = RoundedCornerShape(0.dp),
+	enabled: Boolean = true,
+	buttonState: ButtonState = ButtonState.DEFAULT,
+	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+	onButtonClick: () -> Unit
 ) {
 	Button(
-		modifier = modifier.height(IntrinsicSize.Min).testTag("SecondaryButton"),
+		modifier = modifier
+			.height(IntrinsicSize.Min)
+			.testTag("SecondaryButton"),
 		onClick = onButtonClick,
 		border = BorderStroke(2.dp, if (enabled) textColor else BrandColor.GRAY_500),
 		shape = buttonShape,
@@ -46,6 +49,7 @@ fun SecondaryButton(
 			contentColor = textColor,
 			disabledContentColor = BrandColor.GRAY_600
 		),
+		contentPadding = contentPadding,
 		enabled = enabled
 	) {
 		when (buttonState) {
@@ -55,12 +59,12 @@ fun SecondaryButton(
 					color = textColor
 				)
 			}
+
 			else -> {
 				Text(
 					text = text,
 					textAlign = TextAlign.Center,
 					fontSize = textSize,
-					fontFamily = FontFamily.ARCHIVO,
 					letterSpacing = 1.5.sp,
 					fontWeight = FontWeight.Bold
 				)

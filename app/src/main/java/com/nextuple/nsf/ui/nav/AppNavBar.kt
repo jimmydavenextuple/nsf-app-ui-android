@@ -47,10 +47,10 @@ data class AppNavBarItem(
 
 @Composable
 fun AppNavBar(
-    items: List<AppNavBarItem>,
-    isSelected: (route: String) -> Boolean,
-    onSelect: (route: String) -> Unit,
-    tasksUnassigned: List<Int>
+	items: List<AppNavBarItem>,
+	isSelected: (route: String) -> Boolean,
+	onSelect: (route: String) -> Unit,
+	tasksUnassigned: List<Int>
 ) {
 	Row(
 		modifier = Modifier
@@ -76,10 +76,10 @@ fun AppNavBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RowScope.AppNavItem(
-    item: AppNavBarItem,
-    isSelected: (route: String) -> Boolean,
-    onSelect: (route: String) -> Unit,
-    interactionSource: MutableInteractionSource
+	item: AppNavBarItem,
+	isSelected: (route: String) -> Boolean,
+	onSelect: (route: String) -> Unit,
+	interactionSource: MutableInteractionSource
 ) {
 	val isRouteSelected = isSelected(item.route)
 
@@ -93,8 +93,9 @@ fun RowScope.AppNavItem(
 				indication = null
 			) {
 				onSelect(item.route)
-			}.let {
-				if (isRouteSelected) it.background(color = BrandColor.GRAY_50) else it
+			}
+			.let {
+				if (isRouteSelected) it.background(color = BrandColor.TRANSPARENT) else it
 			},
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
@@ -105,7 +106,7 @@ fun RowScope.AppNavItem(
 					Box(
 						modifier = Modifier
 							.size(20.dp)
-							.background(BrandColor.PINK_NT, CircleShape),
+							.background(BrandColor.STRONG_PINK, CircleShape),
 						contentAlignment = Alignment.Center,
 						content = {
 							Text(
@@ -122,10 +123,10 @@ fun RowScope.AppNavItem(
 			Icon(
 				modifier = Modifier
 					.testTag("navigationBarItemIcon_${item.label}")
-					.size(20.dp)
+					.size(22.dp)
 					.align(Alignment.Center),
 				imageVector = ImageVector.vectorResource(id = item.iconResId),
-				tint = if (isRouteSelected) BrandColor.BLUE_300_NT else BrandColor.GRAY_900,
+				tint = if (isRouteSelected) BrandColor.DARK_BLUE else BrandColor.GRAY_900,
 				contentDescription = "Navigate to ${item.label}"
 			)
 		}
@@ -134,7 +135,7 @@ fun RowScope.AppNavItem(
 			modifier = Modifier
 				.testTag("navigationBarItemLabel_${item.label}"),
 			text = item.label.uppercase(),
-			color = if (isRouteSelected) BrandColor.BLUE_300_NT else BrandColor.GRAY_900,
+			color = if (isRouteSelected) BrandColor.DARK_BLUE else BrandColor.GRAY_900,
 			fontSize = if (isRouteSelected) 12.sp else 10.sp,
 			fontWeight = FontWeight(700),
 			letterSpacing = 1.5.sp

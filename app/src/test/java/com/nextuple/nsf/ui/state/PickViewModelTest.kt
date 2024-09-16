@@ -6,6 +6,8 @@ import com.nextuple.nsf.retrofit.dto.DeclineItemRequest
 import com.nextuple.nsf.retrofit.dto.PickItemRequest
 import com.nextuple.nsf.retrofit.dto.PickTask
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
+import com.nextuple.nsf.retrofit.dto.response.GetUserPickTasksResponse
+import com.nextuple.nsf.service.InfoService
 import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.PickService
 import com.nextuple.nsf.service.dto.Result
@@ -26,6 +28,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -48,12 +51,78 @@ class PickViewModelTest {
 	private lateinit var pickService: PickService
 
 	@MockK
+	private lateinit var infoService: InfoService
+
+	@MockK
 	private lateinit var logService: LogService
 
 	@Before
 	fun setUp() {
 		MockKAnnotations.init(this)
 	}
+
+	@Test
+	fun `fetchCurrentStep should set the user's current pick task`() = runTest {
+		val expectedTask = PickTask(
+			id = 123L,
+			fulfillmentType = BOPIS,
+			subFulfillmentType = SubFulfillmentType.BOPIS,
+			items = listOf(
+				PickTaskItem(
+					sku = "anySku",
+					upcs = emptyList(),
+					onHandQty = 9001,
+					qty = 2,
+					pickedQty = 1,
+					declinedQty = 0,
+					productBrand = "anyBrand",
+					productName = "anyName",
+					style = null
+				)
+			),
+			totalWorkedQty = 1,
+			totalQty = 2,
+			totalRemainingQty = 1
+		)
+
+		every { runBlocking { infoService.getUserPickTasks() } } returns Result.Success(
+			GetUserPickTasksResponse(
+				pickTask = expectedTask
+			)
+		)
+
+		vm.fetchCurrentStep()
+		advanceUntilIdle()
+
+		assertEquals(GenericViewState.Success, vm.viewState)
+		assertEquals(expectedTask, vm.pickTask)
+		assertNotNull(vm.currentPickItem)
+	}
+
+	@Test
+	fun `fetchCurrentStep should set null when user has no current pick task`() = runTest {
+		every { runBlocking { infoService.getUserPickTasks() } } returns Result.Success(null)
+
+		vm.fetchCurrentStep()
+		advanceUntilIdle()
+
+		assertEquals(GenericViewState.Success, vm.viewState)
+		assertNull(vm.pickTask)
+		assertNull(vm.currentPickItem)
+	}
+
+	@Test
+	fun `fetchCurrentStep should set null when failed to retrieve user's current pick task`() =
+		runTest {
+			every { runBlocking { infoService.getUserPickTasks() } } returns Result.Error()
+
+			vm.fetchCurrentStep()
+			advanceUntilIdle()
+
+			assertEquals(GenericViewState.Failure, vm.viewState)
+			assertNull(vm.pickTask)
+			assertNull(vm.currentPickItem)
+		}
 
 	@Test
 	fun `startPick, on error, should enter error state`() = runTest {
@@ -64,7 +133,6 @@ class PickViewModelTest {
 
 		assertEquals(GenericViewState.Idle, vm.startPickState)
 		assertNull(vm.pickTask)
-		assertEquals(errMsg, vm.errMsg)
 	}
 
 	@Test
@@ -78,7 +146,6 @@ class PickViewModelTest {
 
 		assertEquals(GenericViewState.Failure, vm.startPickState)
 		assertNull(vm.pickTask)
-		assertEquals(errMsg, vm.errMsg)
 	}
 
 	@Test
@@ -98,7 +165,6 @@ class PickViewModelTest {
 
 		assertEquals(GenericViewState.Success, vm.startPickState)
 		assertEquals(pickTask, vm.pickTask)
-		assertNull(vm.errMsg)
 	}
 
 	@Test
@@ -120,7 +186,8 @@ class PickViewModelTest {
 						productBrand = "",
 						productName = "",
 						sku = "",
-						upcs = emptyList()
+						upcs = emptyList(),
+						style = ""
 					)
 				)
 			)
@@ -130,8 +197,7 @@ class PickViewModelTest {
 
 			assertEquals(GenericViewState.Success, vm.startPickState)
 			assertEquals(pickTask, vm.pickTask)
-			assertTrue(vm.currentPickItem.value?.qty == 10)
-			assertNull(vm.errMsg)
+			assertTrue(vm.currentPickItem?.qty == 10)
 		}
 
 	@Test
@@ -147,7 +213,6 @@ class PickViewModelTest {
 
 		assertEquals(GenericViewState.Failure, vm.pickDeclineState)
 		assertNull(vm.pickTask)
-		assertEquals(errMsg, vm.errMsg)
 	}
 
 	@Test
@@ -169,7 +234,6 @@ class PickViewModelTest {
 
 		assertEquals(GenericViewState.Success, vm.pickDeclineState)
 		assertEquals(pickTask, vm.pickTask)
-		assertNull(vm.errMsg)
 	}
 
 	@Test
@@ -190,7 +254,8 @@ class PickViewModelTest {
 					pickedQty = 0,
 					declinedQty = 0,
 					productName = "anyProduct",
-					productBrand = "anyBrand"
+					productBrand = "anyBrand",
+					style = "style"
 				)
 			)
 		)
@@ -229,7 +294,8 @@ class PickViewModelTest {
 					pickedQty = 1,
 					declinedQty = 0,
 					productName = "anyProduct",
-					productBrand = "anyBrand"
+					productBrand = "anyBrand",
+					style = "style"
 				)
 			)
 		)
@@ -268,7 +334,6 @@ class PickViewModelTest {
 
 		assertEquals(GenericViewState.Failure, vm.recordPickState)
 		assertNull(vm.pickTask)
-		assertEquals(errMsg, vm.errMsg)
 	}
 
 	@Test
@@ -289,7 +354,6 @@ class PickViewModelTest {
 
 		assertEquals(GenericViewState.Failure, vm.recordPickState)
 		assertNull(vm.pickTask)
-		assertEquals(errMsg, vm.errMsg)
 	}
 
 	@Test
@@ -312,7 +376,8 @@ class PickViewModelTest {
 					productBrand = "",
 					productName = "",
 					sku = "",
-					upcs = listOf(upc1, upc2)
+					upcs = listOf(upc1, upc2),
+					style = ""
 				)
 			)
 		)
@@ -349,7 +414,8 @@ class PickViewModelTest {
 					productBrand = "",
 					productName = "",
 					sku = "sku",
-					upcs = listOf(upc1, upc2)
+					upcs = listOf(upc1, upc2),
+					style = ""
 				)
 			)
 		)

@@ -5,8 +5,6 @@ package com.nextuple.nsf.retrofit.dto
  */
 data class PackTask(
 	val id: Long,
-    val status: Status? = null,
-    val fulfillmentRequestNumber: String
+	val status: Status? = null,
+	val fulfillmentRequestNumber: String
 )
-
-

@@ -38,17 +38,16 @@ import com.nextuple.nsf.R.string
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.chip.CheckableChip
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FiltersBottomSheet(
-    state: SheetState,
-    bottomInset: Dp = 48.dp,
-    initialOrderTypes: List<Filter>,
-    initialOrderStatuses: List<Filter>,
-    onDismiss: () -> Unit,
-    onApplyFilters: (orderTypeFilters: List<Filter>, orderStatusFilters: List<Filter>) -> Unit
+	state: SheetState,
+	bottomInset: Dp = 48.dp,
+	initialOrderTypes: List<Filter>,
+	initialOrderStatuses: List<Filter>,
+	onDismiss: () -> Unit,
+	onApplyFilters: (orderTypeFilters: List<Filter>, orderStatusFilters: List<Filter>) -> Unit
 ) {
 	var orderTypes by remember { mutableStateOf(initialOrderTypes) }
 	var orderStatuses by remember { mutableStateOf(initialOrderStatuses) }
@@ -80,7 +79,6 @@ fun FiltersBottomSheet(
 					color = BrandColor.BLACK,
 					style = TextStyle(
 						fontSize = 18.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(700)
 					)
 				)
@@ -128,7 +126,7 @@ fun FiltersBottomSheet(
 				contentAlignment = Alignment.Center
 			) {
 				PrimaryButton(
-					modifier = Modifier.fillMaxWidth(.7f),
+					modifier = Modifier.fillMaxWidth(),
 					text = stringResource(string.apply_filters),
 					onButtonClick = {
 						onApplyFilters(orderTypes, orderStatuses)

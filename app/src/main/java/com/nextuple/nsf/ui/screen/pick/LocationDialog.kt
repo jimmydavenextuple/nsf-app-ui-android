@@ -30,7 +30,6 @@ import androidx.compose.ui.window.DialogProperties
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.drawable
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun LocationDialog(
@@ -53,16 +52,14 @@ fun LocationDialog(
 					.fillMaxWidth()
 			) {
 				Row(
-						modifier = Modifier
+					modifier = Modifier
 						.fillMaxWidth()
 						.padding(bottom = 10.dp),
 					horizontalArrangement = Arrangement.SpaceBetween,
 					verticalAlignment = Alignment.CenterVertically
 				) {
-
 					Text(
 						text = stringResource(R.string.locations),
-						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 16.sp,
 						fontWeight = FontWeight(700),
 						letterSpacing = 0.5.sp
@@ -86,16 +83,15 @@ fun LocationDialog(
 							.fillMaxWidth()
 							.background(if (count % 2 == 0) BrandColor.GRAY_100 else BrandColor.WHITE)
 					) {
-					Text(
+						Text(
 							modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp),
-						text = it,
+							text = it,
 							fontSize = 12.sp,
 							lineHeight = 13.06.sp,
-						fontFamily = FontFamily.ARCHIVO,
-						fontWeight = FontWeight(400),
-						textAlign = TextAlign.Center,
-						letterSpacing = 0.5.sp
-					)
+							fontWeight = FontWeight(400),
+							textAlign = TextAlign.Center,
+							letterSpacing = 0.5.sp
+						)
 					}
 					count++
 				}

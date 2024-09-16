@@ -45,18 +45,19 @@ private val FILTERS_BOTTOM_INSET_HIDDEN = 0.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderScreen(
-    viewState: GenericViewState = GenericViewState.Loading,
-    orderDetailsState: GenericViewState = GenericViewState.Idle,
-    getOrders: (query: String?) -> Unit,
-    getOrderDetails: (String) -> Unit,
-    getOrderDetailsCompletion: () -> Unit,
-    readyOrders: List<OrderDetailsResponse>,
-    inProgressOrders: List<OrderDetailsResponse>,
-    orderTypeFilters: List<Filter>,
-    orderStatusFilters: List<Filter>,
-    selectedTab: OrderScreenTab,
-    onSelectTab: (tab: OrderScreenTab) -> Unit,
-    onApplyFilters: (orderTypeFilters: List<Filter>, orderStatusFilters: List<Filter>) -> Unit
+	viewState: GenericViewState = GenericViewState.Loading,
+	orderDetailsState: GenericViewState = GenericViewState.Idle,
+	getOrders: (query: String?) -> Unit,
+	getOrderDetails: (String) -> Unit,
+	getOrderDetailsCompletion: () -> Unit,
+	readyOrders: List<OrderDetailsResponse>,
+	sddReadyOrder: List<List<OrderDetailsResponse>>? = null,
+	inProgressOrders: List<OrderDetailsResponse>,
+	orderTypeFilters: List<Filter>,
+	orderStatusFilters: List<Filter>,
+	selectedTab: OrderScreenTab,
+	onSelectTab: (tab: OrderScreenTab) -> Unit,
+	onApplyFilters: (orderTypeFilters: List<Filter>, orderStatusFilters: List<Filter>) -> Unit
 ) {
 	val scope = rememberCoroutineScope()
 
@@ -101,7 +102,7 @@ fun OrderScreen(
 				Tab(
 					modifier = Modifier.weight(1f),
 					title = OrderScreenTab.READY.displayName,
-					count = readyOrders.size,
+					count = readyOrders.size + (sddReadyOrder?.size ?: 0),
 					isSelected = selectedTab == OrderScreenTab.READY
 				) {
 					onSelectTab(OrderScreenTab.READY)
@@ -130,23 +131,24 @@ fun OrderScreen(
 			) {
 				onShowFilters()
 			}
-			if (readyOrders.isEmpty() && selectedTab == OrderScreenTab.READY) {
+			if (readyOrders.isEmpty() && sddReadyOrder.isNullOrEmpty() && selectedTab == OrderScreenTab.READY) {
 				EmptyStateScreen(
 					title = stringResource(R.string.empty_ready_title),
 					body = stringResource(R.string.empty_ready_body),
-					imageVector = ImageVector.vectorResource(id = R.drawable.ic_stop_watch)
+					imageVector = ImageVector.vectorResource(id = R.drawable.applause)
 				)
 			} else if (inProgressOrders.isEmpty() && selectedTab == OrderScreenTab.IN_PROGRESS) {
 				EmptyStateScreen(
 					title = stringResource(R.string.empty_in_progress_title),
 					body = stringResource(R.string.empty_in_progress_body),
-					imageVector = ImageVector.vectorResource(id = R.drawable.ic_basketball_hoop)
+					imageVector = ImageVector.vectorResource(id = R.drawable.applause)
 				)
 			}
 			OrderCardList(
 				modifier = Modifier.padding(top = 10.dp),
 				orderList = if (selectedTab == OrderScreenTab.READY) readyOrders else inProgressOrders,
-				getOrderDetails = getOrderDetails
+				getOrderDetails = getOrderDetails,
+				sddReadyList = sddReadyOrder
 			)
 		}
 		if (viewState == GenericViewState.Loading || orderDetailsState == GenericViewState.Loading) {
@@ -190,6 +192,54 @@ fun PreviewOrderScreen() {
 				)
 			)
 		),
+		inProgressOrders = emptyList(),
+		orderTypeFilters = listOf(
+			Filter("bopis"),
+			Filter("bopl"),
+			Filter("sdd")
+		),
+		orderStatusFilters = listOf(
+			Filter("pack"),
+			Filter("stage"),
+			Filter("dispense")
+		),
+		selectedTab = OrderScreenTab.READY,
+		onSelectTab = {}
+	) { _, _ -> }
+}
+
+@Composable
+@PreviewPdt
+fun PreviewOrderScreen_Swish() {
+	OrderScreen(
+		getOrders = { _ -> },
+		getOrderDetails = {},
+		getOrderDetailsCompletion = {},
+		readyOrders = emptyList(),
+		inProgressOrders = emptyList(),
+		orderTypeFilters = listOf(
+			Filter("bopis"),
+			Filter("bopl"),
+			Filter("sdd")
+		),
+		orderStatusFilters = listOf(
+			Filter("pack"),
+			Filter("stage"),
+			Filter("dispense")
+		),
+		selectedTab = OrderScreenTab.READY,
+		onSelectTab = {}
+	) { _, _ -> }
+}
+
+@Composable
+@PreviewPdt
+fun PreviewOrderScreen_inProgressTab() {
+	OrderScreen(
+		getOrders = { _ -> },
+		getOrderDetails = {},
+		getOrderDetailsCompletion = {},
+		readyOrders = emptyList(),
 		inProgressOrders = emptyList(),
 		orderTypeFilters = listOf(
 			Filter("bopis"),

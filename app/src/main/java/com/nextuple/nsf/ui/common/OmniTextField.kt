@@ -39,24 +39,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OmniTextField(
-    modifier: Modifier = Modifier,
-    icon: ImageVector? = null,
-    iconTint: Color = BrandColor.PINK_NT,
-    fieldValue: String,
-    hintText: String = "",
-    onValueChange: (newValue: String) -> Unit,
-    textFieldShape: Shape = RoundedCornerShape(4.dp),
-    keyboardActions: KeyboardActions = KeyboardActions { },
-    borderStroke: BorderStroke = BorderStroke(
+	modifier: Modifier = Modifier,
+	icon: ImageVector? = null,
+	iconTint: Color = BrandColor.DARK_BLUE,
+	fieldValue: String,
+	hintText: String = "",
+	onValueChange: (newValue: String) -> Unit,
+	textFieldShape: Shape = RoundedCornerShape(4.dp),
+	keyboardActions: KeyboardActions = KeyboardActions { },
+	borderStroke: BorderStroke = BorderStroke(
 		width = 0.5.dp,
 		color = BrandColor.WHITE
 	),
-    onClear: () -> Unit = {}
+	onClear: () -> Unit = {}
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 
@@ -90,7 +89,6 @@ fun OmniTextField(
 					.weight(1.0f),
 				singleLine = true,
 				textStyle = TextStyle.Default.copy(
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Normal,
 					color = BrandColor.GRAY_900,
 					letterSpacing = 0.5.sp,
@@ -111,7 +109,6 @@ fun OmniTextField(
 						Text(
 							text = hintText,
 							fontSize = 12.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Bold,
 							color = BrandColor.GRAY_550,
 							letterSpacing = 1.sp
@@ -162,7 +159,7 @@ fun OmniTextField(
 fun PreviewOmniTextField() {
 	OmniTextField(
 		icon = ImageVector.vectorResource(id = R.drawable.ic_search),
-		iconTint = BrandColor.PINK_NT,
+		iconTint = BrandColor.DARK_BLUE,
 		fieldValue = "Roosevelt",
 		onValueChange = {},
 		onClear = {}
@@ -174,7 +171,7 @@ fun PreviewOmniTextField() {
 fun PreviewOmniTextFieldHint() {
 	OmniTextField(
 		icon = ImageVector.vectorResource(id = R.drawable.ic_search),
-		iconTint = BrandColor.PINK_NT,
+		iconTint = BrandColor.DARK_BLUE,
 		fieldValue = "",
 		hintText = stringResource(id = R.string.search_hint).uppercase(),
 		onValueChange = {},

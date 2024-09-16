@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,7 +32,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun MultiOptionModal(
@@ -62,12 +62,13 @@ fun MultiOptionModal(
 		) {
 			Column(
 				modifier = Modifier
-					.padding(20.dp)
 					.wrapContentHeight(),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
 				Row(
-					modifier = Modifier.fillMaxWidth(),
+					modifier = Modifier
+						.padding(20.dp)
+						.fillMaxWidth(),
 					horizontalArrangement = Arrangement.SpaceBetween,
 					verticalAlignment = Alignment.CenterVertically
 				) {
@@ -76,7 +77,6 @@ fun MultiOptionModal(
 							text = title,
 							style = TextStyle(
 								fontSize = 20.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.Bold,
 								letterSpacing = 0.5.sp
 							)
@@ -91,42 +91,29 @@ fun MultiOptionModal(
 						)
 					}
 				}
-				if (title != null) {
-					Spacer(modifier = Modifier.height(19.dp))
-				}
 				if (subTitle != null) {
 					Text(
+						modifier = Modifier
+							.padding(20.dp, 0.dp, 20.dp, 20.dp),
 						text = subTitle,
 						style = TextStyle(
 							fontSize = 16.sp,
 							letterSpacing = 0.5.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Normal
 						)
 					)
-
-					Spacer(modifier = Modifier.height(24.dp))
 				}
-
 				if (buttons.isNotEmpty()) {
-					PrimaryButton(
-						modifier = Modifier.fillMaxWidth(0.8f),
-						text = buttons[0],
-						buttonColor = BrandColor.PINK_NT,
-						onButtonClick = { buttonClick(buttons[0]) },
-						contentColor = BrandColor.GRAY_100
-					)
-
-					Spacer(modifier = Modifier.height(16.dp))
-
-					for (index in 1 until buttons.size) {
-						SecondaryButton(
-							modifier = Modifier.fillMaxWidth(0.8f),
+					for (index in buttons.indices) {
+						HorizontalDivider(
+							color = BrandColor.DARK_BLUE,
+							thickness = 1.dp
+						)
+						MultiOptionModalButton(
+							modifier = Modifier.fillMaxWidth(),
 							text = buttons[index],
 							onButtonClick = { buttonClick(buttons[index]) }
 						)
-
-						Spacer(modifier = Modifier.height(16.dp))
 					}
 				}
 			}

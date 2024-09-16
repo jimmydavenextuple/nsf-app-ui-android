@@ -46,44 +46,42 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
+import com.nextuple.nsf.util.StringUtils.toPercent
 
 @Composable
 fun CircularProgressBar(
-    modifier: Modifier = Modifier,
-    completedUnits: Int,
-    inProgressUnits: Int,
-    totalUnits: Int,
-    progressBarSize: Dp = 240.dp,
-    indicatorThickness: Dp = 20.dp,
-    animationDuration: Int = 1000,
-    animationDelay: Int = 0,
-	backgroundIndicatorColor: Color = BrandColor.BLUE_100_NT,
-	completedIndicatorColor: Color = BrandColor.BLUE_300_NT,
+	modifier: Modifier = Modifier,
+	completedUnits: Int,
+	inProgressUnits: Int,
+	totalUnits: Int,
+	progressBarSize: Dp = 240.dp,
+	indicatorThickness: Dp = 20.dp,
+	animationDuration: Int = 1000,
+	animationDelay: Int = 0,
+	backgroundIndicatorColor: Color = BrandColor.GRAY_400,
+	completedIndicatorColor: Color = BrandColor.DARK_BLUE,
 	inProgressIndicatorColor: Color = BrandColor.YELLOW_NT,
-    showLegends: Boolean = false,
-    backgroundLegendText: String = "Unworked",
-    completedLegendText: String = "Progress",
-    inProgressLegendText: String = "Being Worked",
-    centerText: String? = null,
-    showCenterImage: Boolean = true,
-    roundBorder: Boolean = true,
-    percent: Float? = null,
-    centerIconModifier: Modifier = Modifier.clickable { },
-    centerProgressTextStyle: TextStyle = TextStyle(
+	showLegends: Boolean = false,
+	backgroundLegendText: String = "Unworked",
+	completedLegendText: String = "Progress",
+	inProgressLegendText: String = "Being Worked",
+	centerText: String? = null,
+	showCenterImage: Boolean = true,
+	roundBorder: Boolean = true,
+	percent: Double? = null,
+	showPercent: Boolean = false,
+	centerIconModifier: Modifier = Modifier.clickable { },
+	centerProgressTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.Bold,
-		fontFamily = FontFamily.ARCHIVO,
 		letterSpacing = 1.5.sp,
 		fontSize = MaterialTheme.typography.displayLarge.fontSize
 	),
-    centerTextStyle: TextStyle = TextStyle(
+	centerTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.SemiBold,
-		fontFamily = FontFamily.ARCHIVO,
 		letterSpacing = 1.5.sp,
 		fontSize = MaterialTheme.typography.bodySmall.fontSize
 	),
-    legendsTextStyle: TextStyle = TextStyle(
-		fontFamily = FontFamily.ARCHIVO,
+	legendsTextStyle: TextStyle = TextStyle(
 		fontWeight = FontWeight.Medium,
 		textAlign = TextAlign.Center,
 		fontSize = 20.sp
@@ -98,7 +96,7 @@ fun CircularProgressBar(
 	}
 
 	// Number Animation
-	val completedAnimateNumer = animateFloatAsState(
+	val completedAnimateNumber = animateFloatAsState(
 		targetValue = completedProgressRemember,
 		animationSpec = tween(
 			durationMillis = animationDuration,
@@ -113,11 +111,13 @@ fun CircularProgressBar(
 		)
 	)
 	SideEffect {
-		if (percent != null) {
-			completedProgressRemember = percent.toFloat()
+		if (showPercent) {
+			completedProgressRemember = percent?.toFloat() ?: 0f
 		} else {
-		completedProgressRemember = if (totalUnits == 0) 0f else completedUnits * 100f / totalUnits
-		inProgressRemember = if (totalUnits == 0) 0f else (inProgressUnits + completedUnits) * 100f / totalUnits
+			completedProgressRemember =
+				if (totalUnits == 0) 0f else completedUnits * 100f / totalUnits
+			inProgressRemember =
+				if (totalUnits == 0) 0f else (inProgressUnits + completedUnits) * 100f / totalUnits
 		}
 	}
 	Column(
@@ -126,7 +126,9 @@ fun CircularProgressBar(
 	) {
 		Box(
 			contentAlignment = Alignment.Center,
-			modifier = Modifier.size(size = progressBarSize).testTag("CircularProgressBar")
+			modifier = Modifier
+				.size(size = progressBarSize)
+				.testTag("CircularProgressBar")
 		) {
 			Canvas(
 				modifier = Modifier.size(size = progressBarSize)
@@ -143,7 +145,7 @@ fun CircularProgressBar(
 					style = Stroke(width = indicatorThickness.toPx(), cap = StrokeCap.Round)
 				)
 
-				val completedUnitsSweepAngle = (completedAnimateNumer.value / 100) * 360
+				val completedUnitsSweepAngle = (completedAnimateNumber.value / 100) * 360
 				val inProgressUnitsSweepAngle = (inProgressAnimateNumber.value / 100) * 360
 
 				drawArc(
@@ -182,8 +184,8 @@ fun CircularProgressBar(
 				centerText = centerText,
 				showCenterImage = showCenterImage,
 				modifier = centerIconModifier,
-				percent = percent
-
+				percent = percent,
+				showPercent = showPercent
 			)
 		}
 		if (showLegends) {
@@ -209,7 +211,8 @@ private fun DisplayText(
 	centerTextStyle: TextStyle,
 	centerText: String?,
 	showCenterImage: Boolean,
-	percent: Float?,
+	percent: Double?,
+	showPercent: Boolean,
 	modifier: Modifier
 ) {
 	Column(
@@ -217,39 +220,28 @@ private fun DisplayText(
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
 		// Text that shows the number inside the circle
-		if (percent != null) {
-			if (percent <= 0) {
-		Text(
-					text = "--%",
-					style = centerProgressTextStyle,
-					fontFamily = FontFamily.SANS
-				)
-			} else {
-				Text(
-					text = String.format("%.1f", percent * 100) + "%",
-					style = centerProgressTextStyle,
-					fontFamily = FontFamily.SANS
-				)
-			}
+		if (showPercent) {
+			Text(
+				text = percent.toPercent(),
+				style = centerProgressTextStyle,
+			)
 		} else {
 			Text(
-			text = "$completedUnits/$totalUnits",
-			style = centerProgressTextStyle,
-			fontFamily = FontFamily.SANS
-		)
-		centerText?.let {
-			Text(
-				text = centerText,
-				style = centerTextStyle,
-				fontFamily = FontFamily.ARCHIVO,
-				fontSize = 12.sp,
-				fontWeight = FontWeight.Bold,
-				color = BrandColor.GRAY_600
+				text = "$completedUnits/$totalUnits",
+				style = centerProgressTextStyle,
 			)
-		}
-		if (showCenterImage) {
-			Spacer(modifier = Modifier.height(3.dp))
-			DisplayImage(modifier = modifier)
+			centerText?.let {
+				Text(
+					text = centerText,
+					style = centerTextStyle,
+					fontSize = 12.sp,
+					fontWeight = FontWeight.Bold,
+					color = BrandColor.GRAY_600
+				)
+			}
+			if (showCenterImage) {
+				Spacer(modifier = Modifier.height(3.dp))
+				DisplayImage(modifier = modifier)
 			}
 		}
 	}
@@ -260,7 +252,7 @@ private fun DisplayImage(
 	modifier: Modifier
 ) {
 	Image(
-		painter = painterResource(id = R.drawable.circular_progress_question_mark),
+		painter = painterResource(id = R.drawable.ic_circular_progress_question_mark),
 		contentDescription = null,
 		modifier = modifier.testTag("CircularProgressBarCenterImage")
 	)
@@ -268,10 +260,10 @@ private fun DisplayImage(
 
 @Composable
 fun DisplayLegends(
-    circleSize: Int = 24,
-    space: Int = 8,
-    items: List<Legend>,
-    textStyle: TextStyle
+	circleSize: Int = 24,
+	space: Int = 8,
+	items: List<Legend>,
+	textStyle: TextStyle
 ) {
 	Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 		items.forEach {
@@ -313,5 +305,47 @@ fun CircularProgressBarPreview() {
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(16.dp)
+	)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CircularProgressBarFillRatePreview() {
+	CircularProgressBar(
+		completedUnits = 0,
+		totalUnits = 0,
+		inProgressUnits = 0,
+		percent = 100.0,
+		showPercent = true,
+		centerProgressTextStyle = TextStyle(
+			fontSize = 20.sp,
+			fontWeight = FontWeight(700),
+			lineHeight = 20.sp,
+			color = BrandColor.GREEN_400
+		),
+		progressBarSize = 75.dp,
+		indicatorThickness = 9.72.dp,
+		completedIndicatorColor = BrandColor.GREEN_400
+	)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CircularProgressBarFillRateEmptyPreview() {
+	CircularProgressBar(
+		completedUnits = 0,
+		totalUnits = 0,
+		inProgressUnits = 0,
+		percent = null,
+		showPercent = true,
+		centerProgressTextStyle = TextStyle(
+			fontSize = 20.sp,
+			fontWeight = FontWeight(700),
+			lineHeight = 20.sp,
+			color = BrandColor.GREEN_400
+		),
+		progressBarSize = 75.dp,
+		indicatorThickness = 9.72.dp,
+		completedIndicatorColor = BrandColor.GREEN_400
 	)
 }

@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.R.drawable
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.conditional
 
 @Composable
@@ -41,7 +40,7 @@ fun CheckableChip(
 			.conditional(
 				condition = isChecked,
 				onTrue = {
-					background(color = BrandColor.BLUE_250_NT, shape = RoundedCornerShape(8.dp))
+					background(color = BrandColor.DARK_BLUE, shape = RoundedCornerShape(8.dp))
 				},
 				onFalse = {
 					background(BrandColor.WHITE, shape = RoundedCornerShape(8.dp))
@@ -72,7 +71,6 @@ fun CheckableChip(
 			Text(
 				text = text.uppercase(),
 				color = if (isChecked) BrandColor.WHITE else BrandColor.GRAY_900,
-				fontFamily = FontFamily.ARCHIVO,
 				fontWeight = FontWeight(700),
 				fontSize = 10.sp
 			)

@@ -38,11 +38,10 @@ import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
+import com.nextuple.nsf.ui.common.HeaderText
 import com.nextuple.nsf.ui.common.PrimaryButton
-import com.nextuple.nsf.ui.screen.prep.component.HeaderText
 import com.nextuple.nsf.ui.screen.prep.component.PackTaskItemCard
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.util.StringUtils
 
 @Composable
@@ -61,7 +60,11 @@ fun BOPLMultiUnitModal(
 		Surface {
 			Column(modifier = Modifier.wrapContentHeight()) {
 				if (!isStep2Active) {
-					Column(modifier = Modifier.heightIn(max = 495.dp).verticalScroll(rememberScrollState())) {
+					Column(
+						modifier = Modifier
+							.heightIn(max = 495.dp)
+							.verticalScroll(rememberScrollState())
+					) {
 						Row(
 							modifier = Modifier
 								.fillMaxWidth()
@@ -73,7 +76,6 @@ fun BOPLMultiUnitModal(
 								text = "Scan A Unit In This Order",
 								style = TextStyle(
 									fontSize = 20.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight.SemiBold,
 									color = BrandColor.BLACK
 								)
@@ -101,7 +103,6 @@ fun BOPLMultiUnitModal(
 								style = TextStyle(
 									fontSize = 16.sp,
 									lineHeight = 20.8.sp,
-									fontFamily = FontFamily.ARCHIVO,
 									fontWeight = FontWeight(700),
 									color = BrandColor.BLACK,
 									letterSpacing = 0.5.sp
@@ -144,12 +145,12 @@ fun BOPLMultiUnitModal(
 						horizontalArrangement = Arrangement.SpaceBetween,
 						verticalAlignment = Alignment.CenterVertically
 					) {
-						val packItemsCompleted = packItems.filter { packTaskItem -> packTaskItem.isScanned }.size
+						val packItemsCompleted =
+							packItems.filter { packTaskItem -> packTaskItem.isScanned }.size
 						Text(
 							text = "Place Hold Slip $packItemsCompleted/${packItems.size} On Unit",
 							style = TextStyle(
 								fontSize = 18.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight.SemiBold,
 								color = BrandColor.BLACK
 							)
@@ -171,17 +172,20 @@ fun BOPLMultiUnitModal(
 							.padding(bottom = 10.dp),
 						horizontalArrangement = Arrangement.Center
 					) {
-						Image(painter = painterResource(id = R.drawable.ic_bopl_treadmill), contentDescription = "Place Hold Slip")
+						Image(
+							painter = painterResource(id = R.drawable.place_hold_slip_on_unit),
+							contentDescription = "Place Hold Slip"
+						)
 					}
 					Row(
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(top = 8.dp, bottom = 24.dp),
+							.padding(20.dp),
 						horizontalArrangement = Arrangement.Center
 					) {
 						PrimaryButton(
 							modifier = Modifier
-								.fillMaxWidth(.6f)
+								.fillMaxWidth()
 								.height(40.dp),
 							text = stringResource(id = R.string.ok)
 						) {
@@ -203,6 +207,19 @@ fun PreviewBoplMultiUnitModal() {
 		athlete = "Yuji Itadori",
 		orderNum = "000000000000",
 		isStep2Active = false,
+		toggleStep2 = {}
+	)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewBoplMultiUnitModal_PlaceHoldSplit() {
+	BOPLMultiUnitModal(
+		onDismissRequest = {},
+		packItems = listOf(),
+		athlete = "Yuji Itadori",
+		orderNum = "000000000000",
+		isStep2Active = true,
 		toggleStep2 = {}
 	)
 }

@@ -29,7 +29,7 @@ fun AppTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable 
 
 // TODO: Properly set these up and remove overrides in relevant UI.
 private val darkColors = darkColorScheme(
-	primary = BrandColor.BLUE_300_NT
+	primary = BrandColor.DARK_BLUE
 )
 
 private val lightColors = lightColorScheme()

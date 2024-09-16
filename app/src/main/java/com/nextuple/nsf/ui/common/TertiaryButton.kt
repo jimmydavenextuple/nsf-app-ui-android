@@ -11,22 +11,22 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @Composable
 fun TertiaryButton(
-    modifier: Modifier = Modifier,
-    text: String,
-    textColor: Color = BrandColor.BLUE_300_NT,
-    tag: String = "TertiaryButton",
-    onButtonClick: () -> Unit
+	modifier: Modifier = Modifier,
+	text: String,
+	textColor: Color = BrandColor.DARK_BLUE,
+	tag: String = "TertiaryButton",
+	onButtonClick: () -> Unit
 ) {
 	Text(
-		modifier = modifier.clickable { onButtonClick() }.testTag(tag),
+		modifier = modifier
+			.clickable { onButtonClick() }
+			.testTag(tag),
 		text = text,
 		color = textColor,
 		textDecoration = TextDecoration.Underline,
-		fontFamily = FontFamily.ARCHIVO,
 		fontSize = 12.sp,
 		letterSpacing = 1.5.sp,
 		fontWeight = FontWeight.Bold

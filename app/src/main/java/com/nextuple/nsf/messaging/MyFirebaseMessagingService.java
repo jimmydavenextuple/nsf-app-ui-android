@@ -25,7 +25,6 @@ import com.nextuple.nsf.R;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
-
     @Override
     public void onNewToken(@NonNull String token) {
         Log.i("ReceivedNewToken: {}", token);
@@ -56,7 +55,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             FirebaseMessaging.getInstance().subscribeToTopic("1234_notification_topic");
             Log.i("DeviceRegistered", "Done");
         } catch (Exception ex) {
-            Log.e("Exceptions while subscribing: {}", token, ex);;
+            Log.e("Exceptions while subscribing: {}", token, ex);
+            ;
         }
 
     }
@@ -83,8 +83,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void sendNotification(String from, String body) {
         new Handler(Looper.getMainLooper()).post(() ->
                 Toast.makeText(
-                        MyFirebaseMessagingService.this.getApplicationContext(),
-                        body, Toast.LENGTH_SHORT)
+                                MyFirebaseMessagingService.this.getApplicationContext(),
+                                body, Toast.LENGTH_SHORT)
                         .show()
         );
     }

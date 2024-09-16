@@ -69,7 +69,6 @@ import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PrinterModal
 import com.nextuple.nsf.ui.state.PrintViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
@@ -84,29 +83,29 @@ const val STEP_BRING_TO_ATHLETE: Int = 2
 
 @Composable
 fun OrderPickupScreen(
-    printViewModel: PrintViewModel = hiltViewModel(),
-    scanManager: ScanManager,
-    completeOrderPickupState: GenericViewState = GenericViewState.Idle,
-    orderNumber: String?,
-    athleteDetail: AthleteDetail?,
-    checkInDetail: AthleteCheckInDetail?,
-    frDetail: FulfillmentRequestDetail?,
-    holdSlipZpl: MutableList<String>?,
-    defaultStep: Int = STEP_GET_ORDER,
-    onOrderPickupClicked: (String) -> Unit,
-    scanHoldSlipState: GenericViewState,
-    onScanSuccess: (scanData: String) -> Unit,
-    onOrderPickupSuccess: () -> Unit,
-    onResetHoldSlipScan: () -> Unit,
-    bypassPrinter: Boolean,
-    printer: Printer,
-    printerConnectionState: GenericViewState = GenericViewState.Idle,
-    onPrintHoldSlip: (String) -> Unit,
-    holdSlipState: GenericViewState = GenericViewState.Idle,
-    resetGetHoldSlipState: () -> Unit,
-    onConnectPrinter: (Printer, String) -> Unit,
-    onResetPrinter: () -> Unit,
-    ipPrefix: String?
+	printViewModel: PrintViewModel = hiltViewModel(),
+	scanManager: ScanManager,
+	completeOrderPickupState: GenericViewState = GenericViewState.Idle,
+	orderNumber: String?,
+	athleteDetail: AthleteDetail?,
+	checkInDetail: AthleteCheckInDetail?,
+	frDetail: FulfillmentRequestDetail?,
+	holdSlipZpl: MutableList<String>?,
+	defaultStep: Int = STEP_GET_ORDER,
+	onOrderPickupClicked: (String) -> Unit,
+	scanHoldSlipState: GenericViewState,
+	onScanSuccess: (scanData: String) -> Unit,
+	onOrderPickupSuccess: () -> Unit,
+	onResetHoldSlipScan: () -> Unit,
+	bypassPrinter: Boolean,
+	printer: Printer,
+	printerConnectionState: GenericViewState = GenericViewState.Idle,
+	onPrintHoldSlip: (String) -> Unit,
+	holdSlipState: GenericViewState = GenericViewState.Idle,
+	resetGetHoldSlipState: () -> Unit,
+	onConnectPrinter: (Printer, String) -> Unit,
+	onResetPrinter: () -> Unit,
+	ipPrefix: String?
 ) {
 	val currentStep = remember {
 		mutableStateOf(defaultStep)
@@ -162,12 +161,13 @@ fun OrderPickupScreen(
 						mutableStateOf(DetailedCallToActionMode.Loading())
 					}
 				}
+
 				GenericViewState.Success -> {
 					scanState = remember {
 						mutableStateOf(
 							DetailedCallToActionMode.Done(
 								BrandColor.WHITE,
-								BrandColor.BLUE_800_NT
+								BrandColor.DARK_BLUE
 							)
 						)
 					}
@@ -175,6 +175,7 @@ fun OrderPickupScreen(
 						advanceToAthleteStep()
 					}, 1000)
 				}
+
 				else -> {
 					scanState = remember {
 						mutableStateOf(DetailedCallToActionMode.Scan(""))
@@ -201,7 +202,6 @@ fun OrderPickupScreen(
 						text = AnnotatedString("Reprint A Hold Slip".uppercase()),
 						style = TextStyle(
 							fontSize = 12.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight(700),
 							color = BrandColor.BLACK,
 							textAlign = TextAlign.Center,
@@ -292,14 +292,14 @@ fun OrderPickupScreen(
 					Toast.LENGTH_SHORT
 				).show()
 			}
-			if (printViewModel.holdSlipPrintState == GenericViewState.Success) {
+			if (printViewModel.printHoldSlipState == GenericViewState.Success) {
 				Toast.makeText(
 					context,
 					stringResource(R.string.hold_slip_print_success),
 					Toast.LENGTH_SHORT
 				).show()
 				printViewModel.resetHoldSlipPrintState()
-			} else if (printViewModel.holdSlipPrintState == GenericViewState.Failure) {
+			} else if (printViewModel.printHoldSlipState == GenericViewState.Failure) {
 				Toast.makeText(
 					context,
 					stringResource(R.string.hold_slip_print_error),
@@ -328,7 +328,12 @@ private fun OrderPickupCardItem(
 	isActive: Boolean,
 	extraContent: @Composable () -> Unit = {}
 ) {
-	ExpandableStepCard(stepNumber = stepNumber, title = title, isActive = isActive, isComplete = !isActive && stepNumber == "1") {
+	ExpandableStepCard(
+		stepNumber = stepNumber,
+		title = title,
+		isActive = isActive,
+		isComplete = !isActive && stepNumber == "1"
+	) {
 		extraContent()
 	}
 }
@@ -360,14 +365,16 @@ private fun GetOrdersContent(
 				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {
 				Row(verticalAlignment = Alignment.CenterVertically) {
-					Image(painter = painterResource(id = R.drawable.ic_package_location), contentDescription = "")
+					Image(
+						painter = painterResource(id = R.drawable.ic_package_location),
+						contentDescription = ""
+					)
 					Spacer(modifier = Modifier.width(5.dp))
 					Text(
 						text = holdingLocation,
 						style = TextStyle(
 							fontSize = 14.sp,
 							lineHeight = 18.2.sp,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight(700),
 							letterSpacing = 0.5.sp
 						)
@@ -436,7 +443,7 @@ fun ColumnScope.BringToAthleteContent(
 	Spacer(modifier = Modifier.height(24.dp))
 	PrimaryButton(
 		modifier = Modifier
-			.fillMaxWidth(0.8f)
+			.fillMaxWidth()
 			.align(Alignment.CenterHorizontally),
 		text = stringResource(id = R.string.complete_pickup),
 		onButtonClick = onOrderPickupClicked
@@ -481,7 +488,7 @@ private fun PickupCompleteModal(
 					modifier = modifier
 						.border(
 							width = 2.dp,
-							color = BrandColor.BLUE_300_NT,
+							color = BrandColor.DARK_BLUE,
 							shape = RoundedCornerShape(size = 3.dp)
 						)
 						.background(
@@ -489,7 +496,7 @@ private fun PickupCompleteModal(
 							shape = RoundedCornerShape(size = 3.dp)
 						),
 					statusText = deliverySpeed,
-					statusColor = BrandColor.BLUE_300_NT,
+					statusColor = BrandColor.DARK_BLUE,
 					fontSize = 16.sp
 				)
 				Text(
@@ -497,7 +504,6 @@ private fun PickupCompleteModal(
 					text = stringResource(id = R.string.delivery_speed).uppercase(),
 					style = TextStyle(
 						fontSize = 12.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(700),
 						color = BrandColor.BLACK,
 						letterSpacing = 1.5.sp

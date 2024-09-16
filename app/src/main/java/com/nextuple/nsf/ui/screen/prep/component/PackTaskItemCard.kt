@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,11 +25,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,9 +38,8 @@ import coil.compose.AsyncImage
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
-import com.nextuple.nsf.ui.common.PrimaryButton
-import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
+import com.nextuple.nsf.ui.common.ScanIcon
+import com.nextuple.nsf.ui.common.SecondaryButton
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -52,10 +48,10 @@ enum class DragAnchors { Start, End }
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PackTaskItemCard(
-    modifier: Modifier = Modifier,
-    packTaskItem: PackTaskItem,
-    onDeclineClick: () -> Unit = {},
-    declineEnabled: Boolean = true
+	modifier: Modifier = Modifier,
+	packTaskItem: PackTaskItem,
+	onDeclineClick: () -> Unit = {},
+	declineEnabled: Boolean = true
 ) {
 	val scope = rememberCoroutineScope()
 	val density = LocalDensity.current
@@ -88,7 +84,9 @@ fun PackTaskItemCard(
 					enabled = declineEnabled,
 					state = state
 				)
-		} else { Modifier }
+		} else {
+			Modifier
+		}
 	) {
 		Row(
 			modifier = modifier,
@@ -116,7 +114,6 @@ fun PackTaskItemCard(
 					modifier = Modifier.padding(bottom = 6.dp),
 					text = packTaskItem.productName,
 					fontSize = 14.sp,
-					fontFamily = FontFamily.ARCHIVO,
 					fontWeight = FontWeight.Bold,
 					letterSpacing = 0.5.sp,
 					maxLines = 1,
@@ -124,6 +121,14 @@ fun PackTaskItemCard(
 				)
 
 				Column(modifier = Modifier.wrapContentHeight()) {
+					packTaskItem.originalItem?.let {
+						Text(
+							text = stringResource(id = R.string.substituted),
+							fontSize = 12.sp,
+							fontWeight = FontWeight.Bold,
+							letterSpacing = 0.5.sp,
+						)
+					}
 					packTaskItem.primaryAttr?.value?.let {
 						TextInfo(
 							label = packTaskItem.primaryAttr.name,
@@ -148,12 +153,12 @@ fun PackTaskItemCard(
 					.align(alignment = Alignment.CenterVertically)
 					.padding(horizontal = 12.dp)
 					.size(height = 30.dp, width = 34.dp),
-				packTaskItem = packTaskItem
+				isScanned = packTaskItem.isScanned
 			)
 		}
 
 		if (declineEnabled) {
-			PrimaryButton(
+			SecondaryButton(
 				modifier = Modifier
 					.align(Alignment.CenterEnd)
 					.width(70.dp)
@@ -162,7 +167,6 @@ fun PackTaskItemCard(
 						translationX = 80.dp.toPx()
 					},
 				buttonShape = RoundedCornerShape(0.dp),
-				buttonColor = BrandColor.GRAY_800,
 				onButtonClick = {
 					scope.launch {
 						state.animateTo(DragAnchors.Start)
@@ -182,32 +186,9 @@ private fun TextInfo(label: String, value: String) {
 	Text(
 		text = "$label: $value",
 		fontSize = 12.sp,
-		fontFamily = FontFamily.ARCHIVO,
 		fontWeight = FontWeight.Normal,
 		letterSpacing = 0.5.sp
 	)
-}
-
-@Composable
-private fun ScanIcon(
-	modifier: Modifier = Modifier,
-	packTaskItem: PackTaskItem
-) {
-	if (packTaskItem.isScanned) {
-		Icon(
-			modifier = modifier,
-			imageVector = ImageVector.vectorResource(R.drawable.ic_check),
-			contentDescription = "scan success icon",
-			tint = BrandColor.BLUE_300_NT
-		)
-	} else {
-		Icon(
-			modifier = modifier,
-			imageVector = ImageVector.vectorResource(R.drawable.ic_scan),
-			contentDescription = "scan icon",
-			tint = BrandColor.PINK_NT
-		)
-	}
 }
 
 @Preview(showBackground = true)
@@ -241,5 +222,14 @@ private val previewPackTaskItem = PackTaskItem(
 		"https://picsum.photos/1705",
 		"https://picsum.photos/1726",
 		"https://picsum.photos/1701"
+	),
+	originalItem = PackTaskItem(
+		sku = "20638722",
+		primaryAttr = ProductAttribute(name = "Color", value = "Yellow/Black"),
+		secondaryAttr = null,
+		tertiaryAttr = null,
+		qty = 1,
+		productName = "Wilson OPTX AVP Tour Outdoor Volleyball",
+		productImageUrls = listOf("url")
 	)
 )

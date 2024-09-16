@@ -21,7 +21,8 @@ class PrimaryButtonTest : ScreenshotTest {
 
 	@Before
 	@Throws(Exception::class)
-	fun setUp() {}
+	fun setUp() {
+	}
 
 	@Test
 	fun should_display_the_button_with_text() {

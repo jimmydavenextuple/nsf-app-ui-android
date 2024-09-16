@@ -14,17 +14,16 @@ import com.nextuple.nsf.service.LogService.Companion.EVENT_PICK_START_RES
 import com.nextuple.nsf.service.dto.Result
 
 class PickService(
-    private val pickApi: PickApi,
-    private val deviceService: DeviceService,
-    private val logService: LogService,
-    private val userRepository: UserRepository
+	private val pickApi: PickApi,
+	private val logService: LogService,
+	private val userRepository: UserRepository
 ) {
 	suspend fun startPick(): Result<PickTask?> = runCatching {
 		logService.trackEvent(EVENT_PICK_START)
 
-		val store = deviceService.getStore() ?: return Result.generalError()
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = pickApi.startPick(store = store.id, userId = dks)
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = pickApi.startPick(store = store.id, userId = userId)
 
 		return Result.fromApiResponse(res) {
 			it!!.also { task ->
@@ -61,8 +60,8 @@ class PickService(
 			)
 		)
 
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = pickApi.pickDecline(declineItemRequest = req, userId = dks)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = pickApi.pickDecline(declineItemRequest = req, userId = userId)
 
 		return Result.fromApiResponse(res) {
 			it!!.also { task ->
@@ -110,8 +109,8 @@ class PickService(
 			)
 		)
 
-		val dks = userRepository.getDks() ?: return Result.generalError()
-		val res = pickApi.recordPick(pickItemRequest = req, userId = dks)
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = pickApi.recordPick(pickItemRequest = req, userId = userId)
 
 		return Result.fromApiResponse(res) {
 			it!!.also { task ->

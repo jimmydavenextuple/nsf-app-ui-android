@@ -61,7 +61,7 @@ class StageTaskServiceTest {
 			)
 		)
 
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every {
 			runBlocking {
 				stageTaskApi.recordHoldingLocation(any(), any())
@@ -85,7 +85,7 @@ class StageTaskServiceTest {
 				containerId = 0,
 				holdingLocation = ""
 			)
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 			every {
 				runBlocking {
 					stageTaskApi.recordHoldingLocation(any(), any())
@@ -104,7 +104,7 @@ class StageTaskServiceTest {
 			containerId = 0,
 			holdingLocation = ""
 		)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every {
 			runBlocking {
 				stageTaskApi.recordHoldingLocation(any(), any())
@@ -119,8 +119,8 @@ class StageTaskServiceTest {
 	}
 
 	@Test
-	fun `recordHoldingLocation should return general error if getDks is null`() = runTest {
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `recordHoldingLocation should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.recordHoldingLocation(
 			req = RecordHoldingLocationRequest(
@@ -144,7 +144,7 @@ class StageTaskServiceTest {
 				StageTaskContainer(id = 12, holdingLocation = "Hyderabad")
 			)
 		)
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every {
 			runBlocking {
 				stageTaskApi.getHoldSlip(any(), any())
@@ -165,7 +165,7 @@ class StageTaskServiceTest {
 	fun `getHoldSlip should return general error on api success response having null data`() =
 		runTest {
 			val fulfillmentRequestNumber = "123"
-			every { runBlocking { userRepository.getDks() } } returns "dks"
+			every { runBlocking { userRepository.getUserId() } } returns "userId"
 			every {
 				runBlocking {
 					stageTaskApi.getHoldSlip(any(), any())
@@ -181,7 +181,7 @@ class StageTaskServiceTest {
 	@Test
 	fun `getHoldSlip should return general error if an exception is thrown`() = runTest {
 		val fulfillmentRequestNumber = "123"
-		every { runBlocking { userRepository.getDks() } } returns "dks"
+		every { runBlocking { userRepository.getUserId() } } returns "userId"
 		every { runBlocking { stageTaskApi.getHoldSlip(any(), any()) } } throws Exception()
 
 		val res = service.getHoldSlip(fulfillmentRequestNumber = fulfillmentRequestNumber)
@@ -193,8 +193,8 @@ class StageTaskServiceTest {
 	}
 
 	@Test
-	fun `getStoreConfig should return general error if getDks is null`() = runTest {
-		every { runBlocking { userRepository.getDks() } } returns null
+	fun `getStoreConfig should return general error if getUserId is null`() = runTest {
+		every { runBlocking { userRepository.getUserId() } } returns null
 
 		val res = service.getHoldSlip(fulfillmentRequestNumber = "123")
 		advanceUntilIdle()

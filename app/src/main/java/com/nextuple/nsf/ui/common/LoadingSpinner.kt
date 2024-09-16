@@ -27,13 +27,13 @@ fun LoadingSpinner(
 			.wrapContentSize()
 			.testTag("loadingSpinner")
 			.clip(CircleShape)
-			.background(color = BrandColor.PINK_NT)
+			.background(color = BrandColor.DARK_BLUE)
 	) {
 		CircularProgressIndicator(
 			modifier = Modifier
 				.wrapContentSize()
 				.padding(24.dp),
-			color = BrandColor.PINK_100_NT,
+			color = BrandColor.GRAY_400,
 			strokeWidth = 6.dp
 		)
 	}

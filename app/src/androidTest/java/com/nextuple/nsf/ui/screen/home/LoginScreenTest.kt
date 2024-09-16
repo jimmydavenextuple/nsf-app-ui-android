@@ -1,8 +1,8 @@
 package com.nextuple.nsf.ui.screen.home
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.karumi.shot.ScreenshotTest
+import com.nextuple.nsf.ui.util.NoOpScanManager
 import org.junit.Rule
 import org.junit.Test
 
@@ -18,8 +18,8 @@ class LoginScreenTest : ScreenshotTest {
 	}
 
 	@Test
-	fun loginScreenErrorInvalidDKS() {
-		renderLoginScreen(true, "Invalid Id.")
+	fun loginScreenErrorInvalidUserId() {
+		renderLoginScreen(true, "Invalid User Id")
 
 		compareScreenshot(composeTestRule)
 	}
@@ -27,11 +27,11 @@ class LoginScreenTest : ScreenshotTest {
 	private fun renderLoginScreen(isValid: Boolean, errorMessage: String? = null) {
 		composeTestRule.setContent {
 			LoginScreen(
-				isInvalid = isValid,
-				resetIsInvalid = {},
+				isFormInvalid = isValid,
+				resetIsFormInvalid = {},
 				errorMessage = errorMessage,
 				showProgressBar = false,
-				onSubmitDks = {},
+				onSubmit = { _, _ -> },
 				isLoggedIn = false,
 				onLoggedIn = {},
 				scanManager = NoOpScanManager(),

@@ -16,7 +16,8 @@ class PrintUtil {
 				// TODO: Don't ignore this exception - Log exception so it is not lost
 				try {
 					socket?.close()
-				} catch (ignored: Exception) { }
+				} catch (ignored: Exception) {
+				}
 			}
 			// TODO: Refactor Errors here to make sure we pass through null socket or something on error instead of the socket we failed to connect to
 			return socket
@@ -29,6 +30,7 @@ data class Printer(
 	var ipAddress: String = "",
 	var connectionStatus: Boolean = false
 )
+
 enum class PrinterName {
 	SFS, BOPIS, SDD, BOPL
 }

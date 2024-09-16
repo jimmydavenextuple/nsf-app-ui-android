@@ -2,30 +2,37 @@ package com.nextuple.nsf.ui.screen.home
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nextuple.nsf.BuildConfig
-import com.nextuple.nsf.R
-import com.nextuple.nsf.ui.component.EmptyStateScreen
-import com.nextuple.nsf.ui.theme.FontFamily
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.nextuple.nsf.retrofit.dto.response.MetricsSummaryResponse
+import com.nextuple.nsf.ui.state.HomeViewModel
+import com.nextuple.nsf.ui.state.MetricsSummaryData
+import com.nextuple.nsf.ui.theme.BrandColor
+import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
 import com.nextuple.nsf.util.SubFulfillmentType
 import com.nextuple.nsf.util.TimeUtils
 import java.time.Instant
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+	homeViewModel: HomeViewModel = hiltViewModel()
+) {
 	val context = LocalContext.current
 
 	BackHandler {
@@ -33,35 +40,69 @@ fun HomeScreen() {
 		activity?.finish()
 	}
 
-	if (BuildConfig.DEBUG && BuildConfig.FLAVOR.lowercase() != "prod") {
-		Column {
-			Column(Modifier.padding(start = 16.dp, top = 8.dp)) {
-				Text(
-					text = "Performance Metrics",
-					style = TextStyle(
-						fontFamily = FontFamily.ARCHIVO,
-						lineHeight = 26.sp,
-						fontSize = 20.sp,
-						fontWeight = FontWeight(700)
-					)
-				)
-				Text(
-					text = TimeUtils.formatTimeStamp(Instant.now()),
-					style = TextStyle(
-						fontFamily = FontFamily.ARCHIVO,
-						lineHeight = 12.sp,
-						fontSize = 12.sp,
-						fontWeight = FontWeight(500)
-					)
-				)
-			}
-			MetricsScreen(fulfillmentType = SubFulfillmentType.BOPIS)
+	HomeScreenComponent(
+		metricsSummaryData = homeViewModel.metricsSummaryData,
+		setMetricSummary = homeViewModel::setMetricsSummary
+	)
+}
+
+@Composable
+private fun HomeScreenComponent(
+	metricsSummaryData: MetricsSummaryData,
+	setMetricSummary: () -> Unit = {}
+) {
+	val bopisMetrics = metricsSummaryData.data?.bopis
+	LaunchedEffect(Unit) {
+		setMetricSummary()
+	}
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.background(color = BrandColor.GRAY_100)
+	) {
+		Column(
+			modifier = Modifier
+				.background(color = BrandColor.GRAY_50)
+		) {
+			MetricsHeader()
+			MetricsScreen(
+				fulfillmentType = SubFulfillmentType.BOPIS,
+				fillRatePercentage = bopisMetrics?.fillRatePercentage,
+				productivityPercentage = bopisMetrics?.productivityPercentage,
+				unitsWorked = bopisMetrics?.unitsWorkedInTime,
+				totalUnits = bopisMetrics?.totalUnitsWorked,
+				uph = bopisMetrics?.pickUph,
+				curbsideDeliverySpeed = bopisMetrics?.curbsideDeliverySpeed,
+				inStoreDeliverySpeed = bopisMetrics?.inStoreDeliverySpeed
+			)
 		}
-	} else {
-		EmptyStateScreen(
-			title = stringResource(id = R.string.under_construction_title),
-			body = stringResource(id = R.string.under_construction_info),
-			imageVector = ImageVector.vectorResource(id = R.drawable.under_construction)
+		if (metricsSummaryData.state == GenericViewState.Loading) {
+			CircularProgressIndicator(
+				modifier = Modifier.align(Alignment.Center),
+				color = BrandColor.GRAY_900
+			)
+		}
+	}
+}
+
+@Composable
+private fun MetricsHeader() {
+	Column(Modifier.padding(start = 16.dp, top = 8.dp)) {
+		Text(
+			text = "Performance Metrics",
+			style = TextStyle(
+				lineHeight = 26.sp,
+				fontSize = 20.sp,
+				fontWeight = FontWeight(700)
+			)
+		)
+		Text(
+			text = TimeUtils.formatTimeStamp(Instant.now()),
+			style = TextStyle(
+				lineHeight = 12.sp,
+				fontSize = 12.sp,
+				fontWeight = FontWeight(500)
+			)
 		)
 	}
 }
@@ -69,15 +110,20 @@ fun HomeScreen() {
 @Composable
 @PreviewPdt
 fun PreviewHomeScreen() {
-	HomeScreen()
-}
-
-@Composable
-@PreviewPdt
-fun PreviewEmptyStateScreen() {
-	EmptyStateScreen(
-		title = stringResource(id = R.string.under_construction_title),
-		body = stringResource(id = R.string.under_construction_info),
-		imageVector = ImageVector.vectorResource(id = R.drawable.under_construction)
+	HomeScreenComponent(
+		metricsSummaryData = MetricsSummaryData(
+			data = MetricsSummaryResponse(
+				bopis = MetricsSummaryResponse.OrderMetrics(
+					fillRatePercentage = 97.3,
+					productivityPercentage = 89.1,
+					unitsWorkedInTime = 109,
+					totalUnitsWorked = 122,
+					pickUph = 8.1,
+					curbsideDeliverySpeed = "00:02:21.012",
+					inStoreDeliverySpeed = "00:03:37.012"
+				),
+				bopl = MetricsSummaryResponse.OrderMetrics()
+			)
+		)
 	)
 }

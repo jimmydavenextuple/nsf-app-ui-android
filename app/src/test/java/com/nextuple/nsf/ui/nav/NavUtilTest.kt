@@ -3,6 +3,7 @@ package com.nextuple.nsf.ui.nav
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nextuple.nsf.ui.nav.NavUtil.ORDERS_PICKUP_DEEP_LINK
+import com.nextuple.nsf.ui.nav.NavUtil.PICK_DEEP_LINK
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +31,14 @@ class NavUtilTest {
 
 	@Test
 	fun `getStartDestination will return ORDERS route when loggedIn is true and deepLinkUri is not found`() {
-		val expectedRoute = NavUtil.getStartDestination(true, Uri.parse("nsf://$ORDERS_PICKUP_DEEP_LINK"))
+		val expectedRoute =
+			NavUtil.getStartDestination(true, Uri.parse("nsf://$ORDERS_PICKUP_DEEP_LINK"))
 		assertEquals(Screen.ORDERS.route, expectedRoute)
+	}
+
+	@Test
+	fun `getStartDestination will return PICK route when loggedIn is true and deepLinkUri is PICK_DEEP_LINK`() {
+		val expectedRoute = NavUtil.getStartDestination(true, Uri.parse("nsf://$PICK_DEEP_LINK"))
+		assertEquals(Screen.PICK.route, expectedRoute)
 	}
 }

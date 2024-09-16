@@ -43,18 +43,17 @@ import com.nextuple.nsf.ui.component.EnterUpcDialog
 import com.nextuple.nsf.ui.screen.prep.PrepScreenTab.PACK
 import com.nextuple.nsf.ui.screen.prep.PrepScreenTab.STAGE
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.ui.util.PreviewPdt
 import com.nextuple.nsf.ui.util.ScanManager
 
 @Composable
 fun PrepLandingScreen(
-    numPackTasks: Int,
-    scanManager: ScanManager,
-    onScanGear: (String) -> Unit,
-    onClickPackByOrder: () -> Unit,
-    resetScreen: () -> Unit
+	numPackTasks: Int,
+	scanManager: ScanManager,
+	onScanGear: (String) -> Unit,
+	onClickPackByOrder: () -> Unit,
+	resetScreen: () -> Unit
 ) {
 	var selectedTab by rememberSaveable { mutableStateOf(PACK) }
 
@@ -118,7 +117,8 @@ private fun PackTabContainer(
 	) {
 		Column(horizontalAlignment = Alignment.CenterHorizontally) {
 			Image(
-				painter = painterResource(id = drawable.scan_box),
+				modifier = Modifier.fillMaxWidth(),
+				painter = painterResource(id = drawable.scan_to_pack),
 				contentDescription = ""
 			)
 
@@ -136,7 +136,7 @@ private fun PackTabContainer(
 					.fillMaxWidth()
 			) {
 				Image(
-					painter = painterResource(id = drawable.ic_scan_orange),
+					painter = painterResource(id = drawable.ic_pick_qr_code_scanner),
 					contentDescription = "",
 					modifier = Modifier
 						.width(36.dp)
@@ -144,11 +144,10 @@ private fun PackTabContainer(
 				)
 				Text(
 					text = stringResource(string.scan_to_pack),
-					color = BrandColor.ORANGE_700,
+					color = BrandColor.DARK_BLUE,
 					style = TextStyle(
 						fontSize = 18.sp,
 						lineHeight = 23.4.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(700),
 						letterSpacing = 0.5.sp
 					)
@@ -162,7 +161,6 @@ private fun PackTabContainer(
 					text = AnnotatedString(stringResource(string.pack_by_order)),
 					style = TextStyle(
 						fontSize = 14.sp,
-						fontFamily = FontFamily.ARCHIVO,
 						fontWeight = FontWeight(700),
 						color = BrandColor.GRAY_900,
 						textAlign = TextAlign.Center,
@@ -203,4 +201,10 @@ fun PreviewPrepLandingScreen() {
 		onScanGear = {},
 		onClickPackByOrder = {}
 	) {}
+}
+
+@Composable
+@PreviewPdt
+fun StageTabContainerPreview() {
+	StageTabContainer()
 }

@@ -34,7 +34,6 @@ import com.nextuple.nsf.ui.common.MultiOptionModal
 import com.nextuple.nsf.ui.common.TertiaryButton
 import com.nextuple.nsf.ui.component.PrinterModal
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.PreviewPdt
 import com.nextuple.nsf.ui.util.Printer
@@ -62,7 +61,7 @@ fun SettingsScreen(
 				.fillMaxWidth()
 				.wrapContentHeight(),
 			shape = RoundedCornerShape(12.dp),
-			colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_100) ,
+			colors = CardDefaults.cardColors(containerColor = BrandColor.GRAY_100),
 			elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
 		) {
 			Column(modifier = Modifier.padding(12.dp)) {
@@ -75,13 +74,19 @@ fun SettingsScreen(
 					text = stringResource(id = R.string.printers_title),
 					style = TextStyle(
 						fontWeight = FontWeight.Bold,
-						fontFamily = FontFamily.ARCHIVO,
 						fontSize = 24.sp,
 						color = BrandColor.BLUE_800_NT
 					)
 				)
 				printersList?.forEach { printer ->
-					PrinterListItem(printer, ipPrefix, onReset, printerConnectionState, onConnectPrinter, onDisConnectPrinter)
+					PrinterListItem(
+						printer,
+						ipPrefix,
+						onReset,
+						printerConnectionState,
+						onConnectPrinter,
+						onDisConnectPrinter
+					)
 				}
 				PrinterProblem(
 					modifier = Modifier.padding(top = 22.dp, bottom = 10.dp)
@@ -92,7 +97,14 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> Unit, printerConnectionState: GenericViewState, onConnectPrinter: (Printer, String) -> Unit, onDisConnectPrinter: (Printer) -> Unit) {
+private fun PrinterListItem(
+	printer: Printer,
+	ipPrefix: String?,
+	onReset: () -> Unit,
+	printerConnectionState: GenericViewState,
+	onConnectPrinter: (Printer, String) -> Unit,
+	onDisConnectPrinter: (Printer) -> Unit
+) {
 	var showConnectModal by remember { mutableStateOf(false) }
 	var showDisconnectModal by remember { mutableStateOf(false) }
 
@@ -102,7 +114,6 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 			text = printer.printerName,
 			style = TextStyle(
 				fontWeight = FontWeight.Normal,
-				fontFamily = FontFamily.ARCHIVO,
 				fontSize = 16.sp,
 				color = BrandColor.BLACK
 			)
@@ -139,7 +150,6 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 							maxLines = 1,
 							style = TextStyle(
 								fontWeight = FontWeight.Normal,
-								fontFamily = FontFamily.ARCHIVO,
 								fontStyle = FontStyle.Normal,
 								fontSize = 12.sp,
 								color = BrandColor.BLACK,
@@ -158,7 +168,6 @@ private fun PrinterListItem(printer: Printer, ipPrefix: String?, onReset: () -> 
 						maxLines = 1,
 						style = TextStyle(
 							fontWeight = FontWeight.Normal,
-							fontFamily = FontFamily.ARCHIVO,
 							fontStyle = FontStyle.Italic,
 							fontSize = 12.sp,
 							color = BrandColor.BLACK,

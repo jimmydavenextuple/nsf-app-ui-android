@@ -10,12 +10,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.retrofit.dto.response.AthleteCheckInDetail
 import com.nextuple.nsf.retrofit.dto.response.FulfillmentRequestDetail
 import com.nextuple.nsf.retrofit.dto.response.OrderDetailsResponse
 import com.nextuple.nsf.ui.state.CancelReasonData
-import com.nextuple.nsf.ui.state.Printer
-import com.karumi.shot.ScreenshotTest
+import com.nextuple.nsf.ui.util.Printer
 import org.junit.Rule
 import org.junit.Test
 
@@ -164,10 +164,11 @@ class OrderDetailsTest : ScreenshotTest {
 			athleteProxyName = "",
 			athletePhoneNumber = "",
 			orderNumber = "",
-			orderDate = "",
+			orderDate = Pair("", ""),
 			expectedDate = "",
 			receivedDate = "",
-			packedOnDate = "",
+			packedOnDate = Pair("", ""),
+			pickedUpOnDate = Pair("", ""),
 			holdingLocation = "",
 			declineModalOptions = emptyList(),
 			onStartPickup = {},
@@ -175,8 +176,6 @@ class OrderDetailsTest : ScreenshotTest {
 			onPickupRemoveCheckIn = {},
 			onStartPickupCompletion = {},
 			onPrintHoldSlip = {},
-			onPrintHoldSlipSuccessCallBack = {},
-			onResetPrintHoldSlip = {},
 			ipPrefix = "",
 			printer = Printer(
 				printerName = "BOPIS",
@@ -193,7 +192,10 @@ class OrderDetailsTest : ScreenshotTest {
 			resetScanLocationState = {},
 			onLocationChange = { _, _ -> },
 			scanManager = null,
-			onPackOrder = {}
+			onPackOrder = {},
+			bypassPrinter = false,
+			holdSlipZpl = mutableListOf(),
+			resetGetHoldSlipState = {}
 		)
 	}
 
@@ -204,10 +206,11 @@ class OrderDetailsTest : ScreenshotTest {
 			athleteProxyName = "",
 			athletePhoneNumber = "",
 			orderNumber = "",
-			orderDate = "",
+			orderDate = Pair("", ""),
 			expectedDate = "",
 			receivedDate = "",
-			packedOnDate = "",
+			packedOnDate = Pair("", ""),
+			pickedUpOnDate = Pair("", ""),
 			holdingLocation = "",
 			declineModalOptions = emptyList(),
 			onStartPickup = {},
@@ -215,8 +218,6 @@ class OrderDetailsTest : ScreenshotTest {
 			onPickupRemoveCheckIn = {},
 			onStartPickupCompletion = {},
 			onPrintHoldSlip = {},
-			onPrintHoldSlipSuccessCallBack = {},
-			onResetPrintHoldSlip = {},
 			ipPrefix = "",
 			printer = Printer(printerName = "BOPIS", ipAddress = "", connectionStatus = false),
 			onConnectPrinter = { _, _ -> },
@@ -229,7 +230,10 @@ class OrderDetailsTest : ScreenshotTest {
 			resetScanLocationState = {},
 			onLocationChange = { _, _ -> },
 			scanManager = null,
-			onPackOrder = {}
+			onPackOrder = {},
+			bypassPrinter = false,
+			holdSlipZpl = mutableListOf(),
+			resetGetHoldSlipState = {}
 		)
 	}
 }

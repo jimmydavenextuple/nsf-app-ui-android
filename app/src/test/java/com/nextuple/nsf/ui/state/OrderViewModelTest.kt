@@ -81,18 +81,23 @@ class OrderViewModelTest {
 	}
 
 	@Test
-	fun `getOrderDetails, on success, should populate userSummary and enter success state`() = runTest {
-		val orderDetailsResponse = OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123"))
-		every { runBlocking { orderService.getOrderDetails(any()) } } returns Result.Success(orderDetailsResponse)
-		vm.getOrderDetails(
-			fulfillmentRequestNumber = "fulfillmentRequestNumber"
-		)
-		advanceUntilIdle()
+	fun `getOrderDetails, on success, should populate userSummary and enter success state`() =
+		runTest {
+			val orderDetailsResponse = OrderDetailsResponse(
+				fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123")
+			)
+			every { runBlocking { orderService.getOrderDetails(any()) } } returns Result.Success(
+				orderDetailsResponse
+			)
+			vm.getOrderDetails(
+				fulfillmentRequestNumber = "fulfillmentRequestNumber"
+			)
+			advanceUntilIdle()
 
-		assertEquals(Success, vm.orderDetailsState)
-		assertEquals(orderDetailsResponse, vm.orderDetailResponse)
-		assertNull(vm.errMsg)
-	}
+			assertEquals(Success, vm.orderDetailsState)
+			assertEquals(orderDetailsResponse, vm.orderDetailResponse)
+			assertNull(vm.errMsg)
+		}
 
 	@Test
 	fun `getOrders, on error, should enter error state`() = runTest {
@@ -113,8 +118,21 @@ class OrderViewModelTest {
 
 	@Test
 	fun `getOrders, on success, should populate orderList and enter success state`() = runTest {
-		val orderList = listOf(OrderDetailsResponse(fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123")))
-		every { runBlocking { orderService.getOrders(any(), any(), any(), any()) } } returns Result.Success(orderList)
+		val orderList = listOf(
+			OrderDetailsResponse(
+				fulfillmentRequestDetail = FulfillmentRequestDetail(fulfillmentRequestNumber = "123")
+			)
+		)
+		every {
+			runBlocking {
+				orderService.getOrders(
+					any(),
+					any(),
+					any(),
+					any()
+				)
+			}
+		} returns Result.Success(orderList)
 		vm.getOrders()
 		advanceUntilIdle()
 
@@ -142,7 +160,16 @@ class OrderViewModelTest {
 					)
 				)
 			)
-			every { runBlocking { orderService.getOrders(any(), any(), any(), any()) } } returns Result.Success(orderList)
+			every {
+				runBlocking {
+					orderService.getOrders(
+						any(),
+						any(),
+						any(),
+						any()
+					)
+				}
+			} returns Result.Success(orderList)
 			vm.getOrders()
 			advanceUntilIdle()
 
@@ -412,7 +439,7 @@ class OrderViewModelTest {
 		vm.getHoldSlip("123")
 		advanceUntilIdle()
 
-		assertEquals(Success, vm.holdSlipState)
+		assertEquals(Success, vm.getHoldSlipState)
 		assertEquals(holdSlipZpl, vm.holdSlipZpl)
 		assertNull(vm.errMsg)
 	}
@@ -426,46 +453,83 @@ class OrderViewModelTest {
 		vm.getHoldSlip("123")
 		advanceUntilIdle()
 
-		assertEquals(Failure, vm.holdSlipState)
+		assertEquals(Failure, vm.getHoldSlipState)
 		assertEquals(errorMsg, vm.errMsg)
 		assertNull(vm.holdSlipZpl)
 	}
 
 	@Test
-	fun `cancelOrder should set cancelReasonData on success when the declined reason is damaged`() = runTest {
-		val recordDeclineResponse = RecordDeclineResponse(true, "")
-		every { runBlocking { orderService.getOrderDetails(any()) } } returns mockk()
-		every { runBlocking { orderService.recordDecline(any(), any(), any(), any()) } } returns Result.Success(
-			data = recordDeclineResponse
-		)
+	fun `cancelOrder should set cancelReasonData on success when the declined reason is damaged`() =
+		runTest {
+			val recordDeclineResponse = RecordDeclineResponse(true, "")
+			every { runBlocking { orderService.getOrderDetails(any()) } } returns mockk()
+			every {
+				runBlocking {
+					orderService.recordDecline(
+						any(),
+						any(),
+						any(),
+						any()
+					)
+				}
+			} returns Result.Success(
+				data = recordDeclineResponse
+			)
 
-		vm.cancelOrder("123", DeclineCode(id = "DAMAGE", displayName = "DAMAGE"), false)
-		advanceUntilIdle()
+			vm.cancelOrder("123", DeclineCode(id = "DAMAGE", displayName = "DAMAGE"), false)
+			advanceUntilIdle()
 
-		assertEquals(Success, vm.cancelReasonData.state)
-		assertEquals(true, vm.cancelReasonData.isDamaged)
-	}
+			assertEquals(Success, vm.cancelReasonData.state)
+			assertEquals(true, vm.cancelReasonData.isDamaged)
+		}
 
 	@Test
-	fun `cancelOrder should set cancelReasonData on success when the declined reason is not damaged`() = runTest {
-		val recordDeclineResponse = RecordDeclineResponse(true, "")
-		every { runBlocking { orderService.getOrderDetails(any()) } } returns mockk()
-		every { runBlocking { orderService.recordDecline(any(), any(), any(), any()) } } returns Result.Success(
-			data = recordDeclineResponse
-		)
+	fun `cancelOrder should set cancelReasonData on success when the declined reason is not damaged`() =
+		runTest {
+			val recordDeclineResponse = RecordDeclineResponse(true, "")
+			every { runBlocking { orderService.getOrderDetails(any()) } } returns mockk()
+			every {
+				runBlocking {
+					orderService.recordDecline(
+						any(),
+						any(),
+						any(),
+						any()
+					)
+				}
+			} returns Result.Success(
+				data = recordDeclineResponse
+			)
 
-		vm.cancelOrder("123", DeclineCode(id = "CUSTOMER_REQUEST", displayName = "CUSTOMER REQUEST"), false)
-		advanceUntilIdle()
+			vm.cancelOrder(
+				"123",
+				DeclineCode(id = "CUSTOMER_REQUEST", displayName = "CUSTOMER REQUEST"),
+				false
+			)
+			advanceUntilIdle()
 
-		assertEquals(Success, vm.cancelReasonData.state)
-		assertEquals(false, vm.cancelReasonData.isDamaged)
-	}
+			assertEquals(Success, vm.cancelReasonData.state)
+			assertEquals(false, vm.cancelReasonData.isDamaged)
+		}
 
 	@Test
 	fun `cancelOrder should set cancelReasonData on failure`() = runTest {
-		every { runBlocking { orderService.recordDecline(any(), any(), any(), any()) } } returns Result.Error()
+		every {
+			runBlocking {
+				orderService.recordDecline(
+					any(),
+					any(),
+					any(),
+					any()
+				)
+			}
+		} returns Result.Error()
 
-		vm.cancelOrder("123", DeclineCode(id = "CUSTOMER_REQUEST", displayName = "CUSTOMER REQUEST"), false)
+		vm.cancelOrder(
+			"123",
+			DeclineCode(id = "CUSTOMER_REQUEST", displayName = "CUSTOMER REQUEST"),
+			false
+		)
 		advanceUntilIdle()
 
 		assertEquals(Failure, vm.cancelReasonData.state)
@@ -490,9 +554,9 @@ class OrderViewModelTest {
 	}
 
 	@Test
-	fun `resetHoldSlipState, should reset holdSlipState`() = runTest {
-		vm.resetHoldSlipState()
-		assertEquals(Idle, vm.holdSlipState)
+	fun `resetGetHoldSlipState, should reset getHoldSlipState`() = runTest {
+		vm.resetGetHoldSlipState()
+		assertEquals(Idle, vm.getHoldSlipState)
 	}
 
 	@Test

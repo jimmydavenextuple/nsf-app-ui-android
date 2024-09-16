@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.Vibrator
+import android.os.VibratorManager
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.ui.util.Haptics
 import com.nextuple.nsf.util.DataWedgeBroadcastReceiver
@@ -24,16 +25,15 @@ internal object IntegrationModule {
 	fun provideHaptics(vibrator: Vibrator): Haptics = Haptics(vibrator = vibrator)
 
 	@Provides
-	fun provideVibrator(app: Application): Vibrator {
-		val serviceName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-			Context.VIBRATOR_MANAGER_SERVICE
+	fun provideVibrator(app: Application): Vibrator =
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			val manager = app.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+			manager.defaultVibrator
 		} else {
 			// Min SDK at time of this change is 30, so we still need this.
 			@Suppress("DEPRECATION")
-			Context.VIBRATOR_SERVICE
+			app.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 		}
-		return app.getSystemService(serviceName) as Vibrator
-	}
 
 	@Provides
 	fun provideIsDebug(): Boolean = BuildConfig.DEBUG

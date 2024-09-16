@@ -36,7 +36,6 @@ import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.TertiaryButton
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.theme.BrandColor
-import com.nextuple.nsf.ui.theme.FontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,7 +73,6 @@ fun SelectHoldingAreaCard(
 							text = stringResource(id = R.string.holding_area_hint),
 							textAlign = TextAlign.Start,
 							color = BrandColor.GRAY_900,
-							fontFamily = FontFamily.ARCHIVO,
 							fontWeight = FontWeight.Normal,
 							fontStyle = FontStyle.Normal,
 							fontSize = 12.sp
@@ -97,7 +95,6 @@ fun SelectHoldingAreaCard(
 							interactionSource = interactionSource,
 							textStyle = TextStyle(
 								fontSize = 14.sp,
-								fontFamily = FontFamily.ARCHIVO,
 								fontWeight = FontWeight(400),
 								letterSpacing = 0.5.sp
 							)
@@ -111,7 +108,7 @@ fun SelectHoldingAreaCard(
 								interactionSource = interactionSource,
 								trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
 								colors = OutlinedTextFieldDefaults.colors(
-									focusedBorderColor = BrandColor.ORANGE_700
+									focusedBorderColor = BrandColor.DARK_BLUE
 								),
 								contentPadding = TextFieldDefaults.contentPaddingWithoutLabel(
 									start = 12.dp,
@@ -142,7 +139,7 @@ fun SelectHoldingAreaCard(
 
 				PrimaryButton(
 					modifier = Modifier
-						.fillMaxWidth(0.7f)
+						.fillMaxWidth()
 						.padding(top = 18.dp),
 					text = stringResource(id = R.string.done).uppercase(),
 					enabled = selectedHoldingArea.isNotEmpty(),

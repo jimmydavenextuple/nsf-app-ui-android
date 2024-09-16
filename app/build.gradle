@@ -31,12 +31,12 @@ def STORE_PASSWORD = Util.getEnv('STORE_PASSWORD')
 def KEY_ALIAS = Util.getEnv('KEY_ALIAS')
 def KEY_PASSWORD = Util.getEnv('KEY_PASSWORD')
 
-def DKS = Util.getEnv('USER')
+def USER_ID = Util.getEnv('USER')
 
-def GOAT_API_URL_LOCAL = Util.getEnv('GOAT_API_LOCAL')
-def GOAT_API_URL_DEV = Util.getEnv('GOAT_API_DEV')
-def GOAT_API_URL_STAGE = Util.getEnv('GOAT_API_STAGE')
-def GOAT_API_URL_PROD = Util.getEnv('GOAT_API_PROD')
+def GOAT_API_URL_LOCAL = Util.getEnv('GOAT_API_URL_LOCAL')
+def GOAT_API_URL_DEV = Util.getEnv('GOAT_API_URL_DEV')
+def GOAT_API_URL_DEMO = Util.getEnv('GOAT_API_URL_DEMO')
+def GOAT_API_URL_PROD = Util.getEnv('GOAT_API_URL_PROD')
 
 android {
 	namespace 'com.nextuple.nsf'
@@ -70,7 +70,7 @@ android {
 		buildConfigField "String", "APP_VERSION", "\"$APK_VERSION\""
 
 		// DEBUG-only
-		buildConfigField "String", "DKS", "\"$DKS\""
+		buildConfigField "String", "USER_ID", "\"$USER_ID\""
 	}
 
 	buildTypes {
@@ -98,17 +98,17 @@ android {
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_PROD\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 
-		stage {
-			applicationId "com.nextuple.nsf.stage"
+		demo {
+			applicationId "com.nextuple.nsf.dev"
 
-			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_STAGE\""
+			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_DEMO\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 
@@ -118,7 +118,7 @@ android {
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_DEV\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 
@@ -128,7 +128,7 @@ android {
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_LOCAL\""
 
 			// DEBUG-only
-			buildConfigField "Boolean", "AUTO_FILL_DKS", "false"
+			buildConfigField "Boolean", "AUTO_FILL_USER_ID", "false"
 			buildConfigField "Boolean", "BYPASS_PRINTER", "false"
 		}
 	}
@@ -193,6 +193,7 @@ dependencies {
 	implementation 'androidx.compose.material3:material3'
 	implementation 'androidx.compose.ui:ui-tooling-preview'
 	implementation 'androidx.compose.foundation:foundation-android:1.6.4'
+	implementation "androidx.compose.runtime:runtime-livedata"
 	debugImplementation 'androidx.compose.ui:ui-tooling'
 	debugImplementation 'androidx.compose.ui:ui-test-manifest'
 	testImplementation 'androidx.compose.ui:ui-test-junit4'
@@ -220,8 +221,8 @@ dependencies {
 	//	implementation 'com.microsoft.clarity:clarity:1.3.2'
 
 	// DataStore
-	implementation  "androidx.datastore:datastore-core:1.0.0"
-	implementation  "com.google.protobuf:protobuf-javalite:3.23.2"
+	implementation "androidx.datastore:datastore-core:1.0.0"
+	implementation "com.google.protobuf:protobuf-javalite:3.23.2"
 	implementation "androidx.datastore:datastore-preferences:1.0.0"
 
 	//noinspection GradleDependency - 1.13.4 breaks spying lambdas, this seems to be a library bug.
@@ -293,9 +294,9 @@ androidComponents {
 	onVariants(selector().all()) { variant ->
 		afterEvaluate {
 			def protoTask =
-					project.tasks.getByName("generate" + variant.name.substring(0,1).toUpperCase() + variant.name.substring(1) + "Proto")
+					project.tasks.getByName("generate" + variant.name.substring(0, 1).toUpperCase() + variant.name.substring(1) + "Proto")
 
-			project.tasks.getByName("ksp" + variant.name.substring(0,1).toUpperCase() + variant.name.substring(1) + "Kotlin") {
+			project.tasks.getByName("ksp" + variant.name.substring(0, 1).toUpperCase() + variant.name.substring(1) + "Kotlin") {
 				dependsOn(protoTask)
 				setSource(
 						protoTask.outputBaseDir

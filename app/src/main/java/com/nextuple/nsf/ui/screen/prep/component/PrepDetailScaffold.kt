@@ -11,12 +11,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.nextuple.nsf.ui.component.OmniBanner
 import com.nextuple.nsf.ui.theme.BrandColor
+import com.nextuple.nsf.ui.util.AppMessage
+import com.nextuple.nsf.ui.util.PreviewPdt
 
 @Composable
 fun PrepDetailScaffold(
 	athleteName: String,
 	orderNumber: String,
+	appMessage: AppMessage? = null,
+	onDismissMessage: () -> Unit = {},
 	content: @Composable ColumnScope.() -> Unit
 ) {
 	Column(
@@ -36,7 +41,34 @@ fun PrepDetailScaffold(
 				.fillMaxSize()
 				.verticalScroll(rememberScrollState())
 		) {
+			appMessage?.let {
+				OmniBanner(
+					appMessage = it,
+					onDismiss = onDismissMessage
+				)
+			}
 			content()
 		}
 	}
+}
+
+@PreviewPdt
+@Composable
+private fun PrepDetailScaffoldPreview() {
+	PrepDetailScaffold(
+		athleteName = "athlete",
+		orderNumber = "100110010",
+		content = {}
+	)
+}
+
+@PreviewPdt
+@Composable
+private fun PrepDetailScaffoldPreviewWithMessage() {
+	PrepDetailScaffold(
+		athleteName = "athlete",
+		orderNumber = "100110010",
+		appMessage = AppMessage.getHoldSlipError,
+		content = {}
+	)
 }

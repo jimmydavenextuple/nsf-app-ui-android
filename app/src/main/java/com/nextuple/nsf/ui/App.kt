@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -44,7 +45,6 @@ import com.nextuple.nsf.ui.screen.home.LoginScreen
 import com.nextuple.nsf.ui.screen.order.OrderDetailsScreen
 import com.nextuple.nsf.ui.screen.order.OrderPickupScreen
 import com.nextuple.nsf.ui.screen.order.OrderScreen
-import com.nextuple.nsf.ui.screen.pick.PickDetailsScreen
 import com.nextuple.nsf.ui.screen.pick.PickScreen
 import com.nextuple.nsf.ui.screen.prep.PrepScreen
 import com.nextuple.nsf.ui.screen.search.SearchResultsScreen
@@ -71,19 +71,19 @@ object AppConfig {
 			count = 0
 		),
 		AppNavBarItem(
-			iconResId = R.drawable.ic_pick,
+			iconResId = R.drawable.ic_pick_qr_code_scanner,
 			label = "Pick",
 			route = Screen.PICK.route,
 			count = 0
 		),
 		AppNavBarItem(
-			iconResId = R.drawable.ic_prep,
+			iconResId = R.drawable.ic_prep_local_mall,
 			label = "Prep",
 			route = Screen.PREP.route,
 			count = 0
 		),
 		AppNavBarItem(
-			iconResId = R.drawable.ic_orders,
+			iconResId = R.drawable.ic_order_shopping_basket,
 			label = "Orders",
 			route = Screen.ORDERS.route,
 			count = 0
@@ -95,7 +95,7 @@ object AppConfig {
 fun App(
 	infoVM: InfoViewModel,
 	userVM: UserViewModel,
-	pickVM: PickViewModel,
+	pickVM: PickViewModel = hiltViewModel(),
 	orderVM: OrderViewModel,
 	settingsVM: SettingsViewModel,
 	configVM: ConfigViewModel,
@@ -123,6 +123,12 @@ fun App(
 		) {
 			orderVM.resetFilters()
 		}
+		// TODO: Remove once HOME is default start destination.
+		if (route.startsWith(Screen.PICK.route) &&
+			lastTabNavRoute.orEmpty().startsWith(Screen.PICK.route)
+		) {
+			pickVM.fetchCurrentStep()
+		}
 		lastTabNavRoute = route
 		navCtrl.navigate(route) {
 			popUpTo(navCtrl.graph[Screen.PICK.route].id) {
@@ -133,7 +139,11 @@ fun App(
 	}
 
 	if (settingsVM.bypassPrinter) {
-		Toast.makeText(LocalContext.current, "Printer Bypass Enabled - Skipping print", Toast.LENGTH_LONG).show()
+		Toast.makeText(
+			LocalContext.current,
+			"Printer Bypass Enabled - Skipping print",
+			Toast.LENGTH_LONG
+		).show()
 	}
 	Scaffold(
 		topBar = {
@@ -173,7 +183,11 @@ fun App(
 							navCtrl.navigate("${Screen.SEARCH_RESULTS.route}?$searchInput")
 						} else {
 							// todo: Confirm text with anna
-							Toast.makeText(context, "Please enter a value to search", Toast.LENGTH_LONG).show()
+							Toast.makeText(
+								context,
+								"Please enter a value to search",
+								Toast.LENGTH_LONG
+							).show()
 						}
 					},
 					onBackAction = {
@@ -202,17 +216,12 @@ fun App(
 				composableForHome()
 				composableForPick(
 					navCtrl = navCtrl,
-					infoVM = infoVM,
 					pickVM = pickVM,
-					onRefreshData = onRefreshData
-				)
-				composableForPickDetails(
-					navCtrl = navCtrl,
-					scanManager = scanManager,
-					haptics = haptics,
 					infoVM = infoVM,
 					configVM = configVM,
-					pickVM = pickVM
+					scanManager = scanManager,
+					haptics = haptics,
+					onRefreshData = onRefreshData
 				)
 				composableForPrep(
 					configVM = configVM,
@@ -294,12 +303,12 @@ private fun NavGraphBuilder.composableForLogin(
 ) {
 	composable(Screen.LOGIN.route) {
 		LoginScreen(
-			isInvalid = userVM.viewState == ViewState.LoginError,
-			resetIsInvalid = userVM::resetFromError,
+			isFormInvalid = userVM.viewState == ViewState.LoginFormValidationError,
+			resetIsFormInvalid = userVM::resetFromError,
 			errorMessage = userVM.errMsg,
 			showProgressBar = userVM.viewState == ViewState.LoggingIn,
-			onSubmitDks = {
-				userVM.login(it)
+			onSubmit = { nodeNo, userId ->
+				userVM.login(nodeNo, userId)
 				settingsVM.retrieveSavedPrinters()
 			},
 			isLoggedIn = userVM.viewState == ViewState.LoggedIn,
@@ -327,103 +336,34 @@ private fun NavGraphBuilder.composableForHome() {
 
 private fun NavGraphBuilder.composableForPick(
 	navCtrl: NavController,
-	infoVM: InfoViewModel,
 	pickVM: PickViewModel,
+	infoVM: InfoViewModel,
+	configVM: ConfigViewModel,
+	scanManager: ScanManager,
+	haptics: Haptics,
 	onRefreshData: () -> Unit
 ) {
 	composable(Screen.PICK.route) {
+		val pickDeclineOptions = infoVM.declineCodes?.pickDeclineCodes?.map {
+			it.displayName to it.id
+		}?.toTypedArray()?.let { linkedMapOf(*it) }
 		PickScreen(
+			pickVM = pickVM,
+			scanManager = scanManager,
+			haptics = haptics,
 			tasksUnassigned = infoVM.pickTasksUnassigned,
 			unitsWorked = infoVM.totalStoreUnitsWorked,
 			totalUnits = infoVM.totalStoreUnits,
 			inProgressUnits = infoVM.totalStoreUnitsInProgress,
 			storeOverviewState = infoVM.storeOverviewState,
-			hasActiveTask = pickVM.currentPickItem.value != null,
-			onHasActiveTask = {
-				navCtrl.navigate(Screen.PICK_DETAILS.route) {
-					popUpTo(Screen.HOME.route)
-				}
-			},
-			startTaskStatus = pickVM.startPickState,
-			onStartPicking = {
-				pickVM.startPick()
-			},
-			startTaskCompletion = {
-				pickVM.resetPickScreen()
-				navCtrl.navigate(Screen.PICK_DETAILS.route)
-			},
-			resetScreen = {
-				pickVM.resetPickScreen()
-				onRefreshData()
-			}
-		)
-	}
-}
-
-private fun NavGraphBuilder.composableForPickDetails(
-	navCtrl: NavController,
-	scanManager: ScanManager,
-	haptics: Haptics,
-	infoVM: InfoViewModel,
-	configVM: ConfigViewModel,
-	pickVM: PickViewModel
-) {
-	composable(Screen.PICK_DETAILS.route) {
-		PickDetailsScreen(
-			scanManager = scanManager,
-			pickDeclineState = pickVM.pickDeclineState,
-			recordPickState = pickVM.recordPickState,
 			declineCodesState = infoVM.declineCodesState,
-			fulfillmentType = pickVM.pickTask?.fulfillmentType,
-			subFulfillmentType = pickVM.pickTask?.subFulfillmentType,
-			currentPickTaskItem = pickVM.currentPickItem.value,
-			unitsWorked = pickVM.pickTask?.totalWorkedQty ?: 0,
-			totalUnits = pickVM.pickTask?.totalQty ?: 0,
-			declineModalOptions = infoVM.declineCodes?.pickDeclineCodes?.map {
-				it.displayName to it.id
-			}?.toTypedArray()?.let { linkedMapOf(*it) },
-			onDeclineClick = {
-				infoVM.getDeclineCodes()
-			},
-			onDeclineReasonSelected = { declineReason, declineReasonText ->
-				pickVM.declinePick(declineReason, declineReasonText)
-			},
-			onCheckItemScan = { upc, symbology ->
-				if (symbology == null || configVM.isInvalidSymbology(symbology)) {
-					haptics.boop()
-					return@PickDetailsScreen false
-				}
-
-				if (!pickVM.matchUpc(upc)) {
-					haptics.boop()
-					haptics.vibrate(1000)
-					return@PickDetailsScreen false
-				}
-
-				return@PickDetailsScreen true
-			},
-			onItemPick = { upc, pickLocation ->
-				if (!pickVM.pickItem(upc, pickLocation)) {
-					haptics.boop()
-					haptics.vibrate(1000)
-				}
-			},
-			onDeclineCompletion = {
-				pickVM.resetPickDeclineState()
-				if (pickVM.currentPickItem.value == null) {
-					infoVM.getStoreOverview()
-					navCtrl.navigate(Screen.PICK.route) {
-						launchSingleTop = true
-					}
-				}
-			},
-			onRecordPickCompletion = {
-				pickVM.resetRecordPickState()
-				if (pickVM.currentPickItem.value == null) {
-					infoVM.getStoreOverview()
-					navCtrl.navigate(Screen.PICK.route) {
-						launchSingleTop = true
-					}
+			declineModalOptions = pickDeclineOptions,
+			onDeclineClick = infoVM::getDeclineCodes,
+			isInvalidSymbology = configVM::isInvalidSymbology,
+			resetScreen = {
+				onRefreshData()
+				navCtrl.navigate(Screen.PICK.route) {
+					launchSingleTop = true
 				}
 			}
 		)
@@ -431,11 +371,11 @@ private fun NavGraphBuilder.composableForPickDetails(
 }
 
 private fun NavGraphBuilder.composableForPrep(
-    configVM: ConfigViewModel,
+	configVM: ConfigViewModel,
 	infoVM: InfoViewModel,
-    settingsVM: SettingsViewModel,
+	settingsVM: SettingsViewModel,
 	scanManager: ScanManager,
-    onTabNav: (route: String) -> Unit,
+	onTabNav: (route: String) -> Unit,
 	onRefreshData: () -> Unit
 ) {
 	composable("${Screen.PREP.route}?frToPack={frToPack}") { navBackStackEntry ->
@@ -454,7 +394,6 @@ private fun NavGraphBuilder.composableForPrep(
 		)
 	}
 }
-
 
 private fun NavGraphBuilder.composableForOrders(
 	navCtrl: NavController,
@@ -490,6 +429,7 @@ private fun NavGraphBuilder.composableForOrders(
 				orderVM.resetOrderDetailsState()
 			},
 			readyOrders = orderVM.readyOrders,
+//			sddReadyOrder = orderVM.sddOrderByBatchIds,
 			inProgressOrders = orderVM.inProgressOrders,
 			orderTypeFilters = orderVM.orderTypeFilters,
 			orderStatusFilters = orderVM.orderStatusFilters,
@@ -512,7 +452,6 @@ private fun NavGraphBuilder.composableForOrderDetails(
 		val orderDetailsRes = orderVM.orderDetailResponse
 		val athleteDetail = orderDetailsRes?.athleteDetail
 
-
 		// TODO: Cleanup params. Order detail response is already being passed in along with its individual properties
 		OrderDetailsScreen(
 			viewState = orderVM.viewState,
@@ -522,12 +461,13 @@ private fun NavGraphBuilder.composableForOrderDetails(
 			athleteProxyName = athleteDetail?.athleteProxyFullName().orEmpty(),
 			athletePhoneNumber = StringUtils.toPhoneNumberFormatted(athleteDetail?.athletePhoneNumber.orEmpty()),
 			orderNumber = orderDetailsRes?.orderNumber.orEmpty(),
-			orderDate = orderVM.orderDate,
+			orderDate = Pair(orderVM.orderDate, orderVM.orderTime),
 			expectedDate = orderVM.expectedDate,
 			receivedDate = orderVM.receivedDate,
-			packedOnDate = orderVM.packedOnDate,
-			pickedUpOnDate = orderVM.pickedUpOnDate,
-			holdingLocation = orderVM.orderDetailResponse?.fulfillmentRequestDetail?.containers?.firstOrNull()?.holdingLocation ?: "",
+			packedOnDate = Pair(orderVM.packDate, orderVM.packTime),
+			pickedUpOnDate = Pair(orderVM.pickedUpOnDate, orderVM.pickedUpOnTime),
+			holdingLocation = orderVM.orderDetailResponse?.fulfillmentRequestDetail?.containers?.firstOrNull()?.holdingLocation
+				?: "",
 			holdSlipZpl = orderVM.holdSlipZpl,
 			holdingAreas = configVM.getHoldingLocations(),
 			declineModalOptions = infoVM.declineCodes?.pickupDeclineCodes,

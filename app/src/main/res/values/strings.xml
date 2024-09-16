@@ -26,7 +26,11 @@
     <string name="connect_printer">Connect Printer</string>
     <string name="connect_printer_subtitle">Type the printer IP address number located on the printer.</string>
     <string name="contents">Order Contents</string>
-    <string name="login_text_label">Login ID</string>
+    <string name="login_node_id_text_label">Store #</string>
+    <string name="login_node_id_text_invalid_error">Invalid Store #</string>
+    <string name="login_user_id_text_label">User ID</string>
+    <string name="login_user_id_text_invalid_error">Invalid User ID</string>
+    <string name="store_no_label">Store Number</string>
     <string name="dropdown_menu_feedback">Feedback</string>
     <string name="dropdown_menu_logout">Logout</string>
     <string name="dropdown_menu_settings">Settings</string>
@@ -64,17 +68,21 @@
     <string name="order_number">ORDER NUMBER</string>
     <string name="order_type">ORDER TYPE</string>
     <string name="order_date">ORDER DATE</string>
+    <string name="order_time">ORDER TIME</string>
     <string name="expected">EXPECTED</string>
     <string name="received_on">RECEIVED ON</string>
     <string name="packer">PACKER</string>
     <string name="stager">STAGER</string>
+    <string name="substitutions_applied">Substitutions Applied</string>
     <string name="dispenser">PICKUP TEAMMATE</string>
     <string name="order_number_or_last_name">Order #, Phone # or Last Name</string>
     <string name="order_search_label">Order Search</string>
     <string name="pack_these_units">Pack These Units</string>
     <string name="packed_by">PACKED BY</string>
     <string name="packed_on">PACKED ON</string>
+    <string name="packed_at">PACKED AT</string>
     <string name="prepped_on">PREPPED ON</string>
+    <string name="prepped_at">PREPPED AT</string>
     <string name="staged_by">STAGED BY</string>
     <string name="phone_number">PHONE NUMBER</string>
     <string name="pickup_actions">Pickup Actions</string>
@@ -123,6 +131,7 @@
     <string name="scan_to_pack">SCAN UPC TO PACK</string>
     <string name="pack_by_order">PACK BY ORDER</string>
     <string name="scan_pack">Scan and Pack Units</string>
+    <string name="substituted">Substituted</string>
     <string name="pack_order">Pack Order</string>
     <string name="pack_info">Package units in a properly-sized bag, then place the printed hold slip on the front.</string>
     <string name="picked_by">Picked By</string>
@@ -141,18 +150,18 @@
     <string name="printer_problems">PRINTER PROBLEMS?</string>
     <string name="other_printer">OTHER PRINTER</string>
     <string name="printer_problems_title">Troubleshooting</string>
-    <string name="printer_problems_info">Label failed to print: \n• Ensure printer is on. \n• Check wifi signal on mobile device.\n• Check IP Address of printer. \n• Tap CONNECT. \n\nLabel printed on multiple labels? \n• Tap CALIBRATE. \n\nStill need help? \nPlease contact the technology service desk to trouble shoot other issues. \n\nsupport@nextuple.com (999) 999–1234</string>
+    <string name="printer_problems_info">Label failed to print: \n• Ensure printer is on. \n• Check wifi signal on mobile device.\n• Check IP Address of printer. \n• Tap CONNECT. \n\nLabel printed on multiple labels? \n• Tap CALIBRATE. \n\nStill need help? \nPlease contact the technology service desk to trouble shoot other issues. \n\ntechnologyservicedesk@dcsg.com (724) 273–3456</string>
 
     <!-- UnderConstruction   -->
-    <string name="under_construction_title">Under Construction</string>
-    <string name="under_construction_info">We are currently researching, designing, and coding the home screen of NSF.</string>
-    <string name="pick_under_construction_body">We are building SFS functionality for future releases of NSF.</string>
-    <string name="pick_under_construction_title">Caution, Work Zone</string>
-    <string name="prep_under_construction_body">We are digging into separating stage and pack so you can work these steps independently.</string>
-    <string name="prep_under_construction_title">Hard Hat Area</string>
+    <string name="under_construction_title">Work in progress</string>
+    <string name="under_construction_info">We\'re working closely with fulfillment experts and smart customers like you to bring more useful features. Check back soon!</string>
+    <string name="pick_under_construction_body">We\'re working closely with fulfillment experts and smart customers like you to bring more useful features. Check back soon!</string>
+    <string name="pick_under_construction_title">Work in progress</string>
+    <string name="prep_under_construction_body">Coming soon to an app near you: separated staging and packing, so we work like you work.</string>
+    <string name="prep_under_construction_title">Breaking news</string>
 
     <!-- Search Results -->
-    <string name="strike">Strike!</string>
+    <string name="strike">No Results!</string>
     <string name="search_results_info"> Scan a barcode or enter a name, phone number, or order number.</string>
 
     <!-- Order Pickup -->
@@ -165,16 +174,19 @@
     <string name="edit_hold_location">Edit Location</string>
     <string name="match_slips_to_units">Match Slips To Units</string>
     <string name="picked_up_on">PICKED UP ON</string>
+    <string name="picked_up_at">PICKED UP AT</string>
+    <string name="sdd_pickup">SDD PICKUP</string>
+    <string name="driver">Driver</string>
 
     <!-- Filters -->
     <string name="filters">Filters</string>
     <string name="filters_category_order_type">Fulfillment Type</string>
     <string name="filters_category_order_status">Status</string>
     <string name="apply_filters">APPLY FILTERS</string>
-    <string name="empty_ready_title">Was that the wind?</string>
-    <string name="empty_ready_body">Or just you delivering all your ready orders super fast? Excellent work!</string>
-    <string name="empty_in_progress_title">Swish!</string>
-    <string name="empty_in_progress_body">There are no in progress orders right now. Keep up the great work!</string>
+    <string name="empty_ready_title">Wow!</string>
+    <string name="empty_ready_body">That was fast, excellent work delivering those orders. Great job!</string>
+    <string name="empty_in_progress_title">Nothing to see here :-)</string>
+    <string name="empty_in_progress_body">All the current orders are done, there\'s nothing to process right now. Good job!</string>
 
     <string name="bopis_pick_uph">bopis pick uph</string>
     <string name="units_worked_in_time">units worked in time</string>

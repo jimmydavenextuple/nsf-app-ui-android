@@ -4,15 +4,14 @@ package com.nextuple.nsf.retrofit.dto
  * TODO: Refactor away the need for this class.
  */
 data class StageTask(
-    val id: Long,
-    val status: Status? = null,
+	val id: Long,
+	val status: Status? = null,
 
-    val fulfillmentRequestNumber: String,
+	val fulfillmentRequestNumber: String,
 
+	val holdSlipZPL: MutableList<String> = mutableListOf(),
 
-    val holdSlipZPL: MutableList<String> = mutableListOf(),
-
-    val containers: List<StageTaskContainer> = emptyList()
+	val containers: List<StageTaskContainer> = emptyList()
 )
 
 data class StageTaskContainer(
@@ -22,14 +21,15 @@ data class StageTaskContainer(
 )
 
 data class PackedItem(
-    val sku: String,
-    val productName: String,
-    val productImageUrls: List<String>,
-    val primaryAttr: ProductAttribute? = null,
-    val secondaryAttr: ProductAttribute? = null,
-    val tertiaryAttr: ProductAttribute? = null,
-    val qty: Int,
-    val scannedUpc: String? = null
+	val sku: String,
+	val productName: String,
+	val productImageUrls: List<String>,
+	val primaryAttr: ProductAttribute? = null,
+	val secondaryAttr: ProductAttribute? = null,
+	val tertiaryAttr: ProductAttribute? = null,
+	val qty: Int,
+	val scannedUpc: String? = null,
+	var originalItem: PackTaskItem? = null,
 )
 
 data class Status(

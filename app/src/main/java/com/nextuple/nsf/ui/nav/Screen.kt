@@ -7,13 +7,20 @@ enum class Screen(
 	val isSearchEnabled: Boolean = false
 ) {
 	LOGIN(route = "login"),
-	HOME(title = "Fulfill", route = "home", isSearchEnabled = true),
+	HOME(title = "Store Fulfillment", route = "home", isSearchEnabled = true),
 	PICK(title = "Pick Orders", route = "pick", isSearchEnabled = true),
-	PREP(title = "Prep", route = "prep", isSearchEnabled = false), // TODO: Find a way around this to make this only false when trying to pack by gear and true otherwise
+	PREP(
+		title = "Prep",
+		route = "prep",
+		isSearchEnabled = false
+	), // TODO: Find a way around this to make this only false when trying to pack by gear and true otherwise
 	ORDERS(title = "Orders", route = "orders", isSearchEnabled = true),
-	ORDERS_DETAILS(title = "Order Details", route = "${ORDERS.route}_order_details", isBackEnabled = true),
+	ORDERS_DETAILS(
+		title = "Order Details",
+		route = "${ORDERS.route}_order_details",
+		isBackEnabled = true
+	),
 	ORDERS_PICKUP(title = "Pickup", route = "${ORDERS.route}_pickup", isBackEnabled = true),
-	PICK_DETAILS(title = "Pick", route = "${PICK.route}_details"),
 	SEARCH_RESULTS(title = "Search Results", route = "search_order", isBackEnabled = true),
 	SETTINGS(title = "Settings", route = "settings", isBackEnabled = true);
 

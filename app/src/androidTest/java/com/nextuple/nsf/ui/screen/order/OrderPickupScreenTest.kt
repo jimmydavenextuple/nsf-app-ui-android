@@ -1,13 +1,13 @@
 package com.nextuple.nsf.ui.screen.order
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.retrofit.dto.response.AthleteCheckInDetail
 import com.nextuple.nsf.retrofit.dto.response.AthleteDetail
 import com.nextuple.nsf.retrofit.dto.response.FulfillmentRequestDetail
-import com.nextuple.nsf.ui.state.Printer
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
-import com.karumi.shot.ScreenshotTest
+import com.nextuple.nsf.ui.util.Printer
 import org.junit.Rule
 import org.junit.Test
 
@@ -56,10 +56,11 @@ class OrderPickupScreenTest : ScreenshotTest {
 				ipPrefix = "",
 				printer = Printer(printerName = "BOPIS", ipAddress = "", connectionStatus = false),
 				onPrintHoldSlip = {},
-				onPrintHoldSlipSuccessCallBack = {},
-				onResetPrintHoldSlip = {},
 				onConnectPrinter = { _, _ -> },
-				onResetPrinter = {}
+				onResetPrinter = {},
+				bypassPrinter = false,
+				holdSlipZpl = mutableListOf(),
+				resetGetHoldSlipState = {}
 			)
 		}
 	}

@@ -15,7 +15,6 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.InfoModal
 import com.nextuple.nsf.ui.common.TopLabeledTextField
-import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.Printer
 import com.nextuple.nsf.util.StringUtils.isValidIPv4Address
@@ -51,15 +50,18 @@ fun PrinterModal(
 			TopLabeledTextField(
 				modifier = Modifier.fillMaxWidth(0.5f),
 				labelText = stringResource(id = R.string.printer_ip),
+				hintText = "",
 				fieldValue = ipInput,
 				prefixText = ipPrefix ?: "",
 				isPrefixEnabled = true,
 				isInvalid = printerConnectionState == GenericViewState.Failure,
 				errorMessage = "Printer not found",
-				errorFillColor = BrandColor.RED_100,
 				onValueChange = {
 					ipInput = it
 					isConnectModalButtonEnabled = isValidIPv4Address(ipPrefix + ipInput)
+					if (printerConnectionState == GenericViewState.Failure) {
+						onReset()
+					}
 				}
 			)
 		},
@@ -93,4 +95,30 @@ fun PrinterModal(
 			connectModalButtonState = ButtonState.DEFAULT
 		}
 	}
+}
+
+@Preview
+@Composable
+private fun PrinterModalPreview() {
+	PrinterModal(
+		ipPrefix = "192.0.1.",
+		printer = Printer(printerName = "BOPIS", ipAddress = "", connectionStatus = false),
+		onReset = { },
+		printerConnectionState = GenericViewState.Idle,
+		toggleModal = {},
+		onConnectPrinter = { _, _ -> }
+	)
+}
+
+@Preview
+@Composable
+private fun PrinterModalFailurePreview() {
+	PrinterModal(
+		ipPrefix = "192.0.1.",
+		printer = Printer(printerName = "BOPIS", ipAddress = "", connectionStatus = false),
+		onReset = { },
+		printerConnectionState = GenericViewState.Failure,
+		toggleModal = {},
+		onConnectPrinter = { _, _ -> }
+	)
 }

@@ -9,10 +9,10 @@ enum class OrderScreenTab(val displayName: String) {
 
 	companion object {
 		fun determineSelectedTab(
-            current: OrderScreenTab,
-            hasReadyOrders: Boolean,
-            hasInProgressOrders: Boolean,
-            selectedFilters: List<String>
+			current: OrderScreenTab,
+			hasReadyOrders: Boolean,
+			hasInProgressOrders: Boolean,
+			selectedFilters: List<String>
 		): OrderScreenTab {
 			val hasReadyFilters = selectedFilters.any {
 				OrderStatus.isReadyStatus(it) || OrderStatus.isCompleteStatus(it)

@@ -43,6 +43,44 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532021297899:android:adf21dd05a6040602334ae",
+        "android_client_info": {
+          "package_name": "com.nextuple.nsf.stage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnoD0aXCt2alFrGpSaz4cESAgPYFG7zKc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532021297899:android:adf21dd05a6040602334ae",
+        "android_client_info": {
+          "package_name": "com.nextuple.nsf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnoD0aXCt2alFrGpSaz4cESAgPYFG7zKc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"

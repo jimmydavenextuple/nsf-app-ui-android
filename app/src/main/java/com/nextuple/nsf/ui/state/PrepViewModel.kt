@@ -219,12 +219,13 @@ class PrepViewModel @Inject constructor(
 		viewModelScope.launch {
 			val declineItemRequest = RecordDeclineRequest(
 				fulfillmentRequestNumber = packTask!!.fulfillmentRequestNumber,
-				sku = itemToDecline.sku,
+				sku = itemToDecline.originalItem?.sku ?: itemToDecline.sku,
 				declinedUnits = 1,
 				declinedReason = declineReason,
 				shouldTranslateReason = false,
 				action = DeclineAction.PACK_DECLINE.toString()
 			)
+
 			packDeclineState = when (packService.declinePackItem(req = declineItemRequest)) {
 				is Result.Success -> {
 					val updatedPackItems = prepOrder?.packItems?.mapIndexed { i, item ->

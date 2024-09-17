@@ -1,6 +1,7 @@
 package com.nextuple.nsf.ui.screen.pick
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
@@ -25,6 +26,7 @@ class PickDetailsScreenTest : ScreenshotTest {
 	private fun renderPickDetailScreen() {
 		composeTestRule.setContent {
 			PickDetailsScreen(
+				pickVM = hiltViewModel(),
 				scanManager = NoOpScanManager(),
 				pickDeclineState = GenericViewState.Loading,
 				fulfillmentType = BOPIS,

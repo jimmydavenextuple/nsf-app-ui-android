@@ -198,7 +198,7 @@ fun PickDetailsScreen(
 						.background(BrandColor.GRAY_100)
 						.height(33.dp)
 						.padding(start = 20.dp, end = 40.dp, top = 8.dp, bottom = 8.dp),
-					title = stringResource(id = R.string.units),
+					title = stringResource(id = string.units),
 					workedCount = unitsWorked,
 					totalCount = totalUnits
 				)
@@ -224,14 +224,14 @@ fun PickDetailsScreen(
 				mainContent = {
 					Column(
 						modifier = Modifier
-							.height(412.dp)
+							.fillMaxHeight()
 							.fillMaxWidth()
-							.padding(top = 6.dp, start = 30.dp, end = 30.dp)
+							.padding(top = 6.dp, start = 30.dp, end = 30.dp, bottom = 6.dp)
 					) {
 						Row(
 							modifier = Modifier
 								.fillMaxWidth()
-								.padding(end = 30.dp),
+								.padding(end = 0.dp),
 							horizontalArrangement = Arrangement.SpaceBetween
 						) {
 							Text(
@@ -382,7 +382,8 @@ fun PickDetailsScreen(
 				secondaryContent = {
 					SecondaryButton(
 						modifier = Modifier
-							.fillMaxWidth(.83f),
+							.fillMaxWidth(.83f)
+							.height(64.dp),
 						buttonShape = RoundedCornerShape(0.dp),
 						buttonState =
 						if (declineCodesState == GenericViewState.Loading) {
@@ -394,13 +395,13 @@ fun PickDetailsScreen(
 							onDeclineClick()
 							showDeclineModal = true
 						},
-						text = stringResource(id = R.string.decline),
+						text = stringResource(id = string.decline),
 						textSize = 16.sp
 					)
 				},
 				secondaryModifier = Modifier
 					.fillMaxWidth()
-					.padding(top = 17.dp),
+					.padding(top = 30.dp, bottom = 10.dp),
 				defaultRevealContent = false
 			)
 		}
@@ -415,8 +416,8 @@ fun PickDetailsScreen(
 	if (showDeclineModal && declineModalOptions != null) {
 		if (subFulfillmentType != SubFulfillmentType.BOPL) {
 			MultiOptionModal(
-				title = stringResource(id = R.string.decline_reason),
-				subTitle = stringResource(id = R.string.decline_reason_subtitle),
+				title = stringResource(id = string.decline_reason),
+				subTitle = stringResource(id = string.decline_reason_subtitle),
 				buttons = declineModalOptions.keys.map { it.uppercase() },
 				buttonClick = { displayStr ->
 					val declineReason = declineModalOptions[displayStr] ?: return@MultiOptionModal
@@ -591,7 +592,7 @@ private fun ProductAttributes(
 				} else {
 					null
 				},
-				label = stringResource(R.string.item_location),
+				label = stringResource(string.item_location),
 				value = locations.firstOrNull(),
 				valueMaxLines = 1
 			)
@@ -604,7 +605,7 @@ private fun ProductAttributes(
 						indication = LocalIndication.current
 					) { showAdditionalDetailsDialog = true }
 					.background(color = BrandColor.GRAY_100),
-				label = stringResource(id = R.string.on_hand),
+				label = stringResource(id = string.on_hand),
 				iconImageVector = ImageVector.vectorResource(R.drawable.ic_on_hand_icon),
 				value = onHandQty?.toString()
 			)
@@ -625,7 +626,7 @@ private fun ProductAttributes(
 					.onGloballyPositioned {
 						copyCoordinatesOrigin = it
 					},
-				label = stringResource(R.string.upc),
+				label = stringResource(string.upc),
 				iconImageVector = ImageVector.vectorResource(R.drawable.ic_copy_icon),
 				value = upcs.firstOrNull(),
 				valueMaxLines = 1
@@ -775,7 +776,7 @@ private fun DeclineDialogDialogPreview() {
 @PreviewPdt
 fun PickDetailsScreenPreview() {
 	PickDetailsScreen(
-		pickVM = hiltViewModel(),
+		pickVM = PickViewModel(null, null, null),
 		scanManager = NoOpScanManager(),
 		pickDeclineState = GenericViewState.Loading,
 		fulfillmentType = BOPIS,

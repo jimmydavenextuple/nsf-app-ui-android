@@ -22,9 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 open class PickViewModel @Inject constructor(
-	@Suppress("UNUSED_PARAMETER") handler: SavedStateHandle,
-	private val infoService: InfoService,
-	private val pickService: PickService
+	@Suppress("UNUSED_PARAMETER") handler: SavedStateHandle?,
+	private val infoService: InfoService?,
+	private val pickService: PickService?
 ) : ViewModel() {
 
 	var viewState: GenericViewState by mutableStateOf(GenericViewState.Loading)
@@ -62,7 +62,7 @@ open class PickViewModel @Inject constructor(
 
 	fun fetchCurrentStep() = viewModelScope.launch {
 		viewState = GenericViewState.Loading
-		when (val res = infoService.getUserPickTasks()) {
+		when (val res = infoService?.getUserPickTasks()) {
 			is Result.Success -> {
 				pickTask = res.data?.pickTask
 				viewState = GenericViewState.Success
@@ -72,13 +72,15 @@ open class PickViewModel @Inject constructor(
 				pickTask = null
 				viewState = GenericViewState.Failure
 			}
+
+			null -> TODO()
 		}
 	}
 
 	fun startPick() {
 		startPickState = GenericViewState.Loading
 		viewModelScope.launch {
-			pickTask = when (val response = pickService.startPick()) {
+			pickTask = when (val response = pickService?.startPick()) {
 				is Result.Success -> {
 					startPickState = GenericViewState.Success
 					response.data
@@ -95,6 +97,8 @@ open class PickViewModel @Inject constructor(
 					}
 					null
 				}
+
+				null -> TODO()
 			}
 		}
 	}
@@ -116,7 +120,7 @@ open class PickViewModel @Inject constructor(
 				declineReasonText = currentPickItem?.originalItemDeclineReasonText ?: declineReasonText
 			)
 			pickTask =
-				when (val response = pickService.declinePick(req = declineItemRequest)) {
+				when (val response = pickService?.declinePick(req = declineItemRequest)) {
 					is Result.Success -> {
 						pickDeclineState = GenericViewState.Success
 						response.data
@@ -126,6 +130,8 @@ open class PickViewModel @Inject constructor(
 						pickDeclineState = GenericViewState.Failure
 						null
 					}
+
+					null -> TODO()
 				}
 			}
 		}
@@ -204,7 +210,7 @@ open class PickViewModel @Inject constructor(
 				pickedLocation = pickLocation
 			)
 			pickTask = when (
-				val res = pickService.pickItem(req = pickItemRequest)
+				val res = pickService?.pickItem(req = pickItemRequest)
 			) {
 				is Result.Success -> {
 					recordPickState = GenericViewState.Success
@@ -215,6 +221,8 @@ open class PickViewModel @Inject constructor(
 					recordPickState = GenericViewState.Failure
 					null
 				}
+
+				null -> TODO()
 			}
 		}
 		return true

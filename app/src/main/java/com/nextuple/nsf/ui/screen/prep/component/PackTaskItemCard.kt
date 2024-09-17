@@ -1,6 +1,7 @@
 package com.nextuple.nsf.ui.screen.prep.component
 
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -57,15 +58,17 @@ fun PackTaskItemCard(
 	val density = LocalDensity.current
 	val anchors = DraggableAnchors {
 		DragAnchors.Start at 0f
-		DragAnchors.End at -165f
+		DragAnchors.End at -220f
 	}
+	val decayAnimationSpec = rememberSplineBasedDecay<Float>()
 	val state = remember {
 		AnchoredDraggableState(
 			initialValue = DragAnchors.Start,
 			anchors = anchors,
 			positionalThreshold = { distance: Float -> distance * 0.5f },
 			velocityThreshold = { with(density) { 100.dp.toPx() } },
-			animationSpec = tween()
+			snapAnimationSpec = tween(), // You already have this for snapAnimationSpec
+			decayAnimationSpec = decayAnimationSpec,
 		)
 	}
 	Box(

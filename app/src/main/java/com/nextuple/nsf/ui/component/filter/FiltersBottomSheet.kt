@@ -55,7 +55,7 @@ fun FiltersBottomSheet(
 	ModalBottomSheet(
 		sheetState = state,
 		shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-		windowInsets = WindowInsets(bottom = bottomInset),
+		contentWindowInsets = { WindowInsets(bottom = bottomInset) },
 		dragHandle = null,
 		onDismissRequest = {
 			onDismiss()

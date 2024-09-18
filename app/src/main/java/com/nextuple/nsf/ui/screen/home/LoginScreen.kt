@@ -119,11 +119,10 @@ fun LoginScreen(
 	) {
 		Image(
 			modifier = Modifier
-				.padding(50.dp, 100.dp, 0.dp, 100.dp)
-				.matchParentSize(),
+				.padding(50.dp, 150.dp, 0.dp, 0.dp),
 			painter = painterResource(id = R.drawable.logo_nextuple_building_blocks),
 			contentDescription = null,
-			contentScale = ContentScale.FillBounds,
+			contentScale = ContentScale.Fit,
 		)
 
 		Column(

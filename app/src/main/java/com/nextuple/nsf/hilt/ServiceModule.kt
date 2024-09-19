@@ -6,6 +6,7 @@ import android.os.Build
 import android.provider.Settings
 import com.nextuple.nsf.datastore.UserRepository
 import com.nextuple.nsf.retrofit.api.ConfigApi
+import com.nextuple.nsf.retrofit.api.DemoApi
 import com.nextuple.nsf.retrofit.api.InfoApi
 import com.nextuple.nsf.retrofit.api.OrderApi
 import com.nextuple.nsf.retrofit.api.PackTaskApi
@@ -13,6 +14,7 @@ import com.nextuple.nsf.retrofit.api.PickApi
 import com.nextuple.nsf.retrofit.api.StageTaskApi
 import com.nextuple.nsf.retrofit.api.UserApi
 import com.nextuple.nsf.service.ConfigService
+import com.nextuple.nsf.service.DemoService
 import com.nextuple.nsf.service.DeviceService
 import com.nextuple.nsf.service.InfoService
 import com.nextuple.nsf.service.LogService
@@ -127,6 +129,16 @@ internal object ServiceModule {
 	): ConfigService = ConfigService(
 		configApi = configApi,
 		logService = logService,
+		userRepository = userRepository
+	)
+
+	@Singleton
+	@Provides
+	fun provideDemoService(
+		demoApi: DemoApi,
+		userRepository: UserRepository
+	): DemoService = DemoService(
+		demoApi = demoApi,
 		userRepository = userRepository
 	)
 }

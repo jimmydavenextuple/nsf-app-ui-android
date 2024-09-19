@@ -3,6 +3,7 @@ package com.nextuple.nsf.hilt
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.retrofit.ApiCallAdapterFactory
 import com.nextuple.nsf.retrofit.api.ConfigApi
+import com.nextuple.nsf.retrofit.api.DemoApi
 import com.nextuple.nsf.retrofit.api.InfoApi
 import com.nextuple.nsf.retrofit.api.MetricsApi
 import com.nextuple.nsf.retrofit.api.OrderApi
@@ -66,4 +67,7 @@ internal object RetrofitModule {
 
 	@Provides
 	fun provideMetricsApi(retrofit: Retrofit): MetricsApi = retrofit.create(MetricsApi::class.java)
+
+	@Provides
+	fun provideDemoApi(retrofit: Retrofit): DemoApi = retrofit.create(DemoApi::class.java)
 }

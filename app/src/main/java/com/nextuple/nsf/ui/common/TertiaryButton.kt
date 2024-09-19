@@ -15,6 +15,7 @@ import com.nextuple.nsf.ui.theme.BrandColor
 @Composable
 fun TertiaryButton(
 	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
 	text: String,
 	textColor: Color = BrandColor.DARK_BLUE,
 	tag: String = "TertiaryButton",
@@ -22,10 +23,10 @@ fun TertiaryButton(
 ) {
 	Text(
 		modifier = modifier
-			.clickable { onButtonClick() }
+			.clickable { if (enabled) onButtonClick() }
 			.testTag(tag),
 		text = text,
-		color = textColor,
+		color = if (enabled) textColor else BrandColor.GRAY_600,
 		textDecoration = TextDecoration.Underline,
 		fontSize = 12.sp,
 		letterSpacing = 1.5.sp,

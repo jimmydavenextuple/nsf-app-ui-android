@@ -91,7 +91,7 @@ fun DemoScreen(
                     onButtonClick = {
                         demoVM.createFRBOPIS(1)
                     },
-                    text = "Variant #1",
+                    text = "3 Line Items",
                     enabled = demoVM.demoApiState != GenericViewState.Loading
                 )
             }
@@ -112,7 +112,7 @@ fun DemoScreen(
                     onButtonClick = {
                         demoVM.createFRBOPIS(2)
                     },
-                    text = "Variant #2",
+                    text = "2 Line Items",
                     enabled = demoVM.demoApiState != GenericViewState.Loading
                 )
             }

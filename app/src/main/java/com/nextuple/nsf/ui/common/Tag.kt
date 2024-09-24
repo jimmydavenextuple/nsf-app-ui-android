@@ -24,8 +24,12 @@ import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
 
 @Composable
-fun ClearanceTag(modifier: Modifier = Modifier, clearanceColor: String, colorDesc: String) {
-	val rgbList = clearanceColor.split(",")
+fun Tag(
+	modifier: Modifier = Modifier,
+	tagColor: String, colorDesc: String,
+	tagText: String = ""
+) {
+	val rgbList = tagColor.split(",")
 	val rgbNums = rgbList.map { it.toInt() }
 
 	val color = Color(rgbNums[0], rgbNums[1], rgbNums[2])
@@ -65,8 +69,8 @@ fun ClearanceTag(modifier: Modifier = Modifier, clearanceColor: String, colorDes
 			) {
 				Text(
 					modifier = Modifier
-						.testTag("Clearance"),
-					text = "CLEARANCE",
+						.testTag("Tag"),
+					text = tagText,
 					fontSize = 10.sp,
 					color = BrandColor.BLUE_600,
 					fontWeight = FontWeight.Bold,
@@ -80,29 +84,29 @@ fun ClearanceTag(modifier: Modifier = Modifier, clearanceColor: String, colorDes
 @Preview(showBackground = true)
 @Composable
 fun PreviewPurpleClearanceTag() {
-	ClearanceTag(Modifier, "112,48,160", "PURPLE")
+	Tag(Modifier, "112,48,160", "PURPLE")
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewGreenClearanceTag() {
-	ClearanceTag(Modifier, "0,175,65", "GREEN")
+	Tag(Modifier, "0,175,65", "GREEN")
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewYellowClearanceTag() {
-	ClearanceTag(Modifier, "255,165,10", "YELLOW")
+	Tag(Modifier, "255,165,10", "YELLOW")
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewPinkClearanceTag() {
-	ClearanceTag(Modifier, "244,134,200", "PINK")
+	Tag(Modifier, "244,134,200", "PINK")
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewOtherClearanceTag() {
-	ClearanceTag(Modifier, "115,147,179", "BLUE")
+fun PreviewOtherTag() {
+	Tag(Modifier, "115,147,179", "BLUE", "OTHER")
 }

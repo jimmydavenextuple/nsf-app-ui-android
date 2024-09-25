@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nextuple.nsf.ui.common.MultiOptionSubstitutionModal
 import com.nextuple.nsf.ui.common.TertiaryButton
 import com.nextuple.nsf.ui.state.DemoViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
@@ -31,15 +30,13 @@ import com.nextuple.nsf.ui.util.PreviewPdt
 fun DemoScreen(
     demoVM: DemoViewModel,
 ) {
-    if (demoVM.demoCreateFRResponse != null) {
+    if (demoVM.demoCreateFRsResponse.size > 0) {
         Toast.makeText(
             LocalContext.current,
-            "FR # " + demoVM.demoCreateFRResponse!!.fulfillmentRequestNumber
-                    + " created for "
-                    +demoVM.demoCreateFRResponse!!.fulfillmentType,
+            "FR(s) Created",
             Toast.LENGTH_LONG
         ).show()
-        demoVM.demoCreateFRResponse = null
+        demoVM.demoCreateFRsResponse = emptyList()
     }
 
     Column(
@@ -91,7 +88,7 @@ fun DemoScreen(
                     onButtonClick = {
                         demoVM.createFRBOPIS(1)
                     },
-                    text = "3 Line Items",
+                    text = "Variant #1",
                     enabled = demoVM.demoApiState != GenericViewState.Loading
                 )
             }
@@ -112,7 +109,7 @@ fun DemoScreen(
                     onButtonClick = {
                         demoVM.createFRBOPIS(2)
                     },
-                    text = "2 Line Items",
+                    text = "Variant #2",
                     enabled = demoVM.demoApiState != GenericViewState.Loading
                 )
             }
@@ -145,29 +142,8 @@ fun DemoScreen(
                     enabled = demoVM.demoApiState != GenericViewState.Loading
                 )
             }
-            Row {
-                Text(
-                    text = "\u2022",
-                    style = TextStyle(textAlign = TextAlign.Center),
-                    modifier = Modifier.padding(start = 24.dp, top = 8.dp, bottom = 8.dp),
-                    fontSize = 12.sp,
-                    letterSpacing = 1.5.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                TertiaryButton(
-                    modifier = Modifier
-                        .padding(start = 12.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                    onButtonClick = {
-                        demoVM.createFRBOPIS(4)
-                    },
-                    text = "By Zone - Seq By Dept",
-                    enabled = demoVM.demoApiState != GenericViewState.Loading
-                )
-            }
             Text(
-                text = "Store #1236",
+                text = "Store #1236 - Batch Pick",
                 style = TextStyle(textAlign = TextAlign.Center),
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
                 fontSize = 12.sp,
@@ -189,9 +165,9 @@ fun DemoScreen(
                         .fillMaxWidth()
                         .wrapContentHeight(),
                     onButtonClick = {
-                        demoVM.createFRBOPIS(1)
+                        demoVM.createFRBOPIS(4)
                     },
-                    text = "For Manual Close Wave",
+                    text = "By Zone - Seq By Dept",
                     enabled = demoVM.demoApiState != GenericViewState.Loading
                 )
             }

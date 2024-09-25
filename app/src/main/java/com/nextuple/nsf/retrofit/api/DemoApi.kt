@@ -14,12 +14,12 @@ interface DemoApi {
 		@Path("option") option: Int,
 		@Query("store") store: String,
 		@Header("userId") userId: String,
-	): ApiResponse<DemoCreateFRResponse>
+	): ApiResponse<List<DemoCreateFRResponse?>>
 
 	@POST("/v1/demo/sdd/{option}")
 	suspend fun createFRSDD(
 		@Path("option") option: Int,
 		@Query("store") store: String,
 		@Header("userId") userId: String,
-	): ApiResponse<DemoCreateFRResponse>
+	): ApiResponse<List<DemoCreateFRResponse?>>
 }

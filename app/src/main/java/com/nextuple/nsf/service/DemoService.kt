@@ -17,7 +17,7 @@ class DemoService(
 	private val userRepository: UserRepository
 ) {
 
-	suspend fun createFRBOPIS(option: Int): Result<DemoCreateFRResponse?> {
+	suspend fun createFRBOPIS(option: Int): Result<List<DemoCreateFRResponse?>> {
 		val store = userRepository.getStore() ?: return Result.generalError()
 		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = demoApi.createFRBOPIS(option = option, store = store.id, userId = userId)
@@ -30,7 +30,7 @@ class DemoService(
 		}.getOrDefault(Result.generalError())
 	}
 
-	suspend fun createFRSDD(option: Int): Result<DemoCreateFRResponse?> {
+	suspend fun createFRSDD(option: Int): Result<List<DemoCreateFRResponse?>> {
 		val store = userRepository.getStore() ?: return Result.generalError()
 		val userId = userRepository.getUserId() ?: return Result.generalError()
 		val res = demoApi.createFRSDD(option = option, store = store.id, userId = userId)

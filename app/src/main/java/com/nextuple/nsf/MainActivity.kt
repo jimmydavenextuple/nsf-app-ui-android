@@ -17,6 +17,7 @@ import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.LogService.Companion.EVENT_INACTIVITY_TIMEOUT
 import com.nextuple.nsf.ui.App
 import com.nextuple.nsf.ui.state.ConfigViewModel
+import com.nextuple.nsf.ui.state.DemoViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
 import com.nextuple.nsf.ui.state.SettingsViewModel
@@ -33,6 +34,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+	private val demoVM: DemoViewModel by viewModels()
 	private val userVM: UserViewModel by viewModels()
 	private val orderVM: OrderViewModel by viewModels()
 	private val settingsVM: SettingsViewModel by viewModels()
@@ -71,6 +73,7 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			AppTheme {
 				App(
+					demoVM = demoVM,
 					infoVM = infoVM,
 					userVM = userVM,
 					orderVM = orderVM,

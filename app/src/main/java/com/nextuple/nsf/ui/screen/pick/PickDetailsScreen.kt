@@ -71,7 +71,7 @@ import com.nextuple.nsf.service.BarcodeScanManager
 import com.nextuple.nsf.ui.common.AttributeText
 import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.Carousel
-import com.nextuple.nsf.ui.common.ClearanceTag
+import com.nextuple.nsf.ui.common.Tag
 import com.nextuple.nsf.ui.common.HorizontalProgressBar
 import com.nextuple.nsf.ui.common.ImageModal
 import com.nextuple.nsf.ui.common.MultiOptionModal
@@ -295,7 +295,7 @@ fun PickDetailsScreen(
 							modifier = Modifier
 								.width(210.dp),
 							text = currentPickTaskItem?.productName ?: "",
-							maxLines = if (clearanceColor.isNullOrEmpty()) 2 else 1,
+							maxLines = if (clearanceColor.isNullOrEmpty() || (currentPickTaskItem?.substitutionAllowed == false && currentPickTaskItem.substitutions.isNullOrEmpty())) 2 else 1,
 							overflow = TextOverflow.Ellipsis,
 							fontSize = 12.sp,
 							fontWeight = FontWeight.Normal,
@@ -305,17 +305,26 @@ fun PickDetailsScreen(
 
 						Spacer(modifier = Modifier.height(6.dp))
 
-						if (!clearanceColor.isNullOrEmpty() && !currentPickTaskItem?.clearanceColorDesc.isNullOrEmpty()) {
-							ClearanceTag(
-								Modifier,
-								clearanceColor.toString(),
-								colorDesc = if (recordPickState == GenericViewState.Idle) {
-									currentPickTaskItem?.clearanceColorDesc
-										?: ""
-								} else {
-									""
-								}
-							)
+						Row() {
+							if (currentPickTaskItem?.substitutionAllowed == true && !currentPickTaskItem.substitutions.isNullOrEmpty()) {
+								Tag(
+									Modifier
+										.padding(top = 0.dp, start = 0.dp, end = 5.dp, bottom = 0.dp),
+									"115,147,179",
+									"BLUE", "Substitutions Available")
+							}
+							if (!clearanceColor.isNullOrEmpty() && !currentPickTaskItem?.clearanceColorDesc.isNullOrEmpty()) {
+								Tag(
+									Modifier,
+									clearanceColor.toString(),
+									colorDesc = if (recordPickState == GenericViewState.Idle) {
+										currentPickTaskItem?.clearanceColorDesc
+											?: ""
+									} else {
+										""
+									}
+								)
+							}
 						}
 
 						Spacer(modifier = Modifier.height(6.dp))
@@ -343,9 +352,7 @@ fun PickDetailsScreen(
 							styleNum = currentPickTaskItem?.style,
 							locations = locations.ifEmpty { defaultLocations },
 							onHandQty = currentPickTaskItem?.onHandQty,
-							primaryAttr = currentPickTaskItem?.primaryAttr,
-							secondaryAttr = currentPickTaskItem?.secondaryAttr,
-							tertiaryAttr = currentPickTaskItem?.tertiaryAttr,
+							additionalAttributes = currentPickTaskItem?.additionalAttributes,
 							lastReceived = currentPickTaskItem?.lastReceived.toString(),
 							lastReturn = currentPickTaskItem?.lastReturn.toString()
 						)
@@ -571,9 +578,7 @@ private fun ProductAttributes(
 	styleNum: String?,
 	locations: List<String>,
 	onHandQty: Int?,
-	primaryAttr: ProductAttribute?,
-	secondaryAttr: ProductAttribute?,
-	tertiaryAttr: ProductAttribute?,
+	additionalAttributes: Map<String, String>?,
 	lastReturn: String,
 	lastReceived: String
 ) {
@@ -685,49 +690,15 @@ private fun ProductAttributes(
 					valueMaxLines = 1
 				)
 			}
-			AttributeText(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 2.dp)
-					.background(
-						color = if (primaryAttr?.value.isNullOrEmpty() || !styleNum.isNullOrEmpty()) {
-							Color.Transparent
-						} else {
-							BrandColor.GRAY_100
-						}
-					),
-				label = primaryAttr?.name.orEmpty(),
-				value = primaryAttr?.value,
-				valueMaxLines = 1
-			)
-			AttributeText(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 2.dp)
-					.background(
-						color = if ((primaryAttr?.value.isNullOrEmpty() || secondaryAttr?.value.isNullOrEmpty()) || styleNum.isNullOrEmpty()) {
-							Color.Transparent
-						} else {
-							BrandColor.GRAY_100
-						}
-					),
-				label = secondaryAttr?.name.orEmpty(),
-				value = secondaryAttr?.value
-			)
-			if (styleNum.isNullOrEmpty()) {
+			additionalAttributes?.forEach { (key, value) ->
 				AttributeText(
 					modifier = Modifier
 						.fillMaxWidth()
 						.padding(vertical = 2.dp)
-						.background(
-							color = if (tertiaryAttr?.value.isNullOrEmpty()) {
-								Color.Transparent
-							} else {
-								BrandColor.GRAY_100
-							}
-						),
-					label = tertiaryAttr?.name.orEmpty(),
-					value = tertiaryAttr?.value
+						.background(Color.Transparent),
+					label = key,
+					value = value,
+					valueMaxLines = 1
 				)
 			}
 		}
@@ -839,9 +810,7 @@ fun PickDetailsScreenPreview() {
 				"https://picsum.photos/1701"
 			),
 			locations = listOf("F1.S1.04A"),
-			primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
-			secondaryAttr = ProductAttribute(name = "Size", value = "7.5"),
-			tertiaryAttr = ProductAttribute(name = "Style", value = "12345"),
+			additionalAttributes = mapOf("Color" to "Cyclamen", "Size" to "7.5"),
 			onHandQty = 10,
 			upcs = listOf("4002560185162"),
 			qty = 1,
@@ -849,7 +818,35 @@ fun PickDetailsScreenPreview() {
 			pickedQty = 0,
 			clearanceColorRgb = "0,175,65",
 			clearanceColorDesc = "GREEN",
-			style = null
+			style = "12345",
+			substitutionAllowed = true,
+			substitutions = listOf(
+				PickTaskItem(
+					sku = "2345",
+					productBrand = "BOMBAS",
+					productName = "Hoka Women’s Clifton 9 Running Shoes",
+					productImageUrls = listOf(
+						"https://picsum.photos/1705",
+						"https://picsum.photos/1726",
+						"https://picsum.photos/1701"
+					),
+					productHighResImageUrls = listOf(
+						"https://picsum.photos/1705",
+						"https://picsum.photos/1726",
+						"https://picsum.photos/1701"
+					),
+					locations = listOf("F1.S1.04A"),
+					additionalAttributes = mapOf("Color" to "Cyclamen", "Size" to "7.5"),
+					onHandQty = 10,
+					upcs = listOf("4002560185162"),
+					qty = 1,
+					declinedQty = 0,
+					pickedQty = 0,
+					clearanceColorRgb = "0,175,65",
+					clearanceColorDesc = "GREEN",
+					style = "12345",
+				)
+			)
 		),
 		unitsWorked = 1,
 		totalUnits = 3,

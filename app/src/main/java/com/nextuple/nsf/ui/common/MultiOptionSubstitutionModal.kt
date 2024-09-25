@@ -184,9 +184,7 @@ fun MultiOptionSubstitutionModalPreview() {
 					"https://picsum.photos/1701"
 				),
 				locations = listOf("F1.S1.04A"),
-				primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
-				secondaryAttr = ProductAttribute(name = "Size", value = "7.5"),
-				tertiaryAttr = ProductAttribute(name = "Style", value = "12345"),
+				additionalAttributes = mapOf("Color" to "Cyclamen", "Size" to "7.5"),
 				onHandQty = 10,
 				upcs = listOf("4002560185162"),
 				qty = 1,
@@ -194,7 +192,7 @@ fun MultiOptionSubstitutionModalPreview() {
 				pickedQty = 0,
 				clearanceColorRgb = "0,175,65",
 				clearanceColorDesc = "GREEN",
-				style = null
+				style = "12345"
 			)
 		),
 		buttonClick = { },

@@ -40,6 +40,7 @@ import com.nextuple.nsf.ui.nav.AppTopBar
 import com.nextuple.nsf.ui.nav.AppTopBarDropdownMenuItems
 import com.nextuple.nsf.ui.nav.NavUtil.getStartDestination
 import com.nextuple.nsf.ui.nav.Screen
+import com.nextuple.nsf.ui.screen.demo.DemoScreen
 import com.nextuple.nsf.ui.screen.home.HomeScreen
 import com.nextuple.nsf.ui.screen.home.LoginScreen
 import com.nextuple.nsf.ui.screen.order.OrderDetailsScreen
@@ -50,6 +51,7 @@ import com.nextuple.nsf.ui.screen.prep.PrepScreen
 import com.nextuple.nsf.ui.screen.search.SearchResultsScreen
 import com.nextuple.nsf.ui.screen.settings.SettingsScreen
 import com.nextuple.nsf.ui.state.ConfigViewModel
+import com.nextuple.nsf.ui.state.DemoViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
 import com.nextuple.nsf.ui.state.OrderViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
@@ -93,6 +95,7 @@ object AppConfig {
 
 @Composable
 fun App(
+	demoVM: DemoViewModel,
 	infoVM: InfoViewModel,
 	userVM: UserViewModel,
 	pickVM: PickViewModel = hiltViewModel(),
@@ -161,11 +164,12 @@ fun App(
 						) {
 							navCtrl.navigate(Screen.SETTINGS.route)
 						},
-						// TODO: Uncomment after implementing.
-// 						AppTopBarDropdownMenuItems(
-// 							label = stringResource(id = R.string.dropdown_menu_feedback),
-// 							R.drawable.ic_feedback
-// 						) {},
+ 						AppTopBarDropdownMenuItems(
+ 							label = stringResource(id = R.string.dropdown_menu_demo),
+ 							R.drawable.ic_store
+ 						) {
+							navCtrl.navigate(Screen.DEMO.route)
+						},
 						AppTopBarDropdownMenuItems(
 							label = stringResource(id = R.string.dropdown_menu_logout),
 							R.drawable.ic_logout
@@ -251,6 +255,9 @@ fun App(
 				)
 				composableForSettings(
 					settingsVM = settingsVM
+				)
+				composableForDemo(
+					demoVM = demoVM
 				)
 				composableForSearchResults(
 					navCtrl = navCtrl,
@@ -597,6 +604,16 @@ private fun NavGraphBuilder.composableForSettings(
 					Toast.LENGTH_SHORT
 				).show()
 			}
+		)
+	}
+}
+
+private fun NavGraphBuilder.composableForDemo(
+	demoVM: DemoViewModel
+) {
+	composable(Screen.DEMO.route) {
+		DemoScreen(
+			demoVM = demoVM
 		)
 	}
 }

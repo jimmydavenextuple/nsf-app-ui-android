@@ -408,9 +408,9 @@ private fun NavGraphBuilder.composableForOrders(
 
 			// Nav right back without arguments to "clear" it. Otherwise, the pack persists
 			// even when removed until next Orders tab refresh.
-			navCtrl.navigate(Screen.ORDERS.route) {
-				popUpTo(Screen.HOME.route)
-			}
+//			navCtrl.navigate(Screen.ORDERS.route) {
+//				popUpTo(Screen.HOME.route)
+//			}
 		}
 
 		OrderScreen(

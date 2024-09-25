@@ -133,7 +133,7 @@ private fun ScanAndPackUnitsCardPreview() {
 		isActive = true,
 		stepNumber = "1",
 		isComplete = false,
-		packItems = listOf(packTaskItem, packTaskItem),
+		packItems = listOf(packTaskItem, packTaskItem, packTaskItem),
 		pickedBy = "Joe Ducko",
 		onAllItemsScanned = {},
 		onConfirmDecline = { _, _, _ -> }

@@ -2,9 +2,11 @@ package com.nextuple.nsf.ui.screen.pick
 
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -36,14 +38,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
@@ -56,12 +62,12 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.string
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
+import com.nextuple.nsf.service.BarcodeScanManager
 import com.nextuple.nsf.ui.common.AttributeText
 import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.Carousel
@@ -114,6 +120,10 @@ fun PickDetailsScreen(
 ) {
 	LaunchedEffect(Unit) {
 		scanManager.set(onItemPick)
+	}
+
+	var showToast by remember {
+		mutableStateOf(false);
 	}
 
 	var showDeclineModal by remember {
@@ -178,12 +188,40 @@ fun PickDetailsScreen(
 		}
 	}
 
+	val barcodeScanManager = remember { BarcodeScanManager() }
+	val focusRequester = remember { FocusRequester() }
+
+	barcodeScanManager.onBarcodeScanned = { barcode ->
+		lastScannedUpc = null
+		lastScannedSymbology = null
+
+		if (onCheckItemScan(barcode, "upc")) {
+			lastScannedUpc = barcode
+			lastScannedSymbology = "upc"
+
+			if (allLocations.size > 1) {
+				showPickLocationModal = true
+			} else {
+				onItemPick(barcode, allLocations.firstOrNull())
+			}
+		} else {
+			showToast = true;
+		}
+	}
+
 	LaunchedEffect(Unit) {
 		scanManager.set(::onItemScan)
+		barcodeScanManager.clearScan()
+		focusRequester.requestFocus()
 	}
 
 	Box(
-		modifier = Modifier.fillMaxHeight(),
+		modifier = Modifier.fillMaxHeight()
+			.focusRequester(focusRequester) // Attach focusRequester to the composable
+			.focusable()
+			.onKeyEvent {
+				barcodeScanManager.handleKeyEvent(it)
+			},
 		contentAlignment = Alignment.Center
 	) {
 		Column(
@@ -321,7 +359,7 @@ fun PickDetailsScreen(
 						) {
 							Column(
 								modifier = Modifier.fillMaxWidth(),
-								horizontalAlignment = Alignment.CenterHorizontally
+								horizontalAlignment = Alignment.CenterHorizontally,
 							) {
 								DetailedCallToAction(
 									detailedCallToActionMode = when {
@@ -499,6 +537,11 @@ fun PickDetailsScreen(
 			crossIconClick = { pickVM.toggleShowSubstitutionModal() },
 			onDismissRequest = { pickVM.toggleShowSubstitutionModal() }
 		)
+	}
+
+	if(showToast) {
+		Toast.makeText(LocalContext.current, "UPC mismatch", Toast.LENGTH_SHORT).show();
+		showToast = false
 	}
 }
 

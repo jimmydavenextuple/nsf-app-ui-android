@@ -25,13 +25,13 @@ open class DemoViewModel @Inject constructor(
 	var errMsg: String? by mutableStateOf(null)
 		protected set
 
-	var demoCreateFRResponse: DemoCreateFRResponse? by mutableStateOf(null)
+	var demoCreateFRsResponse: List<DemoCreateFRResponse?> by mutableStateOf(emptyList())
 
 	fun createFRBOPIS(option: Int) {
 		viewModelScope.launch {
 			demoApiState = GenericViewState.Loading
 
-			demoCreateFRResponse = when (val response = demoService!!.createFRBOPIS(option)) {
+			demoCreateFRsResponse = when (val response = demoService!!.createFRBOPIS(option)) {
 				is Result.Success -> {
 					errMsg = null
 					demoApiState = GenericViewState.Success
@@ -41,7 +41,7 @@ open class DemoViewModel @Inject constructor(
 				is Result.Error -> {
 					errMsg = response.msg
 					demoApiState = GenericViewState.Failure
-					null
+					emptyList()
 				}
 			}
 		}
@@ -51,7 +51,7 @@ open class DemoViewModel @Inject constructor(
 		viewModelScope.launch {
 			demoApiState = GenericViewState.Loading
 
-			demoCreateFRResponse = when (val response = demoService!!.createFRSDD(option)) {
+			demoCreateFRsResponse = when (val response = demoService!!.createFRSDD(option)) {
 				is Result.Success -> {
 					errMsg = null
 					demoApiState = GenericViewState.Success
@@ -61,7 +61,7 @@ open class DemoViewModel @Inject constructor(
 				is Result.Error -> {
 					errMsg = response.msg
 					demoApiState = GenericViewState.Failure
-					null
+					emptyList()
 				}
 			}
 		}

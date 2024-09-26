@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.common.CircularProgressBar
 import com.nextuple.nsf.ui.common.DisplayLegends
@@ -40,6 +41,7 @@ import com.nextuple.nsf.ui.common.Legend
 import com.nextuple.nsf.ui.common.PrimaryButton
 import com.nextuple.nsf.ui.common.Tab
 import com.nextuple.nsf.ui.component.EmptyStateScreen
+import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.GenericViewState
@@ -57,6 +59,8 @@ enum class PickScreenTab(val displayName: String) {
  */
 @Composable
 fun PickScreen(
+	navCtrl: NavController,
+	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	scanManager: ScanManager,
 	haptics: Haptics,
@@ -102,6 +106,8 @@ fun PickScreen(
 			pickVM.pickTask != null -> {
 				pickVM.updateCurrentPickItem()
 				PickDetailsScreen(
+					navCtrl = navCtrl,
+					barcodeScannerVM = barcodeScannerVM,
 					pickVM = pickVM,
 					scanManager = scanManager,
 					pickDeclineState = pickVM.pickDeclineState,

@@ -64,6 +64,13 @@ fun DetailedCallToAction(
 					detailedCallToActionMode
 				)
 			}
+
+			is DetailedCallToActionMode.Camera -> {
+				Camera(
+					detailedCallToActionMode.text,
+					detailedCallToActionMode
+				)
+			}
 		}
 	}
 }
@@ -92,6 +99,32 @@ private fun Info(
 				letterSpacing = 1.5.sp,
 				)
 		}
+}
+
+@Composable
+private fun Camera(
+	text: String,
+	detailedCallToActionMode: DetailedCallToActionMode
+) {
+	Row(
+		modifier = Modifier
+			.wrapContentSize()
+			.fillMaxWidth()
+			.padding(vertical = 16.dp)
+			.testTag("detailedCallToAction_Camera"),
+		horizontalArrangement = Arrangement.Center,
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		CallToActionIcon(detailedCallToActionMode = detailedCallToActionMode)
+		Text(
+			modifier = Modifier.padding(start = 4.dp),
+			text = text.uppercase(),
+			fontSize = 16.sp,
+			fontWeight = FontWeight(700),
+			color = detailedCallToActionMode.contentColor,
+			letterSpacing = 1.5.sp,
+		)
+	}
 }
 
 @Composable
@@ -161,5 +194,13 @@ private fun PreviewCallToActionDone() {
 private fun PreviewCallToActionDecline() {
 	DetailedCallToAction(
 		detailedCallToActionMode = DetailedCallToActionMode.Decline()
+	)
+}
+
+@Composable
+@Preview
+private fun PreviewCallToActionCamera() {
+	DetailedCallToAction(
+		detailedCallToActionMode = DetailedCallToActionMode.Camera("Pick")
 	)
 }

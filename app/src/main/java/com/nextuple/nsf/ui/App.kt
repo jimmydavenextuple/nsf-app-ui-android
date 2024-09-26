@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -41,6 +42,7 @@ import com.nextuple.nsf.ui.nav.AppTopBarDropdownMenuItems
 import com.nextuple.nsf.ui.nav.NavUtil.getStartDestination
 import com.nextuple.nsf.ui.nav.Screen
 import com.nextuple.nsf.ui.screen.demo.DemoScreen
+import com.nextuple.nsf.ui.screen.barcodescanner.BarcodeScannerScreen
 import com.nextuple.nsf.ui.screen.home.HomeScreen
 import com.nextuple.nsf.ui.screen.home.LoginScreen
 import com.nextuple.nsf.ui.screen.order.OrderDetailsScreen
@@ -50,6 +52,7 @@ import com.nextuple.nsf.ui.screen.pick.PickScreen
 import com.nextuple.nsf.ui.screen.prep.PrepScreen
 import com.nextuple.nsf.ui.screen.search.SearchResultsScreen
 import com.nextuple.nsf.ui.screen.settings.SettingsScreen
+import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.state.ConfigViewModel
 import com.nextuple.nsf.ui.state.DemoViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
@@ -103,6 +106,7 @@ fun App(
 	settingsVM: SettingsViewModel,
 	configVM: ConfigViewModel,
 	scanManager: ScanManager,
+	barcodeScannerViewModel: BarcodeScannerViewModel,
 	haptics: Haptics,
 	intentData: Uri?,
 	onLoggedIn: () -> Unit
@@ -186,7 +190,6 @@ fun App(
 						if (searchInput.isNotEmpty()) {
 							navCtrl.navigate("${Screen.SEARCH_RESULTS.route}?$searchInput")
 						} else {
-							// todo: Confirm text with anna
 							Toast.makeText(
 								context,
 								"Please enter a value to search",
@@ -202,7 +205,7 @@ fun App(
 		},
 		content = { paddingValues ->
 			NavHost(
-				modifier = Modifier.padding(paddingValues),
+				modifier = Modifier.fillMaxHeight().padding(paddingValues),
 				navController = navCtrl,
 				startDestination = getStartDestination(userVM.isLoggedIn(), deepLinkUri)
 			) {
@@ -220,6 +223,7 @@ fun App(
 				composableForHome()
 				composableForPick(
 					navCtrl = navCtrl,
+					barcodeScannerVM = barcodeScannerViewModel,
 					pickVM = pickVM,
 					infoVM = infoVM,
 					configVM = configVM,
@@ -264,6 +268,10 @@ fun App(
 					orderVM = orderVM,
 					scanManager = scanManager
 				)
+				composableForBarcodeScanner(
+					navCtrl = navCtrl,
+					barcodeScannerViewModel = barcodeScannerViewModel
+				)
 			}
 
 			if (showToolbarSearch) {
@@ -295,6 +303,18 @@ fun App(
 			}
 		}
 	)
+}
+
+private fun NavGraphBuilder.composableForBarcodeScanner(
+	navCtrl: NavController,
+	barcodeScannerViewModel: BarcodeScannerViewModel
+) {
+	composable("${Screen.BARCODE_SCANNER.route}?upc={upc}") { navBackStackEntry ->
+		val upc = navBackStackEntry.arguments?.getString("upc") ?: ""
+		BarcodeScannerScreen(
+			navCtrl,
+			barcodeScannerViewModel, upc)
+	}
 }
 
 private fun NavGraphBuilder.composableForLogin(
@@ -343,6 +363,7 @@ private fun NavGraphBuilder.composableForHome() {
 
 private fun NavGraphBuilder.composableForPick(
 	navCtrl: NavController,
+	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	infoVM: InfoViewModel,
 	configVM: ConfigViewModel,
@@ -355,6 +376,8 @@ private fun NavGraphBuilder.composableForPick(
 			it.displayName to it.id
 		}?.toTypedArray()?.let { linkedMapOf(*it) }
 		PickScreen(
+			navCtrl = navCtrl,
+			barcodeScannerVM = barcodeScannerVM,
 			pickVM = pickVM,
 			scanManager = scanManager,
 			haptics = haptics,

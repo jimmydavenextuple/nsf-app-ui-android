@@ -23,7 +23,8 @@ enum class Screen(
 	ORDERS_PICKUP(title = "Pickup", route = "${ORDERS.route}_pickup", isBackEnabled = true),
 	SEARCH_RESULTS(title = "Search Results", route = "search_order", isBackEnabled = true),
 	SETTINGS(title = "Settings", route = "settings", isBackEnabled = true),
-	DEMO(title = "Demo", route = "demo", isBackEnabled = true);
+	DEMO(title = "Demo", route = "demo", isBackEnabled = true),
+	BARCODE_SCANNER(title = "Barcode Scanner", route = "barcode_scanner", isBackEnabled = true);
 
 	companion object {
 		fun getByRoute(route: String) = entries.firstOrNull {

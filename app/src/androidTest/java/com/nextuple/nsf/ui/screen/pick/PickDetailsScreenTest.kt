@@ -29,7 +29,6 @@ class PickDetailsScreenTest : ScreenshotTest {
 	private fun renderPickDetailScreen() {
 		composeTestRule.setContent {
 			PickDetailsScreen(
-				navCtrl = NavController(LocalContext.current),
 				barcodeScannerVM = BarcodeScannerViewModel(),
 				scanManager = NoOpScanManager(),
 				pickVM = hiltViewModel(),

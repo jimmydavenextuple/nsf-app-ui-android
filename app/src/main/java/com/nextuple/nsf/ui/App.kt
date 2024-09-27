@@ -222,6 +222,7 @@ fun App(
 				)
 				composableForHome()
 				composableForPick(
+					navCtrl = navCtrl,
 					barcodeScannerVM = barcodeScannerViewModel,
 					pickVM = pickVM,
 					infoVM = infoVM,
@@ -345,6 +346,7 @@ private fun NavGraphBuilder.composableForHome() {
 }
 
 private fun NavGraphBuilder.composableForPick(
+	navCtrl: NavController,
 	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	infoVM: InfoViewModel,
@@ -373,6 +375,9 @@ private fun NavGraphBuilder.composableForPick(
 			isInvalidSymbology = configVM::isInvalidSymbology,
 			resetScreen = {
 				onRefreshData()
+				navCtrl.navigate(Screen.PICK.route) {
+					launchSingleTop = true
+				}
 			}
 		)
 	}

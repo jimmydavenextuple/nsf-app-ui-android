@@ -222,7 +222,6 @@ fun App(
 				)
 				composableForHome()
 				composableForPick(
-					navCtrl = navCtrl,
 					barcodeScannerVM = barcodeScannerViewModel,
 					pickVM = pickVM,
 					infoVM = infoVM,
@@ -268,10 +267,6 @@ fun App(
 					orderVM = orderVM,
 					scanManager = scanManager
 				)
-				composableForBarcodeScanner(
-					navCtrl = navCtrl,
-					barcodeScannerViewModel = barcodeScannerViewModel
-				)
 			}
 
 			if (showToolbarSearch) {
@@ -303,18 +298,6 @@ fun App(
 			}
 		}
 	)
-}
-
-private fun NavGraphBuilder.composableForBarcodeScanner(
-	navCtrl: NavController,
-	barcodeScannerViewModel: BarcodeScannerViewModel
-) {
-	composable("${Screen.BARCODE_SCANNER.route}?upc={upc}") { navBackStackEntry ->
-		val upc = navBackStackEntry.arguments?.getString("upc") ?: ""
-		BarcodeScannerScreen(
-			navCtrl,
-			barcodeScannerViewModel, upc)
-	}
 }
 
 private fun NavGraphBuilder.composableForLogin(
@@ -362,7 +345,6 @@ private fun NavGraphBuilder.composableForHome() {
 }
 
 private fun NavGraphBuilder.composableForPick(
-	navCtrl: NavController,
 	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	infoVM: InfoViewModel,
@@ -376,7 +358,6 @@ private fun NavGraphBuilder.composableForPick(
 			it.displayName to it.id
 		}?.toTypedArray()?.let { linkedMapOf(*it) }
 		PickScreen(
-			navCtrl = navCtrl,
 			barcodeScannerVM = barcodeScannerVM,
 			pickVM = pickVM,
 			scanManager = scanManager,
@@ -392,9 +373,6 @@ private fun NavGraphBuilder.composableForPick(
 			isInvalidSymbology = configVM::isInvalidSymbology,
 			resetScreen = {
 				onRefreshData()
-				navCtrl.navigate(Screen.PICK.route) {
-					launchSingleTop = true
-				}
 			}
 		)
 	}

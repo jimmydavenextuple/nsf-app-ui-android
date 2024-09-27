@@ -2,10 +2,10 @@ package com.nextuple.nsf.ui.screen.pick
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -16,14 +16,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -42,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.onKeyEvent
@@ -65,14 +62,11 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.Navigator
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.string
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
-import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.service.BarcodeScanManager
 import com.nextuple.nsf.ui.common.AttributeText
 import com.nextuple.nsf.ui.common.ButtonState
@@ -88,12 +82,12 @@ import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
 import com.nextuple.nsf.ui.nav.Screen
+import com.nextuple.nsf.ui.screen.barcodescanner.BarcodeScannerScreen
 import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
-import com.nextuple.nsf.ui.util.PreviewPdt
 import com.nextuple.nsf.ui.util.PreviewPdtNordOne
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.FulfillmentType
@@ -109,7 +103,6 @@ val OTHER_REASON = "Other".uppercase()
  */
 @Composable
 fun PickDetailsScreen(
-	navCtrl: NavController,
 	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	scanManager: ScanManager,
@@ -151,6 +144,9 @@ fun PickDetailsScreen(
 	var showPickLocationModal by remember {
 		mutableStateOf(false)
 	}
+	var showBarcodeScanner by remember {
+		mutableStateOf(false)
+	}
 	val showSubstitutionModal by pickVM.showSubstitutionModal.observeAsState()
 
 	val clearanceColor by remember {
@@ -189,7 +185,7 @@ fun PickDetailsScreen(
 	scannedResult?.let {
 		lastScannedUpc = null
 		lastScannedSymbology = null
-
+		Log.i("TESTPOP", "scannedResult")
 		if (onCheckItemScan(it, "upc")) {
 			lastScannedUpc = it
 			lastScannedSymbology = "upc"
@@ -199,9 +195,8 @@ fun PickDetailsScreen(
 			} else {
 				onItemPick(it, allLocations.firstOrNull())
 			}
-		} else {
-			showToast = true;
 		}
+		showBarcodeScanner = false
 		barcodeScannerVM.reset()
 	}
 
@@ -491,8 +486,7 @@ fun PickDetailsScreen(
 								DetailedCallToAction(
 									detailedCallToActionMode = DetailedCallToActionMode.Camera(scanText),
 									onClick = {
-										val upc = currentPickTaskItem?.upcs?.firstOrNull().orEmpty()
-										navCtrl.navigate("${Screen.BARCODE_SCANNER.route}?upc=$upc")
+										showBarcodeScanner = true
 									},
 								)
 							}
@@ -581,6 +575,14 @@ fun PickDetailsScreen(
 			crossIconClick = { showPickLocationModal = false },
 			onDismissRequest = { showPickLocationModal = false }
 		)
+	}
+
+	if(showBarcodeScanner) {
+		BarcodeScannerScreen(
+			barcodeScannerVM,
+			currentPickTaskItem?.upcs?.firstOrNull().orEmpty()) {
+			showBarcodeScanner = false;
+		}
 	}
 
 	if (showImageModal && currentPickTaskItem != null) {
@@ -866,7 +868,6 @@ private fun DeclineDialogDialogPreview() {
 @PreviewPdtNordOne
 fun PickDetailsScreenPreview() {
 	PickDetailsScreen(
-		navCtrl = NavController(LocalContext.current),
 		barcodeScannerVM = BarcodeScannerViewModel(),
 		pickVM = PickViewModel(null, null, null),
 		scanManager = NoOpScanManager(),

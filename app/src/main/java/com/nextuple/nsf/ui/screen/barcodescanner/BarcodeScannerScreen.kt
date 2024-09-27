@@ -2,6 +2,7 @@ package com.nextuple.nsf.ui.screen.barcodescanner
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,15 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.nextuple.nsf.ui.common.barcodescanner.BarcodeScanner
 import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 
 @Composable
 fun BarcodeScannerScreen(
-    navController: NavController,
     viewModel: BarcodeScannerViewModel = hiltViewModel(),
-    upc: String
+    upc: String,
+    onCancel: () -> Unit,
 ) {
     val context = LocalContext.current
     val cameraPermissionGranted = remember { mutableStateOf(false) }
@@ -36,7 +36,7 @@ fun BarcodeScannerScreen(
                 cameraPermissionGranted.value = true
             } else {
                 Toast.makeText(context, "Camera permission is required to scan barcodes", Toast.LENGTH_SHORT).show()
-                navController.popBackStack() // Go back if permission is not granted
+                onCancel()
             }
         }
     )
@@ -56,19 +56,11 @@ fun BarcodeScannerScreen(
             hasScanned = hasScanned,
             expectedUpc = upc,
             onResult = { barcode ->
+                Log.i("TESTPOP", "popupto")
                 viewModel.onBarcodeScanned(barcode)
-                navController.navigate("pick") {
-                    popUpTo("pick") {
-                        inclusive = true
-                    }
-                }
             },
             onCancel = {
-                navController.navigate("pick") {
-                    popUpTo("pick") {
-                        inclusive = true
-                    }
-                }
+                onCancel()
             }
         )
     }

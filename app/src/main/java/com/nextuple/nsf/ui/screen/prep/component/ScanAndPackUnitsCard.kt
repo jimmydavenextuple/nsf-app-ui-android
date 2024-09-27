@@ -1,7 +1,10 @@
 package com.nextuple.nsf.ui.screen.prep.component
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +32,7 @@ import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
+import com.nextuple.nsf.service.BarcodeScanManager
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PackDeclineModal
 import com.nextuple.nsf.ui.screen.prep.packTaskItem
@@ -43,6 +51,7 @@ fun ScanAndPackUnitsCard(
 	onStageCompletionCallBack: () -> Unit = {},
 	onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit
 ) {
+	var ctx = LocalContext.current
 	var showDeclineModal by remember {
 		mutableStateOf(false)
 	}
@@ -50,12 +59,28 @@ fun ScanAndPackUnitsCard(
 		mutableStateOf(-1 to null)
 	}
 
+	val barcodeScanManager = remember { BarcodeScanManager() }
+	val focusRequester = remember { FocusRequester() }
+
 	LaunchedEffect(packItems) {
 		if (packItems?.all { it.isDeclined } == true) {
 			delay(1000)
 			onStageCompletionCallBack()
 		} else if (packItems?.all { it.isScanned || it.isDeclined } == true) {
 			onAllItemsScanned()
+		}
+		barcodeScanManager.clearScan()
+		focusRequester.requestFocus()
+	}
+
+	barcodeScanManager.onBarcodeScanned = { barcode ->
+		Log.i("ScanAndPackUnitsCard:Scanner", "Scanned: $barcode");
+		if(!onPackItem(barcode)) {
+			Toast.makeText(
+				ctx,
+				"UPC mismatch",
+				Toast.LENGTH_SHORT
+			).show()
 		}
 	}
 
@@ -65,7 +90,12 @@ fun ScanAndPackUnitsCard(
 		isActive = isActive,
 		isComplete = isComplete,
 		extraContent = {
-			Column(modifier = Modifier.wrapContentHeight()) {
+			Column(modifier = Modifier.wrapContentHeight()
+				.focusRequester(focusRequester) // Attach focusRequester to the composable
+				.focusable()
+				.onKeyEvent {
+					barcodeScanManager.handleKeyEvent(it)
+				}) {
 				// Not using LazyColumn. Scrolling is handled above for entire screen.
 				packItems?.forEachIndexed { i, prepTaskItem ->
 					if (!prepTaskItem.isDeclined) {

@@ -59,7 +59,6 @@ enum class PickScreenTab(val displayName: String) {
  */
 @Composable
 fun PickScreen(
-	navCtrl: NavController,
 	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	scanManager: ScanManager,
@@ -106,7 +105,6 @@ fun PickScreen(
 			pickVM.pickTask != null -> {
 				pickVM.updateCurrentPickItem()
 				PickDetailsScreen(
-					navCtrl = navCtrl,
 					barcodeScannerVM = barcodeScannerVM,
 					pickVM = pickVM,
 					scanManager = scanManager,

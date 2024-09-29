@@ -42,7 +42,6 @@ import com.nextuple.nsf.ui.nav.AppTopBarDropdownMenuItems
 import com.nextuple.nsf.ui.nav.NavUtil.getStartDestination
 import com.nextuple.nsf.ui.nav.Screen
 import com.nextuple.nsf.ui.screen.demo.DemoScreen
-import com.nextuple.nsf.ui.screen.barcodescanner.BarcodeScannerScreen
 import com.nextuple.nsf.ui.screen.home.HomeScreen
 import com.nextuple.nsf.ui.screen.home.LoginScreen
 import com.nextuple.nsf.ui.screen.order.OrderDetailsScreen

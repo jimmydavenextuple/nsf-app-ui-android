@@ -7,27 +7,17 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
 
-class BarcodeScanManager {
+class RingBarcodeScanManager {
 
     private var scannedBarcode = StringBuilder()
-//    private var isScanning = false
     var onBarcodeScanned: ((String) -> Unit)? = null
 
     // Starts the scanning process
     fun clearScan() {
         scannedBarcode.clear()
-//        isScanning = true
     }
 
-    // Stops the scanning process
-    private fun stopScan() {
-//        isScanning = false
-    }
-
-    // Handles key events (HID input)
     fun handleKeyEvent(keyEvent: KeyEvent): Boolean {
-//        if (!isScanning) return false
-
         if (keyEvent.type == KeyEventType.KeyDown) {
             val char = keyEvent.utf16CodePoint.toChar()
             if (char.isLetterOrDigit()) {

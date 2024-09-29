@@ -43,6 +43,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -62,12 +63,11 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavController
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.string
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
-import com.nextuple.nsf.service.BarcodeScanManager
+import com.nextuple.nsf.service.RingBarcodeScanManager
 import com.nextuple.nsf.ui.common.AttributeText
 import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.Carousel
@@ -81,8 +81,7 @@ import com.nextuple.nsf.ui.common.ScrollToReveal
 import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
-import com.nextuple.nsf.ui.nav.Screen
-import com.nextuple.nsf.ui.screen.barcodescanner.BarcodeScannerScreen
+import com.nextuple.nsf.ui.screen.barcodescanner.CameraBarcodeScannerScreen
 import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
@@ -182,10 +181,10 @@ fun PickDetailsScreen(
 	val remainingPickQty = currentPickTaskItem?.getRemainingPickQty()
 
 
+	//Camera Barcode Scanner
 	scannedResult?.let {
 		lastScannedUpc = null
 		lastScannedSymbology = null
-		Log.i("TESTPOP", "scannedResult")
 		if (onCheckItemScan(it, "upc")) {
 			lastScannedUpc = it
 			lastScannedSymbology = "upc"
@@ -200,6 +199,7 @@ fun PickDetailsScreen(
 		barcodeScannerVM.reset()
 	}
 
+	//DataWedge scanner onItemScan
 	fun onItemScan(upc: String, symbology: String?) {
 		lastScannedUpc = null
 		lastScannedSymbology = null
@@ -218,10 +218,11 @@ fun PickDetailsScreen(
 		}
 	}
 
-	val barcodeScanManager = remember { BarcodeScanManager() }
+	val ringBarcodeScanManager = remember { RingBarcodeScanManager() }
 	val focusRequester = remember { FocusRequester() }
 
-	barcodeScanManager.onBarcodeScanned = { barcode ->
+	//Ring Barcode scanner
+	ringBarcodeScanManager.onBarcodeScanned = { barcode ->
 		lastScannedUpc = null
 		lastScannedSymbology = null
 
@@ -241,7 +242,7 @@ fun PickDetailsScreen(
 
 	LaunchedEffect(Unit) {
 		scanManager.set(::onItemScan)
-		barcodeScanManager.clearScan()
+		ringBarcodeScanManager.clearScan()
 		focusRequester.requestFocus()
 	}
 
@@ -251,8 +252,12 @@ fun PickDetailsScreen(
 			.fillMaxWidth()
 			.focusRequester(focusRequester) // Attach focusRequester to the composable
 			.focusable()
-			.onKeyEvent {
-				barcodeScanManager.handleKeyEvent(it)
+			.onPreviewKeyEvent { keyEvent ->
+				val eventConsumed = ringBarcodeScanManager.handleKeyEvent(keyEvent)
+				if (eventConsumed) {
+					return@onPreviewKeyEvent true // Consume the event
+				}
+				false // Let other events propagate
 			},
 		contentAlignment = Alignment.Center
 	) {
@@ -578,7 +583,7 @@ fun PickDetailsScreen(
 	}
 
 	if(showBarcodeScanner) {
-		BarcodeScannerScreen(
+		CameraBarcodeScannerScreen(
 			barcodeScannerVM,
 			currentPickTaskItem?.upcs?.firstOrNull().orEmpty()) {
 			showBarcodeScanner = false;

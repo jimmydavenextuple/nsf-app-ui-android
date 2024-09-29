@@ -18,7 +18,7 @@ import com.nextuple.nsf.ui.common.barcodescanner.BarcodeScanner
 import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 
 @Composable
-fun BarcodeScannerScreen(
+fun CameraBarcodeScannerScreen(
     viewModel: BarcodeScannerViewModel = hiltViewModel(),
     upc: String,
     onCancel: () -> Unit,

@@ -32,7 +32,7 @@ import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
-import com.nextuple.nsf.service.BarcodeScanManager
+import com.nextuple.nsf.service.RingBarcodeScanManager
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PackDeclineModal
 import com.nextuple.nsf.ui.screen.prep.packTaskItem
@@ -59,7 +59,7 @@ fun ScanAndPackUnitsCard(
 		mutableStateOf(-1 to null)
 	}
 
-	val barcodeScanManager = remember { BarcodeScanManager() }
+	val ringBarcodeScanManager = remember { RingBarcodeScanManager() }
 	val focusRequester = remember { FocusRequester() }
 
 	LaunchedEffect(packItems) {
@@ -69,11 +69,11 @@ fun ScanAndPackUnitsCard(
 		} else if (packItems?.all { it.isScanned || it.isDeclined } == true) {
 			onAllItemsScanned()
 		}
-		barcodeScanManager.clearScan()
+		ringBarcodeScanManager.clearScan()
 		focusRequester.requestFocus()
 	}
 
-	barcodeScanManager.onBarcodeScanned = { barcode ->
+	ringBarcodeScanManager.onBarcodeScanned = { barcode ->
 		Log.i("ScanAndPackUnitsCard:Scanner", "Scanned: $barcode");
 		if(!onPackItem(barcode)) {
 			Toast.makeText(
@@ -94,7 +94,7 @@ fun ScanAndPackUnitsCard(
 				.focusRequester(focusRequester) // Attach focusRequester to the composable
 				.focusable()
 				.onKeyEvent {
-					barcodeScanManager.handleKeyEvent(it)
+					ringBarcodeScanManager.handleKeyEvent(it)
 				}) {
 				// Not using LazyColumn. Scrolling is handled above for entire screen.
 				packItems?.forEachIndexed { i, prepTaskItem ->

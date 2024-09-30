@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -51,7 +53,7 @@ fun ScanAndPackUnitsCard(
 	onStageCompletionCallBack: () -> Unit = {},
 	onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit
 ) {
-	var ctx = LocalContext.current
+	val ctx = LocalContext.current
 	var showDeclineModal by remember {
 		mutableStateOf(false)
 	}
@@ -67,10 +69,12 @@ fun ScanAndPackUnitsCard(
 			delay(1000)
 			onStageCompletionCallBack()
 		} else if (packItems?.all { it.isScanned || it.isDeclined } == true) {
-			onAllItemsScanned()
+				onAllItemsScanned()
 		}
-		ringBarcodeScanManager.clearScan()
-		focusRequester.requestFocus()
+		if(!isComplete) {
+			ringBarcodeScanManager.clearScan()
+			focusRequester.requestFocus()
+		}
 	}
 
 	ringBarcodeScanManager.onBarcodeScanned = { barcode ->
@@ -78,7 +82,7 @@ fun ScanAndPackUnitsCard(
 		if(!onPackItem(barcode)) {
 			Toast.makeText(
 				ctx,
-				"UPC mismatch",
+				"UPC mismatch or item already scanned",
 				Toast.LENGTH_SHORT
 			).show()
 		}
@@ -93,8 +97,12 @@ fun ScanAndPackUnitsCard(
 			Column(modifier = Modifier.wrapContentHeight()
 				.focusRequester(focusRequester) // Attach focusRequester to the composable
 				.focusable()
-				.onKeyEvent {
-					ringBarcodeScanManager.handleKeyEvent(it)
+				.onPreviewKeyEvent { keyEvent ->
+					val eventConsumed = ringBarcodeScanManager.handleKeyEvent(keyEvent)
+					if (eventConsumed) {
+						return@onPreviewKeyEvent true // Consume the event
+					}
+					false // Let other events propagate
 				}) {
 				// Not using LazyColumn. Scrolling is handled above for entire screen.
 				packItems?.forEachIndexed { i, prepTaskItem ->

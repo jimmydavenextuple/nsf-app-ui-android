@@ -29,6 +29,7 @@ import com.nextuple.nsf.ui.util.PreviewPdt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScrollToReveal(
+	modifier: Modifier,
 	mainContent: @Composable ColumnScope.() -> Unit,
 	secondaryContent: @Composable RowScope.() -> Unit,
 	secondaryModifier: Modifier = Modifier,
@@ -88,6 +89,7 @@ fun ScrollToReveal(
 @Composable
 fun PreviewDemo() {
 	ScrollToReveal(
+		modifier = Modifier.padding(top = 17.dp),
 		mainContent = {},
 		secondaryContent = {},
 		secondaryModifier = Modifier.padding(top = 17.dp),

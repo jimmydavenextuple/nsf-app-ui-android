@@ -2,9 +2,11 @@ package com.nextuple.nsf.ui.screen.pick
 
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,14 +37,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
@@ -60,7 +65,7 @@ import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.R.string
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
-import com.nextuple.nsf.retrofit.dto.ProductAttribute
+import com.nextuple.nsf.service.RingBarcodeScanManager
 import com.nextuple.nsf.ui.common.AttributeText
 import com.nextuple.nsf.ui.common.ButtonState
 import com.nextuple.nsf.ui.common.Carousel
@@ -74,11 +79,13 @@ import com.nextuple.nsf.ui.common.ScrollToReveal
 import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToAction
 import com.nextuple.nsf.ui.common.callToAction.DetailedCallToActionMode
+import com.nextuple.nsf.ui.screen.barcodescanner.CameraBarcodeScannerScreen
+import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.state.PickViewModel
 import com.nextuple.nsf.ui.theme.BrandColor
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
-import com.nextuple.nsf.ui.util.PreviewPdt
+import com.nextuple.nsf.ui.util.PreviewPdtNordOne
 import com.nextuple.nsf.ui.util.ScanManager
 import com.nextuple.nsf.util.FulfillmentType
 import com.nextuple.nsf.util.FulfillmentType.BOPIS
@@ -93,6 +100,7 @@ val OTHER_REASON = "Other".uppercase()
  */
 @Composable
 fun PickDetailsScreen(
+	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	scanManager: ScanManager,
 	pickDeclineState: GenericViewState = GenericViewState.Idle,
@@ -109,10 +117,16 @@ fun PickDetailsScreen(
 	onCheckItemScan: (upc: String, symbology: String?) -> Boolean,
 	onItemPick: (upc: String, pickLocation: String?) -> Unit,
 	onRecordPickCompletion: () -> Unit = {},
-	onDeclineCompletion: () -> Unit = {}
+	onDeclineCompletion: () -> Unit = {},
 ) {
 	LaunchedEffect(Unit) {
 		scanManager.set(onItemPick)
+	}
+
+	val scannedResult = barcodeScannerVM.scannedBarcode
+
+	var showToast by remember {
+		mutableStateOf(false)
 	}
 
 	var showDeclineModal by remember {
@@ -125,6 +139,9 @@ fun PickDetailsScreen(
 		mutableStateOf(false)
 	}
 	var showPickLocationModal by remember {
+		mutableStateOf(false)
+	}
+	var showBarcodeScanner by remember {
 		mutableStateOf(false)
 	}
 	val showSubstitutionModal by pickVM.showSubstitutionModal.observeAsState()
@@ -161,6 +178,26 @@ fun PickDetailsScreen(
 	val allLocations = locations.plus(defaultLocations)
 	val remainingPickQty = currentPickTaskItem?.getRemainingPickQty()
 
+
+	//Camera Barcode Scanner
+	scannedResult?.let {
+		lastScannedUpc = null
+		lastScannedSymbology = null
+		if (onCheckItemScan(it, "upc")) {
+			lastScannedUpc = it
+			lastScannedSymbology = "upc"
+
+			if (allLocations.size > 1) {
+				showPickLocationModal = true
+			} else {
+				onItemPick(it, allLocations.firstOrNull())
+			}
+		}
+		showBarcodeScanner = false
+		barcodeScannerVM.reset()
+	}
+
+	//DataWedge scanner onItemScan
 	fun onItemScan(upc: String, symbology: String?) {
 		lastScannedUpc = null
 		lastScannedSymbology = null
@@ -174,20 +211,58 @@ fun PickDetailsScreen(
 			} else {
 				onItemPick(upc, allLocations.firstOrNull())
 			}
+		} else {
+			showToast = true
+		}
+	}
+
+	val ringBarcodeScanManager = remember { RingBarcodeScanManager() }
+	val focusRequester = remember { FocusRequester() }
+
+	//Ring Barcode scanner
+	ringBarcodeScanManager.onBarcodeScanned = { barcode ->
+		lastScannedUpc = null
+		lastScannedSymbology = null
+
+		if (onCheckItemScan(barcode, "upc")) {
+			lastScannedUpc = barcode
+			lastScannedSymbology = "upc"
+
+			if (allLocations.size > 1) {
+				showPickLocationModal = true
+			} else {
+				onItemPick(barcode, allLocations.firstOrNull())
+			}
+		} else {
+			showToast = true
 		}
 	}
 
 	LaunchedEffect(Unit) {
 		scanManager.set(::onItemScan)
+		ringBarcodeScanManager.clearScan()
+		focusRequester.requestFocus()
 	}
 
 	Box(
-		modifier = Modifier.fillMaxHeight(),
+		modifier = Modifier
+			.fillMaxHeight()
+			.fillMaxWidth()
+			.focusRequester(focusRequester) // Attach focusRequester to the composable
+			.focusable()
+			.onPreviewKeyEvent { keyEvent ->
+				val eventConsumed = ringBarcodeScanManager.handleKeyEvent(keyEvent)
+				if (eventConsumed) {
+					return@onPreviewKeyEvent true // Consume the event
+				}
+				false // Let other events propagate
+			},
 		contentAlignment = Alignment.Center
 	) {
 		Column(
 			modifier = Modifier
-				.fillMaxSize()
+				.fillMaxHeight()
+				.fillMaxWidth()
 				.background(color = BrandColor.GRAY_50),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
@@ -219,6 +294,9 @@ fun PickDetailsScreen(
 				}
 			}
 			ScrollToReveal(
+				modifier = Modifier
+					.fillMaxHeight()
+					.fillMaxWidth(),
 				scrollState = scrollState,
 				mainContent = {
 					Column(
@@ -229,10 +307,12 @@ fun PickDetailsScreen(
 					) {
 						Row(
 							modifier = Modifier
+								.fillMaxHeight()
 								.fillMaxWidth()
 								.padding(end = 0.dp),
 							horizontalArrangement = Arrangement.SpaceBetween
 						) {
+
 							Text(
 								text = currentPickTaskItem?.productBrand?.uppercase().orEmpty(),
 								maxLines = 1,
@@ -266,7 +346,7 @@ fun PickDetailsScreen(
 
 						Spacer(modifier = Modifier.height(6.dp))
 
-						Row() {
+						Row {
 							if (currentPickTaskItem?.substitutionAllowed == true && !currentPickTaskItem.substitutions.isNullOrEmpty()) {
 								Tag(
 									Modifier
@@ -318,16 +398,19 @@ fun PickDetailsScreen(
 							lastReturn = currentPickTaskItem?.lastReturn.toString()
 						)
 
+						Spacer(modifier = Modifier.height(20.dp))
+
 						Row(
 							modifier = Modifier
-								.padding(top = 20.dp)
+								.padding(top = 0.dp)
+								.fillMaxHeight()
 								.fillMaxWidth(),
 							horizontalArrangement = Arrangement.Center,
-							verticalAlignment = Alignment.Bottom,
+							verticalAlignment = Alignment.Top,
 						) {
 							Column(
 								modifier = Modifier.fillMaxWidth(),
-								horizontalAlignment = Alignment.CenterHorizontally
+								horizontalAlignment = Alignment.CenterHorizontally,
 							) {
 								DetailedCallToAction(
 									detailedCallToActionMode = when {
@@ -378,6 +461,35 @@ fun PickDetailsScreen(
 												symbology = "upc"
 											)
 										}
+									},
+								)
+							}
+						}
+
+						Spacer(modifier = Modifier.height(6.dp))
+
+						Row(
+							modifier = Modifier
+								.padding(top = 0.dp)
+								.fillMaxHeight()
+								.fillMaxWidth(),
+							horizontalArrangement = Arrangement.Center,
+							verticalAlignment = Alignment.Bottom,
+						) {
+							Column(
+								modifier = Modifier.fillMaxWidth(),
+								horizontalAlignment = Alignment.CenterHorizontally,
+							) {
+								val scanText =
+									if (remainingPickQty != null && remainingPickQty > 0) {
+										"Pick $remainingPickQty"
+									} else {
+										"Pick"
+									}
+								DetailedCallToAction(
+									detailedCallToActionMode = DetailedCallToActionMode.Camera(scanText),
+									onClick = {
+										showBarcodeScanner = true
 									},
 								)
 							}
@@ -468,6 +580,14 @@ fun PickDetailsScreen(
 		)
 	}
 
+	if(showBarcodeScanner) {
+		CameraBarcodeScannerScreen(
+			barcodeScannerVM,
+			currentPickTaskItem?.upcs?.firstOrNull().orEmpty()) {
+			showBarcodeScanner = false
+		}
+	}
+
 	if (showImageModal && currentPickTaskItem != null) {
 		ImageModal(
 			productName = currentPickTaskItem.productName,
@@ -505,6 +625,11 @@ fun PickDetailsScreen(
 			crossIconClick = { pickVM.toggleShowSubstitutionModal() },
 			onDismissRequest = { pickVM.toggleShowSubstitutionModal() }
 		)
+	}
+
+	if(showToast) {
+		Toast.makeText(LocalContext.current, "UPC mismatch", Toast.LENGTH_SHORT).show()
+		showToast = false
 	}
 }
 
@@ -577,7 +702,7 @@ private fun ProductAttributes(
 	Box(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(horizontal = 30.dp),
+			.padding(horizontal = 10.dp),
 		contentAlignment = Alignment.Center
 	) {
 		Column {
@@ -743,17 +868,18 @@ private fun DeclineDialogDialogPreview() {
 }
 
 @Composable
-@PreviewPdt
+@PreviewPdtNordOne
 fun PickDetailsScreenPreview() {
 	PickDetailsScreen(
+		barcodeScannerVM = BarcodeScannerViewModel(),
 		pickVM = PickViewModel(null, null, null),
 		scanManager = NoOpScanManager(),
 		pickDeclineState = GenericViewState.Loading,
 		fulfillmentType = BOPIS,
-		subFulfillmentType = SubFulfillmentType.BOPL,
+		subFulfillmentType = SubFulfillmentType.BOPIS,
 		currentPickTaskItem = PickTaskItem(
 			sku = "2345",
-			productBrand = "BOMBAS",
+			productBrand = "BOMBAY",
 			productName = "Hoka Women’s Clifton 9 Running Shoes",
 			productImageUrls = listOf(
 				"https://picsum.photos/1705",
@@ -779,7 +905,7 @@ fun PickDetailsScreenPreview() {
 			substitutions = listOf(
 				PickTaskItem(
 					sku = "2345",
-					productBrand = "BOMBAS",
+					productBrand = "BOMBAY",
 					productName = "Hoka Women’s Clifton 9 Running Shoes",
 					productImageUrls = listOf(
 						"https://picsum.photos/1705",

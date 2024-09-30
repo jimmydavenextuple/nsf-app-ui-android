@@ -73,7 +73,6 @@ fun AppNavBar(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RowScope.AppNavItem(
 	item: AppNavBarItem,

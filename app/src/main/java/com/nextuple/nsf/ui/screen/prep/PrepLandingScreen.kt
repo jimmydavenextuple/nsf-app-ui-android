@@ -28,7 +28,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -157,17 +159,49 @@ private fun PackTabContainer(
 			Spacer(modifier = Modifier.height(60.dp))
 
 			Row(modifier = Modifier.padding(horizontal = 56.dp)) {
-				ClickableText(
-					text = AnnotatedString(stringResource(string.pack_by_order)),
-					style = TextStyle(
-						fontSize = 14.sp,
-						fontWeight = FontWeight(700),
-						color = BrandColor.GRAY_900,
-						textAlign = TextAlign.Center,
-						letterSpacing = 1.5.sp,
-						textDecoration = TextDecoration.Underline
-					),
-					onClick = {
+//				ClickableText(
+//					text = AnnotatedString(stringResource(string.pack_by_order)),
+//					style = TextStyle(
+//						fontSize = 14.sp,
+//						fontWeight = FontWeight(700),
+//						color = BrandColor.GRAY_900,
+//						textAlign = TextAlign.Center,
+//						letterSpacing = 1.5.sp,
+//						textDecoration = TextDecoration.Underline
+//					),
+//					onClick = {
+//						onClickPackByOrder()
+//					}
+//				)
+
+				val annotatedText = buildAnnotatedString {
+					val packByOrderText = stringResource(string.pack_by_order)
+					append(packByOrderText)
+
+					addStyle(
+						style = SpanStyle(
+							fontSize = 14.sp,
+							fontWeight = FontWeight(700),
+							color = BrandColor.GRAY_900,
+							letterSpacing = 1.5.sp,
+							textDecoration = TextDecoration.Underline
+						),
+						start = 0,
+						end = packByOrderText.length
+					)
+
+					addStringAnnotation(
+						tag = "URL",
+						annotation = "pack_by_order_link", // Replace with actual link or identifier
+						start = 0,
+						end = packByOrderText.length
+					)
+				}
+
+				Text(
+					text = annotatedText,
+					textAlign = TextAlign.Center,
+					modifier = Modifier.clickable {
 						onClickPackByOrder()
 					}
 				)

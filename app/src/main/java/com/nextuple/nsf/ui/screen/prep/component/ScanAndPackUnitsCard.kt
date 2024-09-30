@@ -1,7 +1,9 @@
 package com.nextuple.nsf.ui.screen.prep.component
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +17,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -24,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
-import com.nextuple.nsf.retrofit.dto.ProductAttribute
+import com.nextuple.nsf.service.RingBarcodeScanManager
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PackDeclineModal
 import com.nextuple.nsf.ui.screen.prep.packTaskItem
@@ -43,6 +49,7 @@ fun ScanAndPackUnitsCard(
 	onStageCompletionCallBack: () -> Unit = {},
 	onConfirmDecline: (declineReason: String, index: Int, item: PackTaskItem) -> Unit
 ) {
+	val ctx = LocalContext.current
 	var showDeclineModal by remember {
 		mutableStateOf(false)
 	}
@@ -50,12 +57,29 @@ fun ScanAndPackUnitsCard(
 		mutableStateOf(-1 to null)
 	}
 
+	val ringBarcodeScanManager = remember { RingBarcodeScanManager() }
+	val focusRequester = remember { FocusRequester() }
+
 	LaunchedEffect(packItems) {
 		if (packItems?.all { it.isDeclined } == true) {
 			delay(1000)
 			onStageCompletionCallBack()
 		} else if (packItems?.all { it.isScanned || it.isDeclined } == true) {
-			onAllItemsScanned()
+				onAllItemsScanned()
+		}
+		if(!isComplete) {
+			ringBarcodeScanManager.clearScan()
+			focusRequester.requestFocus()
+		}
+	}
+
+	ringBarcodeScanManager.onBarcodeScanned = { barcode ->
+		if(!onPackItem(barcode)) {
+			Toast.makeText(
+				ctx,
+				"UPC mismatch or item already scanned",
+				Toast.LENGTH_SHORT
+			).show()
 		}
 	}
 
@@ -65,7 +89,16 @@ fun ScanAndPackUnitsCard(
 		isActive = isActive,
 		isComplete = isComplete,
 		extraContent = {
-			Column(modifier = Modifier.wrapContentHeight()) {
+			Column(modifier = Modifier.wrapContentHeight()
+				.focusRequester(focusRequester) // Attach focusRequester to the composable
+				.focusable()
+				.onPreviewKeyEvent { keyEvent ->
+					val eventConsumed = ringBarcodeScanManager.handleKeyEvent(keyEvent)
+					if (eventConsumed) {
+						return@onPreviewKeyEvent true // Consume the event
+					}
+					false // Let other events propagate
+				}) {
 				// Not using LazyColumn. Scrolling is handled above for entire screen.
 				packItems?.forEachIndexed { i, prepTaskItem ->
 					if (!prepTaskItem.isDeclined) {
@@ -133,23 +166,9 @@ private fun ScanAndPackUnitsCardPreview() {
 		isActive = true,
 		stepNumber = "1",
 		isComplete = false,
-		packItems = listOf(packTaskItem, packTaskItem),
+		packItems = listOf(packTaskItem, packTaskItem, packTaskItem),
 		pickedBy = "Joe Ducko",
 		onAllItemsScanned = {},
 		onConfirmDecline = { _, _, _ -> }
 	)
 }
-
-private val PACK_TASK_ITEM = PackTaskItem(
-	sku = "2345",
-	primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
-	secondaryAttr = ProductAttribute(name = "Size", value = "7.5"),
-	tertiaryAttr = ProductAttribute(name = "Style", value = "12345"),
-	qty = 1,
-	productName = "Hoka Women’s Clifton 9 Running Shoes",
-	productImageUrls = listOf(
-		"https://picsum.photos/1705",
-		"https://picsum.photos/1726",
-		"https://picsum.photos/1701"
-	)
-)

@@ -1,10 +1,13 @@
 package com.nextuple.nsf.ui.screen.pick
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.karumi.shot.ScreenshotTest
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
 import com.nextuple.nsf.retrofit.dto.ProductAttribute
+import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.util.GenericViewState
 import com.nextuple.nsf.ui.util.NoOpScanManager
 import com.nextuple.nsf.util.FulfillmentType.BOPIS
@@ -26,8 +29,9 @@ class PickDetailsScreenTest : ScreenshotTest {
 	private fun renderPickDetailScreen() {
 		composeTestRule.setContent {
 			PickDetailsScreen(
-				pickVM = hiltViewModel(),
+				barcodeScannerVM = BarcodeScannerViewModel(),
 				scanManager = NoOpScanManager(),
+				pickVM = hiltViewModel(),
 				pickDeclineState = GenericViewState.Loading,
 				fulfillmentType = BOPIS,
 				subFulfillmentType = SubFulfillmentType.BOPIS,
@@ -41,9 +45,7 @@ class PickDetailsScreenTest : ScreenshotTest {
 						"https://picsum.photos/1701"
 					),
 					locations = listOf("F1.S1.04A"),
-					primaryAttr = ProductAttribute(name = "Size", value = "7.5"),
-					secondaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
-					tertiaryAttr = ProductAttribute(name = "Style", value = "123456"),
+					additionalAttributes = null,
 					onHandQty = 10,
 					upcs = listOf("123456789101"),
 					qty = 1,

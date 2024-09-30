@@ -16,6 +16,7 @@ import com.nextuple.nsf.service.DeviceService
 import com.nextuple.nsf.service.LogService
 import com.nextuple.nsf.service.LogService.Companion.EVENT_INACTIVITY_TIMEOUT
 import com.nextuple.nsf.ui.App
+import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.state.ConfigViewModel
 import com.nextuple.nsf.ui.state.DemoViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
@@ -40,6 +41,7 @@ class MainActivity : ComponentActivity() {
 	private val settingsVM: SettingsViewModel by viewModels()
 	private val infoVM: InfoViewModel by viewModels()
 	private val configVM: ConfigViewModel by viewModels()
+	private val barcodeScannerVM: BarcodeScannerViewModel by viewModels()
 
 	@Inject
 	lateinit var logService: LogService
@@ -87,6 +89,7 @@ class MainActivity : ComponentActivity() {
 							)
 						}
 					},
+					barcodeScannerViewModel = barcodeScannerVM,
 					haptics = haptics,
 					intentData = intent.data,
 					onLoggedIn = ::startSessionListener

@@ -1,6 +1,8 @@
 package com.nextuple.nsf.ui.common.callToAction
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import com.nextuple.nsf.R
 import com.nextuple.nsf.ui.theme.BrandColor
 
@@ -12,6 +14,15 @@ sealed class DetailedCallToActionMode(
 	 * Initial state and Displays scan image
 	 */
 	class Scan(
+		val text: String,
+		backgroundColor: Color = BrandColor.DARK_BLUE,
+		contentColor: Color = BrandColor.TRANSPARENT
+	) : DetailedCallToActionMode(backgroundColor, contentColor)
+
+	/**
+	 * Initial state and Displays scan image
+	 */
+	class Camera(
 		val text: String,
 		backgroundColor: Color = BrandColor.DARK_BLUE,
 		contentColor: Color = BrandColor.TRANSPARENT
@@ -46,7 +57,8 @@ sealed class DetailedCallToActionMode(
 fun DetailedCallToActionMode.imageResource(): Int {
 	return when (this) {
 		is DetailedCallToActionMode.Done -> R.drawable.ic_check
-		is DetailedCallToActionMode.Scan -> R.drawable.ic_pick_qr_code_scanner
+		is DetailedCallToActionMode.Scan -> R.drawable.ic_scan
+		is DetailedCallToActionMode.Camera -> R.drawable.ic_camera_scan
 		is DetailedCallToActionMode.Decline -> R.drawable.ic_close
 		is DetailedCallToActionMode.Loading -> -1
 	}

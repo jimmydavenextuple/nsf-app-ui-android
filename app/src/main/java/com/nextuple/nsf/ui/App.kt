@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -50,6 +51,7 @@ import com.nextuple.nsf.ui.screen.pick.PickScreen
 import com.nextuple.nsf.ui.screen.prep.PrepScreen
 import com.nextuple.nsf.ui.screen.search.SearchResultsScreen
 import com.nextuple.nsf.ui.screen.settings.SettingsScreen
+import com.nextuple.nsf.ui.state.BarcodeScannerViewModel
 import com.nextuple.nsf.ui.state.ConfigViewModel
 import com.nextuple.nsf.ui.state.DemoViewModel
 import com.nextuple.nsf.ui.state.InfoViewModel
@@ -103,6 +105,7 @@ fun App(
 	settingsVM: SettingsViewModel,
 	configVM: ConfigViewModel,
 	scanManager: ScanManager,
+	barcodeScannerViewModel: BarcodeScannerViewModel,
 	haptics: Haptics,
 	intentData: Uri?,
 	onLoggedIn: () -> Unit
@@ -186,7 +189,6 @@ fun App(
 						if (searchInput.isNotEmpty()) {
 							navCtrl.navigate("${Screen.SEARCH_RESULTS.route}?$searchInput")
 						} else {
-							// todo: Confirm text with anna
 							Toast.makeText(
 								context,
 								"Please enter a value to search",
@@ -202,7 +204,7 @@ fun App(
 		},
 		content = { paddingValues ->
 			NavHost(
-				modifier = Modifier.padding(paddingValues),
+				modifier = Modifier.fillMaxHeight().padding(paddingValues),
 				navController = navCtrl,
 				startDestination = getStartDestination(userVM.isLoggedIn(), deepLinkUri)
 			) {
@@ -220,6 +222,7 @@ fun App(
 				composableForHome()
 				composableForPick(
 					navCtrl = navCtrl,
+					barcodeScannerVM = barcodeScannerViewModel,
 					pickVM = pickVM,
 					infoVM = infoVM,
 					configVM = configVM,
@@ -343,6 +346,7 @@ private fun NavGraphBuilder.composableForHome() {
 
 private fun NavGraphBuilder.composableForPick(
 	navCtrl: NavController,
+	barcodeScannerVM: BarcodeScannerViewModel,
 	pickVM: PickViewModel,
 	infoVM: InfoViewModel,
 	configVM: ConfigViewModel,
@@ -355,6 +359,7 @@ private fun NavGraphBuilder.composableForPick(
 			it.displayName to it.id
 		}?.toTypedArray()?.let { linkedMapOf(*it) }
 		PickScreen(
+			barcodeScannerVM = barcodeScannerVM,
 			pickVM = pickVM,
 			scanManager = scanManager,
 			haptics = haptics,
@@ -415,9 +420,9 @@ private fun NavGraphBuilder.composableForOrders(
 
 			// Nav right back without arguments to "clear" it. Otherwise, the pack persists
 			// even when removed until next Orders tab refresh.
-			navCtrl.navigate(Screen.ORDERS.route) {
-				popUpTo(Screen.HOME.route)
-			}
+//			navCtrl.navigate(Screen.ORDERS.route) {
+//				popUpTo(Screen.HOME.route)
+//			}
 		}
 
 		OrderScreen(

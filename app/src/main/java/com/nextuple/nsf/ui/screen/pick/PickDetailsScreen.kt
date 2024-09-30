@@ -2,7 +2,6 @@ package com.nextuple.nsf.ui.screen.pick
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
@@ -42,7 +41,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -128,7 +126,7 @@ fun PickDetailsScreen(
 	val scannedResult = barcodeScannerVM.scannedBarcode
 
 	var showToast by remember {
-		mutableStateOf(false);
+		mutableStateOf(false)
 	}
 
 	var showDeclineModal by remember {
@@ -214,7 +212,7 @@ fun PickDetailsScreen(
 				onItemPick(upc, allLocations.firstOrNull())
 			}
 		} else {
-			showToast = true;
+			showToast = true
 		}
 	}
 
@@ -236,7 +234,7 @@ fun PickDetailsScreen(
 				onItemPick(barcode, allLocations.firstOrNull())
 			}
 		} else {
-			showToast = true;
+			showToast = true
 		}
 	}
 
@@ -348,7 +346,7 @@ fun PickDetailsScreen(
 
 						Spacer(modifier = Modifier.height(6.dp))
 
-						Row() {
+						Row {
 							if (currentPickTaskItem?.substitutionAllowed == true && !currentPickTaskItem.substitutions.isNullOrEmpty()) {
 								Tag(
 									Modifier
@@ -586,7 +584,7 @@ fun PickDetailsScreen(
 		CameraBarcodeScannerScreen(
 			barcodeScannerVM,
 			currentPickTaskItem?.upcs?.firstOrNull().orEmpty()) {
-			showBarcodeScanner = false;
+			showBarcodeScanner = false
 		}
 	}
 
@@ -630,7 +628,7 @@ fun PickDetailsScreen(
 	}
 
 	if(showToast) {
-		Toast.makeText(LocalContext.current, "UPC mismatch", Toast.LENGTH_SHORT).show();
+		Toast.makeText(LocalContext.current, "UPC mismatch", Toast.LENGTH_SHORT).show()
 		showToast = false
 	}
 }
@@ -881,7 +879,7 @@ fun PickDetailsScreenPreview() {
 		subFulfillmentType = SubFulfillmentType.BOPIS,
 		currentPickTaskItem = PickTaskItem(
 			sku = "2345",
-			productBrand = "BOMBAS",
+			productBrand = "BOMBAY",
 			productName = "Hoka Women’s Clifton 9 Running Shoes",
 			productImageUrls = listOf(
 				"https://picsum.photos/1705",
@@ -907,7 +905,7 @@ fun PickDetailsScreenPreview() {
 			substitutions = listOf(
 				PickTaskItem(
 					sku = "2345",
-					productBrand = "BOMBAS",
+					productBrand = "BOMBAY",
 					productName = "Hoka Women’s Clifton 9 Running Shoes",
 					productImageUrls = listOf(
 						"https://picsum.photos/1705",

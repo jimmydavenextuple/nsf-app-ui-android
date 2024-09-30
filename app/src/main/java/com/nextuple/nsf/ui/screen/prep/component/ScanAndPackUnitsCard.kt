@@ -1,6 +1,5 @@
 package com.nextuple.nsf.ui.screen.prep.component
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
-import com.nextuple.nsf.retrofit.dto.ProductAttribute
 import com.nextuple.nsf.service.RingBarcodeScanManager
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PackDeclineModal
@@ -78,7 +74,6 @@ fun ScanAndPackUnitsCard(
 	}
 
 	ringBarcodeScanManager.onBarcodeScanned = { barcode ->
-		Log.i("ScanAndPackUnitsCard:Scanner", "Scanned: $barcode");
 		if(!onPackItem(barcode)) {
 			Toast.makeText(
 				ctx,
@@ -177,17 +172,3 @@ private fun ScanAndPackUnitsCardPreview() {
 		onConfirmDecline = { _, _, _ -> }
 	)
 }
-
-private val PACK_TASK_ITEM = PackTaskItem(
-	sku = "2345",
-	primaryAttr = ProductAttribute(name = "Color", value = "Cyclamen"),
-	secondaryAttr = ProductAttribute(name = "Size", value = "7.5"),
-	tertiaryAttr = ProductAttribute(name = "Style", value = "12345"),
-	qty = 1,
-	productName = "Hoka Women’s Clifton 9 Running Shoes",
-	productImageUrls = listOf(
-		"https://picsum.photos/1705",
-		"https://picsum.photos/1726",
-		"https://picsum.photos/1701"
-	)
-)

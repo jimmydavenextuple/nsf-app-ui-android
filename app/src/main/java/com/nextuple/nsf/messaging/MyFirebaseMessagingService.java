@@ -53,6 +53,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         try {
             FirebaseMessaging.getInstance().subscribeToTopic("1234_notification_topic");
+            FirebaseMessaging.getInstance().subscribeToTopic("1235_notification_topic");
+            FirebaseMessaging.getInstance().subscribeToTopic("1236_notification_topic");
             Log.i("DeviceRegistered", "Done");
         } catch (Exception ex) {
             Log.e("Exceptions while subscribing: {}", token, ex);

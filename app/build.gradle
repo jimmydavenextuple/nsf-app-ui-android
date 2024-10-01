@@ -105,7 +105,7 @@ android {
 		}
 
 		demo {
-			applicationId "com.nextuple.nsf.dev"
+			applicationId "com.nextuple.nsf.demo"
 
 			buildConfigField "String", "GOAT_API_URL", "\"$GOAT_API_URL_DEMO\""
 

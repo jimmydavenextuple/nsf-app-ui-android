@@ -110,20 +110,20 @@ fun LoginScreen(
 			.background(
 				brush = Brush.verticalGradient(
 					colors = listOf(
-						BrandColor.BG_GRADIENT_TOP, // Start color
-						BrandColor.STRONG_PINK // End color
+						BrandColor.GRAY_200, // Start color
+						BrandColor.GRAY_200 // End color
 					),
 				),
-				alpha = .8f
+				alpha = .9f
 			)
 	) {
-		Image(
-			modifier = Modifier
-				.padding(50.dp, 150.dp, 0.dp, 0.dp),
-			painter = painterResource(id = R.drawable.logo_nextuple_building_blocks),
-			contentDescription = null,
-			contentScale = ContentScale.Fit,
-		)
+//		Image(
+//			modifier = Modifier
+//				.padding(50.dp, 150.dp, 0.dp, 0.dp),
+//			painter = painterResource(id = R.drawable.logo_nextuple_building_blocks),
+//			contentDescription = null,
+//			contentScale = ContentScale.Fit,
+//		)
 
 		Column(
 			modifier = Modifier
@@ -148,9 +148,9 @@ fun LoginScreen(
 					fontStyle = FontStyle.Normal,
 					letterSpacing = 1.5.sp,
 					fontSize = 50.sp,
-					color = BrandColor.WHITE,
+					color = Color(0xFF242424),
 					shadow = Shadow(
-						color = Color.Black,
+						color = BrandColor.BLACK,
 						offset = Offset(3f, 3f),
 						blurRadius = 2f
 					)
@@ -170,9 +170,9 @@ fun LoginScreen(
 					fontStyle = FontStyle.Normal,
 					letterSpacing = 1.5.sp,
 					fontSize = 50.sp,
-					color = BrandColor.WHITE,
+					color = Color(0xFF242424),
 					shadow = Shadow(
-						color = Color.Black,
+						color = BrandColor.BLACK,
 						offset = Offset(3f, 3f),
 						blurRadius = 2f
 					)
@@ -240,7 +240,7 @@ fun LoginScreen(
 				modifier = Modifier
 					.padding(top = 10.dp, end = 10.dp)
 					.height(30.dp),
-				painter = painterResource(R.drawable.nextuple_fulllogo),
+				painter = painterResource(R.drawable.fanatics_logo1),
 				contentDescription = null,
 				contentScale = ContentScale.FillHeight
 			)

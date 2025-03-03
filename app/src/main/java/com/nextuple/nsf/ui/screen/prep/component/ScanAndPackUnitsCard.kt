@@ -5,10 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Label
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -31,10 +36,14 @@ import com.nextuple.nsf.BuildConfig
 import com.nextuple.nsf.R
 import com.nextuple.nsf.retrofit.dto.PackTaskItem
 import com.nextuple.nsf.service.RingBarcodeScanManager
+import com.nextuple.nsf.ui.common.ButtonState
+import com.nextuple.nsf.ui.common.PrimaryButton
+import com.nextuple.nsf.ui.common.SecondaryButton
 import com.nextuple.nsf.ui.component.ExpandableStepCard
 import com.nextuple.nsf.ui.component.PackDeclineModal
 import com.nextuple.nsf.ui.screen.prep.packTaskItem
 import com.nextuple.nsf.ui.theme.BrandColor
+import com.nextuple.nsf.ui.util.PreviewPdtNordOne
 import kotlinx.coroutines.delay
 
 @Composable
@@ -99,6 +108,86 @@ fun ScanAndPackUnitsCard(
 					}
 					false // Let other events propagate
 				}) {
+				HorizontalDivider(
+					modifier = Modifier,
+					thickness = 1.dp,
+					color = BrandColor.GRAY_350
+				)
+				Column() {
+					PrimaryButton(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(top = 5.dp)
+							.padding(bottom = 5.dp),
+						text = "+ Create Package".uppercase(),
+						buttonColor = Color(0xFF0060AA),
+						enabled = true,
+						buttonState = ButtonState.DEFAULT,
+						onButtonClick = {
+						},
+					)
+				}
+				Column(modifier = Modifier
+					.fillMaxWidth(),
+					) {
+					Row() {
+						Column(modifier = Modifier
+							.padding(top = 5.dp)
+							.padding(end = 1.dp)
+							.padding(start = 5.dp)) {
+							Text(
+								modifier = Modifier.padding(top = 5.dp),
+								text = "Package #1",
+								style = TextStyle(
+									fontSize = 13.sp,
+									fontWeight = FontWeight(800),
+									color = BrandColor.BLACK,
+									letterSpacing = 0.4.sp
+								)
+							)
+							Text(
+								modifier = Modifier.padding(vertical = 8.dp),
+								text = "2 items",
+								style = TextStyle(
+									fontSize = 11.sp,
+									fontWeight = FontWeight(400),
+									color = BrandColor.BLACK,
+									letterSpacing = 0.4.sp
+								)
+							)
+						}
+						SecondaryButton(
+							modifier = Modifier
+								.padding(start = 2.dp)
+								.padding(top = 4.dp)
+								.padding(bottom = 4.dp),
+							text = "Generate label",
+							buttonColor = Color(0xFFFFFFFF),
+							enabled = true,
+							buttonState = ButtonState.DEFAULT,
+							onButtonClick = {
+								Toast.makeText(ctx, "Print job submitted", Toast.LENGTH_LONG).show()
+							},
+							textSize = 11.sp
+						)
+						SecondaryButton(
+							modifier = Modifier
+								.padding(4.dp),
+							text = "Unpack",
+							buttonColor = Color(0xFFFFFFFF),
+							enabled = true,
+							buttonState = ButtonState.DEFAULT,
+							onButtonClick = {
+							},
+							textSize = 11.sp
+						)
+					}
+				}
+				HorizontalDivider(
+					modifier = Modifier,
+					thickness = 1.dp,
+					color = BrandColor.GRAY_350
+				)
 				// Not using LazyColumn. Scrolling is handled above for entire screen.
 				packItems?.forEachIndexed { i, prepTaskItem ->
 					if (!prepTaskItem.isDeclined) {
@@ -124,16 +213,16 @@ fun ScanAndPackUnitsCard(
 						)
 					}
 				}
-				Text(
-					modifier = Modifier.padding(vertical = 8.dp),
-					text = stringResource(id = R.string.pack_info),
-					style = TextStyle(
-						fontSize = 12.sp,
-						fontWeight = FontWeight(400),
-						color = BrandColor.BLACK,
-						letterSpacing = 0.5.sp
-					)
-				)
+//				Text(
+//					modifier = Modifier.padding(vertical = 8.dp),
+//					text = stringResource(id = R.string.pack_info),
+//					style = TextStyle(
+//						fontSize = 12.sp,
+//						fontWeight = FontWeight(400),
+//						color = BrandColor.BLACK,
+//						letterSpacing = 0.5.sp
+//					)
+//				)
 				if (!pickedBy.isNullOrEmpty()) {
 					com.nextuple.nsf.ui.common.TextInfo(
 						label = stringResource(id = R.string.picked_by),
@@ -159,7 +248,7 @@ fun ScanAndPackUnitsCard(
 	}
 }
 
-@Preview
+@PreviewPdtNordOne
 @Composable
 private fun ScanAndPackUnitsCardPreview() {
 	ScanAndPackUnitsCard(

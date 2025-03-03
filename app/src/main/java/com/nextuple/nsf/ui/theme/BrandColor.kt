@@ -67,4 +67,6 @@ object BrandColor {
 	val VERY_DARY_GREY_BLACK = Color(0xff262626)
 	val VERY_DARY_GREY_BLACK_USER = Color(0xff141414)
 	val DARY_MODERATE_CYAN = Color(0xff38a3a3)
+	val BG_GRADIENT_FN_TOP = Color(0xFF042679)
+	val BG_GRADIENT_FN_BOTTOM = Color(0x232121FF)
 }

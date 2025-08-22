@@ -15,6 +15,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -24,7 +25,15 @@ import java.util.concurrent.TimeUnit
 @Module
 @InstallIn(SingletonComponent::class)
 internal object RetrofitModule {
+	private const val API_KEY_HEADER = "x-api-key"
+	private const val API_KEY_VALUE = "6e5af8d5-7944-4a3f-b656-75a3e59bb397"
 
+	private val apiKeyInterceptor = Interceptor { chain ->
+		val request = chain.request().newBuilder()
+			.addHeader(API_KEY_HEADER, API_KEY_VALUE)
+			.build()
+		chain.proceed(request)
+	}
 	@Provides
 	fun provideRetrofit(): Retrofit {
 		val interceptor = HttpLoggingInterceptor()
@@ -33,7 +42,7 @@ internal object RetrofitModule {
 		}
 		val builder = OkHttpClient().newBuilder().connectTimeout(1, TimeUnit.MINUTES)
 			.readTimeout(30, TimeUnit.SECONDS)
-			.writeTimeout(30, TimeUnit.SECONDS).addInterceptor(interceptor).build()
+			.writeTimeout(30, TimeUnit.SECONDS).addInterceptor(apiKeyInterceptor).addInterceptor(interceptor).build()
 
 		return Retrofit.Builder()
 			.baseUrl(BuildConfig.GOAT_API_URL)

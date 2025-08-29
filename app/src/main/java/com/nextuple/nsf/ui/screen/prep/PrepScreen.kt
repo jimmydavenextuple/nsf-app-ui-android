@@ -166,6 +166,34 @@ fun PrepScreen(
 						}
 					)
 				}
+				SubFulfillmentType.SFS.name -> {
+					SFSPrepDetailsScreen(
+						printViewModel = printViewModel,
+						scanManager = scanManager,
+						prepOrder = prepOrder,
+						holdingAreas = configVM.getHoldingLocations(),
+						currentPrepStage = prepViewModel.currentStep,
+						getHoldSlipState = prepViewModel.getHoldSlipState,
+						holdLocationState = prepViewModel.holdLocationState,
+						onPackItem = prepViewModel::packItem,
+						onPackOrder = {
+							// Print placeholder for passing through package data
+							println("aaa PackageData: $it")
+							prepViewModel.packAndGetHoldSlip()
+						},
+						onRecordHoldingLocation = ::recordHoldLocation,
+						ipPrefix = settingsVM.ipPrefix,
+						printer = settingsVM.findPrinter(PrinterName.SFS),
+						printerConnectionState = settingsVM.printerConnectionState,
+						onConnectPrinter = settingsVM::connectPrinter,
+						onResetPrinter = settingsVM::resetConnectionState,
+						onPrintHoldSlip = { onPrintHoldSlip(PrinterName.SFS) },
+						onStageCompletionCallBack = ::onStageCompletionCallBack,
+						onConfirmDecline = { declineReason, index, itemToDecline ->
+							prepViewModel.declinePackItem(declineReason, index, itemToDecline)
+						}
+					)
+				}
 
 				SubFulfillmentType.SAME_DAY.name -> {
 					SDDPrepDetailsScreen(

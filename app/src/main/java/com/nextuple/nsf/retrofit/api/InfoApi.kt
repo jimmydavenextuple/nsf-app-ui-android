@@ -23,7 +23,8 @@ interface InfoApi {
 	suspend fun getUserPickTasks(
 		@Path("store") store: String,
 		@Header("userId") userId: String,
-		@Query("pickTaskAutoComplete") pickTaskAutoComplete: Boolean = true
+		@Query("pickTaskAutoComplete") pickTaskAutoComplete: Boolean = true,
+		@Query("fulfillmentType") fulfillmentType: String? = null
 	): ApiResponse<GetUserPickTasksResponse>
 
 	@GET("v1/tasks/prep/store/{store}")

@@ -46,6 +46,23 @@ class InfoService(
 		}.getOrDefault(Result.generalError())
 	}
 
+	suspend fun getUserSfsPickTasks(): Result<GetUserPickTasksResponse?> {
+		val store = userRepository.getStore() ?: return Result.generalError()
+		val userId = userRepository.getUserId() ?: return Result.generalError()
+		val res = infoApi.getUserPickTasks(
+			store = store.id, 
+			userId = userId,
+			fulfillmentType = FulfillmentType.SFS.name
+		)
+		return runCatching {
+			Result.fromApiResponse(res) {
+				it!!
+			}
+		}.onFailure {
+			// TODO: Log as non-fatal exception.
+		}.getOrDefault(Result.generalError())
+	}
+
 	suspend fun getUserPrepTasks(): Result<GetUserPrepTasksResponse?> {
 		val store = userRepository.getStore() ?: return Result.generalError()
 		val userId = userRepository.getUserId() ?: return Result.generalError()

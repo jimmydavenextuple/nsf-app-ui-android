@@ -11,6 +11,7 @@ import com.nextuple.nsf.retrofit.dto.DeclineItemRequest
 import com.nextuple.nsf.retrofit.dto.PickItemRequest
 import com.nextuple.nsf.retrofit.dto.PickTask
 import com.nextuple.nsf.retrofit.dto.PickTaskItem
+import com.nextuple.nsf.util.FulfillmentType
 import com.nextuple.nsf.service.InfoService
 import com.nextuple.nsf.service.PickService
 import com.nextuple.nsf.service.dto.Result
@@ -41,13 +42,20 @@ open class PickViewModel @Inject constructor(
 	var pickTask: PickTask? by mutableStateOf(null)
 		private set
 
+	var sfsPickTask: PickTask? by mutableStateOf(null)
+		private set
+
+	var sfsTasks: Int by mutableStateOf(0)
+		private set
+
 	var currentPickItem: PickTaskItem? by mutableStateOf(null)
 		private set
 
 	var showSubstitutionModal = MutableLiveData<Boolean>(false)
 
 	fun updateCurrentPickItem() {
-		currentPickItem = pickTask?.items?.find {
+		val currentTask = pickTask ?: sfsPickTask
+		currentPickItem = currentTask?.items?.find {
 			it.pickedQty.plus(it.declinedQty) != it.qty
 		}
 	}
@@ -62,19 +70,37 @@ open class PickViewModel @Inject constructor(
 
 	fun fetchCurrentStep() = viewModelScope.launch {
 		viewState = GenericViewState.Loading
+		
+		// Fetch PICKUP tasks
 		when (val res = infoService?.getUserPickTasks()) {
 			is Result.Success -> {
-				pickTask = res.data?.pickTask
-				viewState = GenericViewState.Success
+				val task = res.data?.pickTask
+				if (task?.fulfillmentType == FulfillmentType.BOPIS || task?.fulfillmentType == FulfillmentType.SAME_DAY) {
+					pickTask = task
+				} else {
+					pickTask = null
+				}
 			}
-
 			is Result.Error -> {
 				pickTask = null
-				viewState = GenericViewState.Failure
 			}
-
 			null -> TODO()
 		}
+		
+		// Fetch SFS tasks
+		when (val sfsRes = infoService?.getUserSfsPickTasks()) {
+			is Result.Success -> {
+				sfsPickTask = sfsRes.data?.pickTask
+				sfsTasks = if (sfsPickTask != null) 1 else 0
+			}
+			is Result.Error -> {
+				sfsPickTask = null
+				sfsTasks = 0
+			}
+			null -> TODO()
+		}
+		
+		viewState = GenericViewState.Success
 	}
 
 	fun startPick() {
@@ -103,6 +129,32 @@ open class PickViewModel @Inject constructor(
 		}
 	}
 
+	fun startSfsPick() {
+		startPickState = GenericViewState.Loading
+		viewModelScope.launch {
+			sfsPickTask = when (val response = pickService?.startPick()) {
+				is Result.Success -> {
+					if (response.data?.fulfillmentType == FulfillmentType.SFS) {
+						startPickState = GenericViewState.Success
+						response.data
+					} else {
+						startPickState = GenericViewState.Failure
+						null
+					}
+				}
+				is Result.Error -> {
+					if (response.type == NOT_FOUND) {
+						startPickState = GenericViewState.Failure
+					} else {
+						resetPickScreen()
+					}
+					null
+				}
+				null -> TODO()
+			}
+		}
+	}
+
 	fun declinePick(declineReason: String, declineReasonText: String) {
 		if (currentPickItem?.substitutionAllowed == true && !currentPickItem?.substitutions.isNullOrEmpty()) {
 			if (currentPickItem?.originalItem == null) {
@@ -112,47 +164,57 @@ open class PickViewModel @Inject constructor(
 		} else {
 		pickDeclineState = GenericViewState.Loading
 		viewModelScope.launch {
+			val currentTask = pickTask ?: sfsPickTask
 			val declineItemRequest = DeclineItemRequest(
-				taskId = pickTask?.id ?: 0,
+				taskId = currentTask?.id ?: 0,
 				sku = currentPickItem?.originalItem?.sku ?: currentPickItem?.sku ?: "",
 				declinedQty = getDeclineQty(),
 				declineReason = currentPickItem?.originalItemDeclineReason ?: declineReason,
 				declineReasonText = currentPickItem?.originalItemDeclineReasonText ?: declineReasonText
 			)
-			pickTask =
-				when (val response = pickService?.declinePick(req = declineItemRequest)) {
-					is Result.Success -> {
-						pickDeclineState = GenericViewState.Success
-						response.data
+			val response = pickService?.declinePick(req = declineItemRequest)
+			when (response) {
+				is Result.Success -> {
+					pickDeclineState = GenericViewState.Success
+					if (pickTask != null) {
+						pickTask = response.data
+					} else {
+						sfsPickTask = response.data
 					}
-
-					is Result.Error -> {
-						pickDeclineState = GenericViewState.Failure
-						null
-					}
-
-					null -> TODO()
 				}
+
+				is Result.Error -> {
+					pickDeclineState = GenericViewState.Failure
+				}
+
+				null -> TODO()
 			}
+		}
 		}
 	}
 
 	private fun setOriginalItemDeclineReason(declineReason: String, declineReasonText: String) {
-		val currentItemIdx = pickTask?.items?.indexOf(currentPickItem)
+		val currentTask = pickTask ?: sfsPickTask
+		val currentItemIdx = currentTask?.items?.indexOf(currentPickItem)
 		// create a copy of (pick task) items
-		val updatedItems = (pickTask?.items?.toMutableList() ?: emptyList()).toMutableList()
+		val updatedItems = (currentTask?.items?.toMutableList() ?: emptyList()).toMutableList()
 		updatedItems[currentItemIdx!!].originalItemDeclineReason = declineReason
 		updatedItems[currentItemIdx].originalItemDeclineReasonText = declineReasonText
 		// update (pick task) items
-		pickTask?.items = updatedItems
+		if (pickTask != null) {
+			pickTask?.items = updatedItems
+		} else {
+			sfsPickTask?.items = updatedItems
+		}
 	}
 
 	fun onSubstitutionSelected(sku: String) {
-		val currentItemIdx = pickTask?.items?.indexOf(currentPickItem)
+		val currentTask = pickTask ?: sfsPickTask
+		val currentItemIdx = currentTask?.items?.indexOf(currentPickItem)
 		val currentItemSubstitutions = (currentPickItem?.substitutions ?: emptyList()).toMutableList()
 
 		// create a copy of (pick task) items
-		val updatedItems = (pickTask?.items?.toMutableList() ?: emptyList()).toMutableList()
+		val updatedItems = (currentTask?.items?.toMutableList() ?: emptyList()).toMutableList()
 		// update current item to selected substitution item
 		val selectedSubstitution = currentItemSubstitutions.find { it.sku == sku }!!
 		updatedItems[currentItemIdx!!] = selectedSubstitution
@@ -173,7 +235,11 @@ open class PickViewModel @Inject constructor(
 		}
 
 		// update (pick task) items
-		pickTask?.items = updatedItems
+		if (pickTask != null) {
+			pickTask?.items = updatedItems
+		} else {
+			sfsPickTask?.items = updatedItems
+		}
 		// update current (pick) item
 		updateCurrentPickItem()
 	}
@@ -187,7 +253,8 @@ open class PickViewModel @Inject constructor(
 			return false
 		}
 
-		if (pickTask?.id == null) {
+		val currentTask = pickTask ?: sfsPickTask
+		if (currentTask?.id == null) {
 			recordPickState = GenericViewState.Failure
 			return false
 		}
@@ -202,24 +269,26 @@ open class PickViewModel @Inject constructor(
 		viewModelScope.launch {
 			recordPickState = GenericViewState.Loading
 			val pickItemRequest = PickItemRequest(
-				taskId = pickTask?.id ?: 0,
+				taskId = currentTask.id ?: 0,
 				sku = currentPickItem?.originalItem?.sku ?: currentPickItem?.sku ?: "",
 				substitutedSku = if (currentPickItem?.originalItem != null) currentPickItem?.sku else null,
 				scannedUpc = upc,
 				pickedQty = 1,
 				pickedLocation = pickLocation
 			)
-			pickTask = when (
-				val res = pickService?.pickItem(req = pickItemRequest)
-			) {
+			val res = pickService?.pickItem(req = pickItemRequest)
+			when (res) {
 				is Result.Success -> {
 					recordPickState = GenericViewState.Success
-					res.data
+					if (pickTask != null) {
+						pickTask = res.data
+					} else {
+						sfsPickTask = res.data
+					}
 				}
 
 				is Result.Error -> {
 					recordPickState = GenericViewState.Failure
-					null
 				}
 
 				null -> TODO()
@@ -241,6 +310,7 @@ open class PickViewModel @Inject constructor(
 
 	fun resetPickState() {
 		pickTask = null
+		sfsPickTask = null
 		viewState = GenericViewState.Success
 	}
 

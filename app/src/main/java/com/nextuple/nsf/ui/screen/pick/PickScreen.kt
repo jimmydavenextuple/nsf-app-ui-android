@@ -168,6 +168,7 @@ fun PickScreen(
 					storeOverviewState = storeOverviewState,
 					startTaskStatus = pickVM.startPickState,
 					onStartPicking = pickVM::startPick,
+					onStartSfsPicking = pickVM::startSfsPick,
 					startTaskCompletion = pickVM::resetPickScreen,
 					resetScreen = {
 						pickVM.resetPickScreen()
@@ -189,6 +190,7 @@ fun PickLanding(
 	storeOverviewState: GenericViewState,
 	startTaskStatus: GenericViewState,
 	onStartPicking: () -> Unit,
+	onStartSfsPicking: () -> Unit,
 	startTaskCompletion: () -> Unit,
 	resetScreen: () -> Unit,
 	pickVM: PickViewModel
@@ -213,7 +215,7 @@ fun PickLanding(
 			Tab(
 				modifier = Modifier.weight(1f),
 				title = PickScreenTab.SFS.displayName,
-				count = 0,
+				count = pickVM.sfsTasks,
 				isSelected = selectedTab == PickScreenTab.SFS
 			) {
 				selectedTab = PickScreenTab.SFS
@@ -234,13 +236,13 @@ fun PickLanding(
 			)
 		} else {
 			SfsTabContainer(
-				tasksUnassigned,
+				pickVM.sfsTasks,
 				storeOverviewState,
 				startTaskStatus,
 				unitsWorked,
 				totalUnits,
 				inProgressUnits,
-				onStartPicking,
+				onStartSfsPicking,
 				startTaskCompletion,
 				resetScreen
 			)
@@ -491,6 +493,7 @@ fun PreviewPickLanding() {
 		storeOverviewState = GenericViewState.Idle,
 		startTaskStatus = GenericViewState.Idle,
 		onStartPicking = {},
+		onStartSfsPicking = {},
 		startTaskCompletion = {},
 		resetScreen = {},
 		pickVM = PickViewModel(null, null, null)
@@ -508,6 +511,7 @@ fun PreviewPickLandingStartPicking() {
 		storeOverviewState = GenericViewState.Success,
 		startTaskStatus = GenericViewState.Success,
 		onStartPicking = {},
+		onStartSfsPicking = {},
 		startTaskCompletion = {},
 		resetScreen = {},
 		pickVM = PickViewModel(null, null, null)
